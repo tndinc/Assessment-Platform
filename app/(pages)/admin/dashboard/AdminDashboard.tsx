@@ -27,7 +27,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import { useState } from "react";
 import Notification from "@/components/Notification";
-import UserIcon from "@/components/UserIcon";
+import UserIcon from "@/app/(pages)/admin/dashboard/components/UserIcon";
 import ManageCourse from "./dashboardSettings/ManageCourse";
 
 export const description =

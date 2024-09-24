@@ -25,7 +25,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Loading from "../components/Loading";
+import Loading from "../../../../../components/Loading";
 import AddCourse from "../components/AddCourse";
 
 const supabase = createClient();

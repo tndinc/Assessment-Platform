@@ -72,7 +72,7 @@ const AddCourse: React.FC<AddCourseProps> = ({ onCourseAdded }) => {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="default" className="gap-1">
+          <Button variant="bluelogin" className="gap-1">
             <PlusCircle className="h-3.5 w-3.5" />
             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
               Add Course
@@ -108,7 +108,9 @@ const AddCourse: React.FC<AddCourseProps> = ({ onCourseAdded }) => {
               Cancel
             </Button>
 
-            <Button onClick={handleAddCourse}>Add Course</Button>
+            <Button variant="bluelogin" onClick={handleAddCourse}>
+              Add Course
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -7,10 +7,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "./ui/button";
+import { Button } from "../../../../../components/ui/button";
 import { CircleUser } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
+
+const supabase = createClient();
 
 const UserIcon = () => {
+  const router = useRouter();
+  const handleLogout = () => {
+    sessionStorage.removeItem("admin_user");
+    router.push("/login");
+  };
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -25,7 +34,7 @@ const UserIcon = () => {
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuItem>Support</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
