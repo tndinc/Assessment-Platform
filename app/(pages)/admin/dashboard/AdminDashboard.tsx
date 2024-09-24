@@ -28,7 +28,7 @@ import { ModeToggle } from "@/components/ui/ModeToggle";
 import { useState } from "react";
 import Notification from "@/components/Notification";
 import UserIcon from "@/components/UserIcon";
-import ManageCourse from "./components/ManageCourse";
+import ManageCourse from "./dashboardSettings/ManageCourse";
 
 export const description =
   "A products dashboard with a sidebar navigation and a main content area.";
