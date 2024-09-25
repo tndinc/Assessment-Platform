@@ -29,6 +29,7 @@ import { useState } from "react";
 import Notification from "@/components/Notification";
 import UserIcon from "@/app/(pages)/admin/dashboard/components/UserIcon";
 import ManageCourse from "./dashboardSettings/ManageCourse";
+import ManageExam from "./dashboardSettings/ManageExam";
 
 export const description =
   "A products dashboard with a sidebar navigation and a main content area.";
@@ -43,7 +44,7 @@ export function AdminDashboard() {
       case "Manage Course":
         return <ManageCourse />;
       case "Manage Exam":
-        return <h1>Manage Exam</h1>;
+        return <ManageExam />;
       case "Students":
         return <h1>Students</h1>;
       case "Student Ranking by Exam":
