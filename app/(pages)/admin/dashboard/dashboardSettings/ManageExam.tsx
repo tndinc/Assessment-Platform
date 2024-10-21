@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Loading from "../../../../../components/Loading";
 import AddExam from "../components/AddExam";
+import { useRouter } from "next/navigation";
 
 const supabase = createClient();
 
@@ -48,6 +49,7 @@ interface Exam {
 
 const ManageExam = () => {
   const [exams, setExams] = useState<Exam[]>([]);
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -205,7 +207,11 @@ const ManageExam = () => {
                   <TableCell>
                     <Button
                       variant="bluelogin"
-                      onClick={() => console.log(`Manage exam ${exam.exam_id}`)}
+                      onClick={() => {
+                        router.push(
+                          `/admin/dashboard/dashboardSettings/${exam.exam_id}`
+                        );
+                      }}
                     >
                       Manage
                     </Button>

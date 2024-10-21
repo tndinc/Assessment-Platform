@@ -2,6 +2,21 @@
 import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export const description =
+  "A login form for admins with username and password inside a card. There is also a link to reset the password.";
 
 const Login = () => {
   const [adminUser, setAdminUser] = useState("");
@@ -33,41 +48,55 @@ const Login = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6">Admin Login</h2>
-        <form onSubmit={handleLogin}>
-          <div className="mb-4">
-            <label className="block text-gray-700">Username</label>
-            <input
-              type="text"
-              className="w-full p-2 border rounded mt-1"
-              value={adminUser}
-              onChange={(e) => setAdminUser(e.target.value)}
-              required
-            />
+    <div className="flex items-center justify-center h-screen">
+      <Card className="max-w-sm w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">Admin Login</CardTitle>
+          <CardDescription>
+            Enter your admin credentials to access the dashboard
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleLogin}>
+            <div className="grid gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="admin username"
+                  value={adminUser}
+                  onChange={(e) => setAdminUser(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="your password"
+                  value={adminPsw}
+                  onChange={(e) => setAdminPsw(e.target.value)}
+                  required
+                />
+              </div>
+              {errorMessage && (
+                <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
+              )}
+              <Button type="submit" className="w-full">
+                Log In
+              </Button>
+            </div>
+          </form>
+          <div className="mt-4 text-center text-sm">
+            Forgot your password?{" "}
+            <Link href="/reset-password" className="underline">
+              Reset it here
+            </Link>
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Password</label>
-            <input
-              type="password"
-              className="w-full p-2 border rounded mt-1"
-              value={adminPsw}
-              onChange={(e) => setAdminPsw(e.target.value)}
-              required
-            />
-          </div>
-          {errorMessage && (
-            <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
-          )}
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-          >
-            Log In
-          </button>
-        </form>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
