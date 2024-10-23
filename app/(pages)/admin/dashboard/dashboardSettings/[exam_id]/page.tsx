@@ -7,11 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle } from "lucide-react";
+
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import BackButton from "../../components/BackButton";
 import LoadingPage from "@/components/Loading";
+import ExamSection from "./ExamSection";
+import { PlusCircle } from "lucide-react";
+import AddTopic from "./AddTopic";
 
 const supabase = createClient();
 
@@ -33,6 +35,9 @@ interface Exam {
 }
 
 export default function ManageExamPage() {
+  const [topics, setTopics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const { exam_id } = useParams<{ exam_id: string }>();
   const router = useRouter();
   const [exam, setExam] = useState<Exam | null>(null);
@@ -92,9 +97,39 @@ export default function ManageExamPage() {
       }
     };
 
+    const fetchTopics = async () => {
+      const { data, error } = await supabase
+        .from("topic_tbl")
+        .select()
+        .eq("exam_id", exam_id); // Add this line to filter by exam_id
+      if (error) {
+        console.error("Error fetching topics:", error);
+      } else {
+        setTopics(data);
+      }
+      setLoading(false);
+    };
+
+    fetchTopics();
     fetchExamData();
     fetchCourses();
   }, [exam_id]);
+
+  const handleTopicAdded = () => {
+    // Fetch topics again after adding
+    const fetchUpdatedTopics = async () => {
+      const { data, error } = await supabase
+        .from("topic_tbl")
+        .select()
+        .eq("exam_id", exam_id);
+      if (error) {
+        console.error("Error fetching updated topics:", error);
+      } else {
+        setTopics(data);
+      }
+    };
+    fetchUpdatedTopics();
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -128,6 +163,7 @@ export default function ManageExamPage() {
   if (!exam) {
     return <LoadingPage />;
   }
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
       <div className="flex-grow flex flex-col p-4 space-y-4">
@@ -245,88 +281,11 @@ export default function ManageExamPage() {
         </Card>
 
         <div className="flex flex-grow space-x-4">
-          <Card className="w-48 shrink-0 bg-white dark:bg-gray-800 dark:text-white">
-            <CardHeader>
-              <CardTitle className="text-lg font-semibold dark:text-white">
-                Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col space-y-2">
-              <Button className="dark:bg-blue-500">
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Question
-              </Button>
-              <Button className="dark:bg-blue-500">
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Topic
-              </Button>
-            </CardContent>
-          </Card>
-          <Card className="flex-grow bg-white dark:bg-gray-800 dark:text-white">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold dark:text-white">
-                Exam Questions and Topics
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="topic1" className="w-full">
-                <TabsList className="justify-start mb-4 dark:bg-gray-700">
-                  <TabsTrigger value="topic1" className="dark:text-white">
-                    Topic 1
-                  </TabsTrigger>
-                  <TabsTrigger value="topic2" className="dark:text-white">
-                    Topic 2
-                  </TabsTrigger>
-                  <TabsTrigger value="topic3" className="dark:text-white">
-                    Topic 3
-                  </TabsTrigger>
-                </TabsList>
-                {["topic1", "topic2", "topic3"].map((topic, index) => (
-                  <TabsContent
-                    key={topic}
-                    value={topic}
-                    className="h-[calc(100vh-400px)] overflow-y-auto"
-                  >
-                    <h3 className="text-lg font-semibold mb-4 dark:text-white">
-                      Exam Questions for Topic {index + 1}
-                    </h3>
-                    {Array.from({ length: 10 }).map((_, qIndex) => (
-                      <Card
-                        key={qIndex}
-                        className="mb-4 bg-gray-100 dark:bg-gray-700 dark:text-white"
-                      >
-                        <CardHeader>
-                          <CardTitle className="text-base dark:text-white">
-                            Question {qIndex + 1}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
-                            This is a placeholder for question {qIndex + 1}{" "}
-                            content.
-                          </p>
-                          <div className="mt-2 flex justify-end space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="dark:text-white"
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="dark:text-white"
-                            >
-                              Delete
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </TabsContent>
-                ))}
-              </Tabs>
-            </CardContent>
-          </Card>
+          {topics.length === 0 ? (
+            <AddTopic examId={exam_id} onTopicAdded={handleTopicAdded} />
+          ) : (
+            <ExamSection />
+          )}
         </div>
       </div>
     </div>
