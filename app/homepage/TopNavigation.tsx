@@ -25,7 +25,7 @@ export default function TopNavigation() {
       <div className="container flex h-16 items-center justify-between space-x-4 sm:space-x-0">
         <div className="flex items-center space-x-4">
           <Link href="/">
-            <span className="text-2xl font-bold">Logo</span>
+            <span className="text-2xl font-bold">TND</span>
           </Link>
         </div>
         <nav className="hidden md:flex space-x-4">

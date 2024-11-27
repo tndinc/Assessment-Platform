@@ -1,11 +1,13 @@
 import Image from "next/image";
 import TopNavigation from "./homepage/TopNavigation";
+import Hero from "./homepage/hero";
 
 export default function Home() {
   return (
     <>
       <div className="flex flex-col min-h-screen">
         <TopNavigation />
+        <Hero />
         {/* Main Content
         <main className="flex-1">
           <section className="container grid items-center gap-6 pb-8 pt-6 md:py-10">
