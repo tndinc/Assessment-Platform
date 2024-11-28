@@ -16,6 +16,12 @@ const config: Config = {
 			blueLight: '#B3C8CF', 
 			creamDark: '#E5E1DA',
 			creamLight: '#F1F0E8',
+			newDarkBlue: '#243642',
+			newDarkGreen: '#387478',
+			newLightGreen: '#629584',
+			newLightCream: '#ECDFCC',
+			navbarLight: '#9A7E6F',
+			navbarDark: '#54473F',
 
   			card: {
   				DEFAULT: 'hsl(var(--card))',

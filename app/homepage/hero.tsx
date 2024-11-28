@@ -39,7 +39,7 @@ export default function HeroLandingPage() {
   }
 
   return (
-    <div className="min-h-screen text-foreground bg-creamLight dark:bg-creamDark">
+    <div className="min-h-screen text-foreground bg-creamLight dark:bg-newDarkBlue">
 
       {/* Hero Section */}
       <section className="py-20">
@@ -56,25 +56,52 @@ export default function HeroLandingPage() {
                 Start free trial
               </Button>
             </div>
-            <div className="relative h-[400px] bg-muted rounded-lg mt-16">
-              {/* Placeholder for hero image */}
-              <Image
-                src="/placeholder.svg?height=400&width=600"
-                alt="Hero illustration"
-                fill
-                className="object-cover rounded-lg"
-              />
+            <div className="relative bg-muted rounded-lg mt-16">
+            <Card className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="relative aspect-video">
+                  <Image
+                    src={images[currentImageIndex]}
+                    alt={`Unique Feature of System ${currentImageIndex + 1}`}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    priority
+                  />
+                </div>
+              </CardContent>
+            </Card>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="absolute top-1/2 left-4 -translate-y-1/2 bg-background/50 hover:bg-background/75"
+              onClick={goToPreviousImage}
+              aria-label="Previous image"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="icon" 
+              className="absolute top-1/2 right-4 -translate-y-1/2 bg-background/50 hover:bg-background/75"
+              onClick={goToNextImage}
+              aria-label="Next image"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Carousel Section */}
-      <section className="py-20 bg-muted">
+      <section className="py-20 bg-creamLight dark:bg-newDarkBlue">
         <div className="container mx-auto px-4 flex flex-col items-center">
           <h2 className="text-4xl font-bold mb-8 text-center">
-            Online Assessment Platform
+            ABOUT US
           </h2>
+          <h4 className="text-sm font-bold mb-8 text-center">
+            TND IS AN EKLAVUVU
+          </h4>
           <div className="relative w-full max-w-2xl">
             <Card className="overflow-hidden">
               <CardContent className="p-0">

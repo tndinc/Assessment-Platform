@@ -22,7 +22,7 @@ export default function TopNavigation() {
   ];
 
   return (
-    <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+    <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-navbarLight dark:bg-newDarkGreen px-4 md:px-6">
       <div className="container flex h-16 items-center justify-between space-x-4 sm:space-x-0">
         <div className="flex items-center space-x-4">
           <Link href="/">
