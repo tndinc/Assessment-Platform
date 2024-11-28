@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 import LoginModal from "./components/LoginModal";
+import Image from "next/image";
 
 export default function TopNavigation() {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -25,7 +26,13 @@ export default function TopNavigation() {
       <div className="container flex h-16 items-center justify-between space-x-4 sm:space-x-0">
         <div className="flex items-center space-x-4">
           <Link href="/">
-            <span className="text-2xl font-bold">TND</span>
+            <Image
+              src="/TND.png"
+              alt="TND Logo"
+              width={50}
+              height={50}
+              className="cursor-pointer"
+            />
           </Link>
         </div>
         <nav className="hidden md:flex space-x-4">
@@ -37,13 +44,8 @@ export default function TopNavigation() {
             </Button>
           ))}
         </nav>
-        <div className="flex items-center space-x-4 ">
+        <div className="flex items-center space-x-4">
           <ModeToggle />
-          {/* <Button asChild>
-            <Link href="/login">
-              <LogIn className="mr-2 h-4 w-4" /> Login
-            </Link>
-          </Button> */}
           <LoginModal />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
@@ -53,7 +55,7 @@ export default function TopNavigation() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <div className="flex flex-col space-y-4 ">
+              <div className="flex flex-col space-y-4">
                 {navItems.map((item) => (
                   <Button
                     key={item.name}
