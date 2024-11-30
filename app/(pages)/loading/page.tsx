@@ -25,7 +25,7 @@ export default function loading() {
           }, 2000); // Redirect after 2 seconds
         } else {
           setTimeout(() => {
-            window.location.href = "/adashboard"; // Redirect to /adashboard
+            window.location.href = "/anonDashboard"; // Redirect to /adashboard
           }, 2000); // Redirect after 2 seconds
         }
       } catch (error) {
