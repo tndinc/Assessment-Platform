@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import supabase from "@/components/supabase";
+
 import {
   Dialog,
   DialogContent,
@@ -48,6 +50,20 @@ export default function LoginModal() {
     setIsOpen(false);
   };
 
+  const login = async () => {
+    try {
+      let { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: 'http://localhost:3000//loading',
+        },
+      })
+  
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -66,7 +82,7 @@ export default function LoginModal() {
           <Button
             variant="outline"
             className="w-full max-w-sm"
-            onClick={handleGoogleLogin}
+            onClick={login}
           >
             <GoogleIcon />
             Log in with Google
