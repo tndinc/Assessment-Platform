@@ -16,17 +16,17 @@ const AdminDashboard = () => {
           data: { user },
           error,
         } = await supabase.auth.getUser();
-        console.log("Fetched user:", user);  // Debugging: log the user object to check its contents
+        console.log("Fetched user:", user);  
 
         if (error) {
           console.error("Error fetching user:", error.message);
           setFetchError("Error fetching user");
         }
 
-        setUser(user);  // Set the user state if the user data is available
+        setUser(user); 
       } catch (error) {
         setFetchError("Error fetching user");
-        console.error("Unexpected error fetching user:", error);  // Log any unexpected errors
+        console.error("Unexpected error fetching user:", error); 
       }
     };
 

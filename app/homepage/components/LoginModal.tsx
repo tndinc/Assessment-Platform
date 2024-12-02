@@ -40,7 +40,7 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function LoginModal() {
+export default function LoginModal() { 
   const [isOpen, setIsOpen] = useState(false);
 
   const handleGoogleLogin = async () => {
@@ -50,9 +50,9 @@ export default function LoginModal() {
     setIsOpen(false);
   };
 
-  const login = async () => {
-    try {
-      let { data, error } = await supabase.auth.signInWithOAuth({
+  const login = async () => { // handling user authentication with google
+    try { // try catch block for d process
+      let { data, error } = await supabase.auth.signInWithOAuth({ // redirect eme eme 
         provider: 'google',
         options: {
             redirectTo: 'http://localhost:3000//loading',

@@ -7,25 +7,25 @@ import { Loader2 } from "lucide-react";
 
 export default function loading() {
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null); // stores the authenticated user fetched from supabase ; null - wala pa logged in from the start
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const {
           data: { user },
-        } = await supabase.auth.getUser();
+        } = await supabase.auth.getUser(); // supabase method to fetch the authenticated user
 
-        setUser(user);
+        setUser(user); // update the user state 
 
         // Check if user's email is equal to the specified email
         if (user && user.email === "olympia.francheska.2@gmail.com") {
           setTimeout(() => {
-            window.location.href = "/adminDashboard"; // Redirect to /dashboard
+            window.location.href = "/adminDashboard"; // Redirect to ....
           }, 2000); // Redirect after 2 seconds
         } else {
           setTimeout(() => {
-            window.location.href = "/anonDashboard"; // Redirect to /adashboard
+            window.location.href = "/anonDashboard"; // Redirect to ....
           }, 2000); // Redirect after 2 seconds
         }
       } catch (error) {
