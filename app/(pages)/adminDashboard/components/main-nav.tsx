@@ -7,11 +7,10 @@ import { useTheme } from "next-themes";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
-import LoginModal from "./components/LoginModal";
 import Image from "next/image";
+import { UserNav } from "./user-nav";
 
-export default function TopNavigation() {
+export function MainNav() {
   const [isOpen, setIsOpen] = React.useState(false);
   const { setTheme } = useTheme();
 
@@ -37,7 +36,12 @@ export default function TopNavigation() {
         </div>
         <nav className="hidden md:flex space-x-4">
           {navItems.map((item) => (
-            <Button key={item.name} variant="ghost" asChild>
+            <Button 
+              key={item.name} 
+              variant="ghost" 
+              asChild
+              className="hover:bg-white dark:hover:bg-slate-800 transition-colors"
+            >
               <Link href={item.href} className="flex items-center">
                 {item.name}
               </Link>
@@ -46,7 +50,7 @@ export default function TopNavigation() {
         </nav>
         <div className="flex items-center space-x-4">
           <ModeToggle />
-          <LoginModal />
+          <UserNav />
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -77,3 +81,4 @@ export default function TopNavigation() {
     </header>
   );
 }
+

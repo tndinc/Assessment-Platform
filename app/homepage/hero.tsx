@@ -39,7 +39,7 @@ export default function HeroLandingPage() {
   }
 
   return (
-    <div className="min-h-screen text-foreground bg-creamLight dark:bg-creamDark">
+    <div className="min-h-screen text-foreground bg-creamLight dark:bg-newDarkBlue">
 
       {/* Hero Section */}
       <section className="py-20">
@@ -56,26 +56,7 @@ export default function HeroLandingPage() {
                 Start free trial
               </Button>
             </div>
-            <div className="relative h-[400px] bg-muted rounded-lg mt-16">
-              {/* Placeholder for hero image */}
-              <Image
-                src="/placeholder.svg?height=400&width=600"
-                alt="Hero illustration"
-                fill
-                className="object-cover rounded-lg"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Carousel Section */}
-      <section className="py-20 bg-muted">
-        <div className="container mx-auto px-4 flex flex-col items-center">
-          <h2 className="text-4xl font-bold mb-8 text-center">
-            Online Assessment Platform
-          </h2>
-          <div className="relative w-full max-w-2xl">
+            <div className="relative bg-muted rounded-lg mt-16">
             <Card className="overflow-hidden">
               <CardContent className="p-0">
                 <div className="relative aspect-video">
@@ -107,6 +88,52 @@ export default function HeroLandingPage() {
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section className="py-20 bg-creamLight dark:bg-newDarkBlue">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center max-w-3xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold leading-tight mb-6">
+              About Us
+            </h2>
+            <div className="space-y-4 mb-12">
+              <p className="text-lg text-muted-foreground">
+                With over a decade of experience in educational technology, we're passionate about transforming the way assessments are conducted in the digital age.
+              </p>
+              <p className="text-lg text-muted-foreground">
+                Our platform combines cutting-edge technology with user-friendly design to create an assessment experience that's both powerful and intuitive.
+              </p>
+              <div className="grid grid-cols-2 gap-6 pt-4 max-w-md mx-auto">
+                <div>
+                  <h3 className="text-2xl font-bold text-primary">10+</h3>
+                  <p className="text-muted-foreground">Years of Experience</p>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-primary">50K+</h3>
+                  <p className="text-muted-foreground">Assessments Delivered</p>
+                </div>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              size="lg"
+              className="mb-12"
+            >
+              Learn More About Us
+            </Button>
+            <div className="relative h-[500px] w-full max-w-2xl bg-background rounded-lg overflow-hidden">
+              <Image
+                src="/placeholder.svg?height=500&width=600&text=Team+Image"
+                alt="Our team at work"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
         </div>
       </section>

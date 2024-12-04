@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import supabase from "@/components/supabase";
+
 import {
   Dialog,
   DialogContent,
@@ -38,7 +40,7 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function LoginModal() {
+export default function LoginModal() { 
   const [isOpen, setIsOpen] = useState(false);
 
   const handleGoogleLogin = async () => {
@@ -47,6 +49,20 @@ export default function LoginModal() {
     // After successful login, close the modal
     setIsOpen(false);
   };
+
+  const login = async () => { // handling user authentication with google
+    try { // try catch block for d process
+      let { data, error } = await supabase.auth.signInWithOAuth({ // redirect eme eme 
+        provider: 'google',
+        options: {
+            redirectTo: 'http://localhost:3000//loading',
+        },
+      })
+  
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -66,7 +82,7 @@ export default function LoginModal() {
           <Button
             variant="outline"
             className="w-full max-w-sm"
-            onClick={handleGoogleLogin}
+            onClick={login}
           >
             <GoogleIcon />
             Log in with Google

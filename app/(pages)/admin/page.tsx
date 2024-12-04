@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { AdminDashboard } from "./dashboard/AdminDashboard";
+import { AdminDashboard } from "./dashboard/page";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import LoadingPage from "../../../components/Loading";
