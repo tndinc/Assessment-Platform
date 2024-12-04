@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import supabase from "@/components/supabase";
 import { User } from "@supabase/supabase-js";
-import UserInfo from "@/components/UserInfo"; // Import UserInfo component
+import { Layout } from "./components/Layout";
+
 
 const AdminDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -32,20 +33,12 @@ const AdminDashboard = () => {
 
     fetchUser();
   }, []);
+return(<>
+<Layout user={user}></Layout>
+</>)
+  
+    
 
-  return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold text-foreground mt-4"> DI KA ADMIN BEH</h1>
-
-      {/* Display User Info */}
-      <UserInfo user={user} />
-
-      {/* Other admin dashboard content */}
-      <p className="mt-4 text-muted-foreground">
-        You can manage users and settings here.
-      </p>
-    </div>
-  );
 };
 
 export default AdminDashboard;

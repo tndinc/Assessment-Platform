@@ -19,13 +19,13 @@ export default function loading() {
         setUser(user); // update the user state 
 
         // Check if user's email is equal to the specified email
-        if (user && user.email === "olympia.francheska.2@gmail.com") {
+        if (user && user.email === "tnd.incorporation@gmail.com") {
           setTimeout(() => {
             window.location.href = "/adminDashboard"; // Redirect to ....
           }, 2000); // Redirect after 2 seconds
         } else {
           setTimeout(() => {
-            window.location.href = "/anonDashboard"; // Redirect to ....
+            window.location.href = "/userDashboard"; // Redirect to ....
           }, 2000); // Redirect after 2 seconds
         }
       } catch (error) {

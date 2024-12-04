@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import supabase from "@/components/supabase";
 import { User } from "@supabase/supabase-js";
-import UserInfo from "@/components/UserInfo"; // Import UserInfo component
+
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MainNav } from "./components/main-nav"
@@ -75,10 +75,9 @@ const AdminDashboard = () => {
         <aside className="lg:w-1/5 ">
           <SidebarNav items={sidebarNavItems} />
         </aside>
+
         <div className="flex-1 lg:max-w-4xl">
-          <div className="flex items-center justify-between space-y-2">
-            <h2 className="text-3xl font-bold tracking-tight">Welcome back, <UserInfo user={user} /></h2>
-          </div>
+          
           <Tabs defaultValue="overview" className="mt-8">
             <TabsList>
               <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -116,6 +115,7 @@ const AdminDashboard = () => {
             </TabsContent>
           </Tabs>
         </div>
+
       </div>
     </div>
   </div>
