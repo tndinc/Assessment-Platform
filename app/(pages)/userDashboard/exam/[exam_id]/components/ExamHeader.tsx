@@ -1,6 +1,12 @@
-import { formatTime } from "./FormatTime" 
+import { formatTime } from "./FormatTime";
 
-export default function ExamHeader({ title, timeRemaining, instructions }) {
+interface ExamHeaderProps {
+  title: string;
+  timeRemaining: number; // Assuming `timeRemaining` is a number (e.g., seconds)
+  instructions: string;
+}
+
+export default function ExamHeader({ title, timeRemaining, instructions }: ExamHeaderProps) {
   return (
     <header className="bg-white shadow-md p-2 md:p-4">
       <div className="container mx-auto">
@@ -13,6 +19,5 @@ export default function ExamHeader({ title, timeRemaining, instructions }) {
         <p className="text-xs md:text-sm text-gray-600">{instructions}</p>
       </div>
     </header>
-  )
+  );
 }
-

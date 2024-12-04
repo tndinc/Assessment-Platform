@@ -40,9 +40,9 @@ export function Sidebar({ open, onClose, activeItem, setActiveItem }: SidebarPro
   }, [])
 
   // Extract user profile info
-  const userName = user?.user_metadata?.full_name || "John Doe"
-  const userEmail = user?.email || "john.doe@example.com"
-  const profilePicture = user?.user_metadata?.avatar_url || ""
+  const userName = user?.user_metadata?.full_name || 'User profile data loading...'
+  const userEmail = user?.email 
+  const profilePicture = user?.user_metadata?.avatar_url
 
   const sidebarContent = (
     <div className="flex h-full flex-col gap-4 p-4">

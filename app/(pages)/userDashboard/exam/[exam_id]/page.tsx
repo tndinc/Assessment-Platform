@@ -8,6 +8,8 @@ import QuestionDisplay from './components/QuestionsDisplay'
 import ProgressBar from './components/ProgressBar'
 import SubmitButton from './components/SubmitButton'
 
+
+
 const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
   const { exam_id } = params
   const supabase = createClient()
@@ -81,9 +83,11 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
     return () => clearInterval(timer)
   }, [])
 
-  const handleAnswer = (questionId, answer) => {
-    setAnswers((prevAnswers) => ({ ...prevAnswers, [questionId]: answer }))
-  }
+  const handleAnswer = (questionId: string | number, answer: string): void => {
+    setAnswers((prevAnswers) => ({ ...prevAnswers, [questionId]: answer }));
+  };
+  
+  
 
   const handleSubmit = () => {
     setIsSubmitted(true)
