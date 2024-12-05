@@ -1,4 +1,4 @@
-import supabase from "@/components/supabase";
+import supabase from "@/supabase";
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { Loader2 } from 'lucide-react'

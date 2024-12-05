@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import supabase from "@/components/supabase";
+import supabase from "@/supabase";
 
 import {
   Dialog,
