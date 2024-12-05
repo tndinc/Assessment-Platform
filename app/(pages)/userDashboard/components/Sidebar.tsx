@@ -40,8 +40,8 @@ export function Sidebar({ open, onClose, activeItem, setActiveItem }: SidebarPro
   }, [])
 
   // Extract user profile info
-  const userName = user?.user_metadata?.full_name || "John Doe"
-  const userEmail = user?.email || "john.doe@example.com"
+  const userName = user?.user_metadata?.full_name || "loading user data"
+  const userEmail = user?.email
   const profilePicture = user?.user_metadata?.avatar_url || ""
 
   const sidebarContent = (

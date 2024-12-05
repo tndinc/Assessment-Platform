@@ -1,6 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-export default function QuestionDisplay({ question, answer, onAnswer, isSubmitted }) {
+// Define types for the question and its choices
+interface Choice {
+  question_txt: string; // Text of the choice
+}
+
+interface Question {
+  question_id: string | number; // ID of the question
+  question_desc: string; // Description or text of the question
+  choices?: Choice[]; // Array of choices (optional)
+}
+
+interface QuestionDisplayProps {
+  question: Question | null; // The current question (nullable)
+  answer: string | null; // The currently selected answer
+  onAnswer: (questionId: string | number, answer: string) => void; // Function to handle answer selection
+  isSubmitted: boolean; // Whether the question is submitted
+}
+
+export default function QuestionDisplay({
+  question,
+  answer,
+  onAnswer,
+  isSubmitted,
+}: QuestionDisplayProps) {
   const [timeSpent, setTimeSpent] = useState(0);
 
   useEffect(() => {
@@ -13,7 +36,7 @@ export default function QuestionDisplay({ question, answer, onAnswer, isSubmitte
   }, [question?.question_id]); // Optional chaining to avoid runtime errors
 
   const renderChoices = () => {
-    if (!question.choices || question.choices.length === 0) {
+    if (!question?.choices || question.choices.length === 0) {
       return <div>No choices available for this question.</div>;
     }
 
