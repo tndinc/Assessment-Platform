@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { User } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
-import supabase from "@/components/supabase"
+import supabase from "@/supabase"
 import TakeExam from './dashboardSettings/takeExams/page'
 
 interface SidebarProps {

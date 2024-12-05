@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import supabase from "@/components/supabase";
+import supabase from "@/supabase";
 import { User } from "@supabase/supabase-js";
 import { Layout } from "./components/Layout";
 
