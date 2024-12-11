@@ -36,5 +36,9 @@ export function LoginDialog() {
       </DialogContent>
     </Dialog>
   )
+<<<<<<< HEAD
 }
 
+=======
+}
+>>>>>>> cheska
