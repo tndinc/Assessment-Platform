@@ -1,48 +1,57 @@
-import { LayoutDashboard, BookOpen, History, Layers } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent } from "@/components/ui/sheet"
-import { User } from '@supabase/supabase-js'
-import { useEffect, useState } from 'react'
-import supabase from "@/supabase"
-import TakeExam from './dashboardSettings/takeExams/page'
+import { LayoutDashboard, BookOpen, History, Layers } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { User } from "@supabase/supabase-js";
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import TakeExam from "./dashboardSettings/takeExams/page";
+const supabase = createClient();
 
 interface SidebarProps {
-  open: boolean
-  onClose: () => void
-  activeItem: string
-  setActiveItem: (item: string) => void
+  open: boolean;
+  onClose: () => void;
+  activeItem: string;
+  setActiveItem: (item: string) => void;
 }
 
 const navItems = [
-  { name: 'Dashboard', icon: LayoutDashboard },
-  { name: 'Take Exam', icon: BookOpen },
-  { name: 'History', icon: History },
-  { name: 'Subject', icon: Layers },
-]
+  { name: "Dashboard", icon: LayoutDashboard },
+  { name: "Take Exam", icon: BookOpen },
+  { name: "History", icon: History },
+  { name: "Subject", icon: Layers },
+];
 
-export function Sidebar({ open, onClose, activeItem, setActiveItem }: SidebarProps) {
-  const [user, setUser] = useState<User | null>(null)
+export function Sidebar({
+  open,
+  onClose,
+  activeItem,
+  setActiveItem,
+}: SidebarProps) {
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser()
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
         if (error) {
-          console.error("Error fetching user:", error.message)
+          console.error("Error fetching user:", error.message);
         }
-        setUser(user)
+        setUser(user);
       } catch (error) {
-        console.error("Unexpected error fetching user:", error)
+        console.error("Unexpected error fetching user:", error);
       }
-    }
+    };
 
-    fetchUser()
-  }, [])
+    fetchUser();
+  }, []);
 
   // Extract user profile info
-  const userName = user?.user_metadata?.full_name || "loading user data"
-  const userEmail = user?.email
-  const profilePicture = user?.user_metadata?.avatar_url || ""
+  const userName = user?.user_metadata?.full_name || "loading user data";
+  const userEmail = user?.email;
+  const profilePicture = user?.user_metadata?.avatar_url || "";
 
   const sidebarContent = (
     <div className="flex h-full flex-col gap-4 p-4">
@@ -73,18 +82,18 @@ export function Sidebar({ open, onClose, activeItem, setActiveItem }: SidebarPro
         ))}
       </nav>
     </div>
-  )
+  );
 
   const renderContent = () => {
     switch (activeItem) {
       case "Dashboard":
-        return <h1>Dashboard</h1>
+        return <h1>Dashboard</h1>;
       case "Take Exam":
-        return <TakeExam/>
+        return <TakeExam />;
       default:
-        return <div>Select an option from the sidebar</div>
+        return <div>Select an option from the sidebar</div>;
     }
-  }
+  };
 
   return (
     <>
@@ -101,9 +110,7 @@ export function Sidebar({ open, onClose, activeItem, setActiveItem }: SidebarPro
       </Sheet>
 
       {/* Content Section */}
-      <div className="flex-1 p-4">
-        {renderContent()}
-      </div>
+      <div className="flex-1 p-4">{renderContent()}</div>
     </>
-  )
+  );
 }

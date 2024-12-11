@@ -1,9 +1,11 @@
 "use client";
 
-import supabase from "@/supabase";
+import { createClient } from "@/utils/supabase/client";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { Loader2 } from "lucide-react";
+
+const supabase = createClient();
 
 export default function loading() {
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -16,7 +18,7 @@ export default function loading() {
           data: { user },
         } = await supabase.auth.getUser(); // supabase method to fetch the authenticated user
 
-        setUser(user); // update the user state 
+        setUser(user); // update the user state
 
         // Check if user's email is equal to the specified email
         if (user && user.email === "tnd.incorporation@gmail.com") {
