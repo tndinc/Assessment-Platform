@@ -11,7 +11,7 @@ export default function CTASection() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="w-full py-20 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
+    <section className="w-full py-20 bg-[#ECEBDE] dark:bg-[#344955] relative overflow-hidden">
       <div className="w-full max-w-[2000px] mx-auto px-4 md:px-6 text-center relative z-10">
         <motion.div
           ref={ref}
@@ -27,7 +27,7 @@ export default function CTASection() {
           </p>
           <Button
             size="lg"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-[#C7B198] hover:bg-[#8E806A] text-white dark:bg-[#31304D] dark:hover:bg-[#201E43]"
           >
             Sign Up Now
           </Button>

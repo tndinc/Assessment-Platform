@@ -30,7 +30,7 @@ const features = [
 
 export default function FeaturesSection() {
   return (
-    <section className="w-full py-20 bg-gray-100 dark:bg-gray-800">
+    <section className="w-full py-20 bg-[#ECEBDE] dark:bg-[#344955]">
       <div className="w-full max-w-[2000px] mx-auto px-4 md:px-6">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
           Our Features
@@ -52,7 +52,7 @@ function FeatureCard({ icon: Icon, title, description, image, index }) {
   return (
     <motion.div
       ref={ref}
-      className="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-md"
+      className="bg-[#F0ECE3] dark:bg-[#35374B] p-6 rounded-lg shadow-md"
       initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
       animate={
         isInView
@@ -62,7 +62,7 @@ function FeatureCard({ icon: Icon, title, description, image, index }) {
       transition={{ duration: 0.5, delay: index * 0.2 }}
     >
       <div className="flex flex-col items-center">
-        <Icon className="w-12 h-12 text-blue-600 dark:text-blue-400 mb-4" />
+        <Icon className="w-12 h-12 text-[#8E806A] dark:text-[#7C81AD] mb-4" />
         <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
           {title}
         </h3>

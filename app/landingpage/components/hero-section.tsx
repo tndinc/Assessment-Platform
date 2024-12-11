@@ -6,7 +6,7 @@ import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="min-h-screen w-full flex items-center justify-center bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+    <section className="min-h-screen w-full flex items-center justify-center bg-creamLight dark:bg-newDarkBlue text-gray-900 dark:text-white">
       <div className="w-full max-w-[2000px] mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center">
         <div className="md:w-1/2 text-center md:text-left mb-8 md:mb-0">
           <motion.h1
@@ -32,7 +32,7 @@ export default function HeroSection() {
           >
             <Button
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-[#C7B198] hover:bg-[#8E806A] text-white dark:bg-[#31304D] dark:hover:bg-[#201E43]"
             >
               Get Started
             </Button>

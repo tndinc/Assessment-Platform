@@ -36,9 +36,11 @@ export default function Header() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-            YourBrand
-          </h1>
+          <img
+            src="/TND.png" // path to your logo image in the public folder
+            alt="Your Brand"
+            className="h-10 md:h-10" // adjust size of the logo
+          />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, x: 20 }}
