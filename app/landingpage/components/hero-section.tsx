@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
-import Image from 'next/image'
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function HeroSection() {
   return (
-    <section className="min-h-screen flex border-4 items-center justify-center bg-background text-foreground">
-      <div className="container flex flex-col md:flex-row items-center">
+    <section className="min-h-screen w-full flex items-center justify-center bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+      <div className="w-full max-w-[2000px] mx-auto px-4 md:px-6 flex flex-col md:flex-row items-center">
         <div className="md:w-1/2 text-center md:text-left mb-8 md:mb-0">
           <motion.h1
             className="text-5xl font-bold mb-6"
@@ -18,7 +18,7 @@ export default function HeroSection() {
             Welcome to the Future
           </motion.h1>
           <motion.p
-            className="text-xl mb-8"
+            className="text-xl mb-8 text-gray-600 dark:text-gray-300"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -30,7 +30,12 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
           >
-            <Button size="lg">Get Started</Button>
+            <Button
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Get Started
+            </Button>
           </motion.div>
         </div>
         <motion.div
@@ -49,6 +54,5 @@ export default function HeroSection() {
         </motion.div>
       </div>
     </section>
-  )
+  );
 }
-

@@ -1,52 +1,55 @@
-"use client"
+"use client";
 
-import { ThemeToggle } from "@/components/theme-toggle"
-import { LoginDialog } from "@/components/login-dialog"
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
+import { ThemeToggle } from "@/components/theme-toggle";
+import { LoginDialog } from "@/components/login-dialog";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
+      setIsScrolled(window.scrollY > 20);
+    };
 
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleScroll)
-    }
-  }, [])
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 px-10 py-4 transition-colors duration-300 ${
-        isScrolled ? "bg-background/80 backdrop-blur-md" : "bg-transparent"
+      className={`fixed top-0 left-0 right-0 z-50 py-2 md:py-4 transition-colors duration-300 ${
+        isScrolled
+          ? "bg-white/80 dark:bg-gray-800/80 backdrop-blur-md"
+          : "bg-transparent"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
-      <div className="container flex items-center justify-between">
+      <div className="w-full max-w-[2000px] mx-auto px-4 md:px-6 flex items-center justify-between">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h1 className="text-2xl font-bold">YourBrand</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+            YourBrand
+          </h1>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex items-center space-x-4"
+          className="flex items-center space-x-2 md:space-x-4"
         >
           <ThemeToggle />
           <LoginDialog />
         </motion.div>
       </div>
     </motion.header>
-  )
+  );
 }
-

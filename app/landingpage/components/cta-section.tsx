@@ -1,27 +1,34 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
-import { useInView } from "framer-motion"
-import { useRef } from "react"
-import Image from "next/image"
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
+import Image from "next/image";
 
 export default function CTASection() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section className="px-20 py-20 bg-muted relative overflow-hidden">
-      <div className="container text-center relative z-10">
+    <section className="w-full py-20 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
+      <div className="w-full max-w-[2000px] mx-auto px-4 md:px-6 text-center relative z-10">
         <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-xl mb-8">Join thousands of satisfied users today!</p>
-          <Button size="lg">
+          <h2 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+            Ready to Get Started?
+          </h2>
+          <p className="text-xl mb-8 text-gray-600 dark:text-gray-300">
+            Join thousands of satisfied users today!
+          </p>
+          <Button
+            size="lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
             Sign Up Now
           </Button>
         </motion.div>
@@ -29,7 +36,9 @@ export default function CTASection() {
       <motion.div
         className="absolute inset-0 z-0"
         initial={{ opacity: 0, scale: 1.1 }}
-        animate={isInView ? { opacity: 0.2, scale: 1 } : { opacity: 0, scale: 1.1 }}
+        animate={
+          isInView ? { opacity: 0.2, scale: 1 } : { opacity: 0, scale: 1.1 }
+        }
         transition={{ duration: 1 }}
       >
         <Image
@@ -41,6 +50,5 @@ export default function CTASection() {
         />
       </motion.div>
     </section>
-  )
+  );
 }
-
