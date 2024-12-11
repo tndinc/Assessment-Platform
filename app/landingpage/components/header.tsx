@@ -1,7 +1,7 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LoginDialog } from "@/components/login-dialog"
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 
@@ -21,7 +21,7 @@ export default function Header() {
 
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 py-4 px-10 transition-colors duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 px-10 py-4 transition-colors duration-300 ${
         isScrolled ? "bg-background/80 backdrop-blur-md" : "bg-transparent"
       }`}
       initial={{ y: -100 }}
@@ -43,9 +43,10 @@ export default function Header() {
           className="flex items-center space-x-4"
         >
           <ThemeToggle />
-          <Button variant="outline">Log In</Button>
+          <LoginDialog />
         </motion.div>
       </div>
     </motion.header>
   )
 }
+
