@@ -244,13 +244,31 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
               <p className="text-2xl font-semibold text-gray-800">
                 Your Total Score
               </p>
-              <p className="text-5xl font-bold text-blue-600 mt-2">{score}</p>
+              <p className="text-5xl font-bold text-blue-600 mt-2">
+                {score} /{" "}
+                {Object.values(topicScores).reduce(
+                  (acc, { total }) => acc + total,
+                  0
+                )}
+              </p>
+              <p className="text-lg font-medium text-gray-700 mt-2">
+                {(
+                  (score /
+                    Object.values(topicScores).reduce(
+                      (acc, { total }) => acc + total,
+                      0
+                    )) *
+                  100
+                ).toFixed(2)}
+                %
+              </p>
             </div>
             <div className="grid gap-4 mb-6">
               {Object.entries(topicScores).map(([topic, { score, total }]) => {
+                // Find the topic title using topic_id from questions
                 const topicTitle =
-                  questions.find((q) => q.topic_id === topic)?.topic_title ||
-                  `Topic ${topic}`;
+                  questions.find((q) => q.topic_id.toString() === topic)
+                    ?.topic_title || `Topic ${topic}`; // Fallback in case topic title is not found
                 const percentage = (score / total) * 100;
                 return (
                   <div key={topic} className="bg-gray-50 p-4 rounded-lg">
