@@ -9,6 +9,7 @@ import ProgressBar from "./components/ProgressBar";
 import SubmitButton from "./components/SubmitButton";
 import OpenAI from "openai";
 import { User } from "@supabase/supabase-js";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,7 @@ const openai = new OpenAI({
 });
 
 const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
+  const router = useRouter(); // Initialize useRouter
   const { exam_id } = params;
   const supabase = createClient();
   const [examData, setExamData] = useState<any>(null);
@@ -337,6 +339,16 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
             </CardContent>
           </Card>
         )}
+                {/* Back Button */}
+                <div className="text-center mt-6">
+        <Button
+          variant="secondary"
+          onClick={() => router.push('/userDashboard')}
+          className="transition-all duration-300 ease-in-out transform hover:scale-105 bg-gray-900 text-white  hover:bg-gray-700 hover:text-white"
+        >
+          Back
+        </Button>
+      </div>
       </div>
     );
   }
