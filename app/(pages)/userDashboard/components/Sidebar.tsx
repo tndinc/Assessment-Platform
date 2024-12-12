@@ -98,7 +98,7 @@ export function Sidebar({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="bg-navbarLight/40 dark:bg-newDarkBlue/90 text-black dark:text-white">
+      <div className="bg-[#B2C8BA]/90 dark:bg-newDarkBlue/90 text-black dark:text-white">
         {sidebarContent}
       </div>
 
@@ -110,7 +110,7 @@ export function Sidebar({
       </Sheet>
 
       {/* Content Section */}
-      <div className="flex-1 p-4 bg-creamLight dark:bg-newDarkBlue">{renderContent()}</div>
+      <div className="flex-1 p-4 bg-[#B2C8BA]/80 dark:bg-newDarkBlue">{renderContent()}</div>
     </>
   );
 }

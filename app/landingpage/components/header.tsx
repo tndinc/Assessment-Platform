@@ -35,12 +35,14 @@ export default function Header() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
+          className="flex items-center"
         >
           <img
             src="/TND.png" // path to your logo image in the public folder
             alt="Your Brand"
             className="h-10 md:h-10" // adjust size of the logo
           />
+          <span className="mt-3 text-xl font-bold text-[#89A8B2] dark:text-[#89A8B2]">TND</span>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, x: 20 }}

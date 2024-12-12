@@ -22,7 +22,7 @@ export function Header({ user }: HeaderProps) {
   const profilePicture = user?.avatar_url || ""  // Avatar URL or empty string if not set
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-creamLight/90 dark:bg-newDarkBlue/90 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-[#AEC2B6]/90 dark:bg-newDarkBlue/90 backdrop-blur-sm">
       <div className="container flex h-14 items-center">
         <div className="mr-4 hidden md:flex ml-5  ">
         <img
@@ -30,7 +30,8 @@ export function Header({ user }: HeaderProps) {
             alt="Your Brand"
             className="h-10 md:h-10" // adjust size of the logo
           />
-        </div>
+          <span className="mt-3 text-xl font-bold text-[#89A8B2] dark:text-[#89A8B2]">TND</span>
+          </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none" />
           <nav className="flex items-center space-x-2">
