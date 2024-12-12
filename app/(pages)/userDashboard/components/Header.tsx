@@ -22,7 +22,7 @@ export function Header({ user }: HeaderProps) {
   const profilePicture = user?.avatar_url || ""  // Avatar URL or empty string if not set
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-navbarLight/40 dark:bg-newDarkGreen/40 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-creamLight/90 dark:bg-newDarkBlue/90 backdrop-blur-sm">
       <div className="container flex h-14 items-center">
         <div className="mr-4 hidden md:flex ml-5  ">
         <img

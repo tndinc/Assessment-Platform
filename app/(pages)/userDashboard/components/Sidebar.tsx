@@ -98,7 +98,7 @@ export function Sidebar({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="bg-navbarLight/40 dark:bg-newDarkGreen/40 text-black dark:text-white">
+      <div className="bg-navbarLight/40 dark:bg-newDarkBlue/90 text-black dark:text-white">
         {sidebarContent}
       </div>
 
