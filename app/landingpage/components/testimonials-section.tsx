@@ -87,7 +87,7 @@ function TeamCard({ name, role, content, avatar, index }) {
             alt={name}
             width={300}
             height={100}
-            className="rounded-full"
+            className="rounded-lg"
           />
         </div>
       ) : (
@@ -98,7 +98,7 @@ function TeamCard({ name, role, content, avatar, index }) {
             alt={name}
             width={100}
             height={100}
-            className="rounded-full mr-4"
+            className="rounded-lg mr-4"
           />
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">

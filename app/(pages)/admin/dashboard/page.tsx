@@ -157,7 +157,7 @@ export function AdminDashboard() {
               </Link>
             </nav>
           </div>
-          <div className="mt-auto p-4">
+          {/* <div className="mt-auto p-4">
             <Card className="text-center">
               <CardHeader>
                 <CardTitle>Follow Us</CardTitle>
@@ -183,7 +183,7 @@ export function AdminDashboard() {
                 </Button>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="flex flex-col">

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Header from "./components/header"
 
 import { Button } from "@/components/ui/button";
 import {
@@ -48,8 +49,9 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <Card className="max-w-sm w-full">
+    <div className="flex items-center justify-center h-screen bg-creamLight dark:bg-newDarkBlue">
+      <Header />
+      <Card className="max-w-sm w-full bg-[#F0ECE3] dark:bg-[#35374B]">
         <CardHeader>
           <CardTitle className="text-xl">Admin Login</CardTitle>
           <CardDescription>
@@ -84,7 +86,7 @@ const Login = () => {
               {errorMessage && (
                 <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
               )}
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full bg-[#C7B198] hover:bg-[#8E806A] text-white dark:bg-[#31304D] dark:hover:bg-[#201E43]">
                 Log In
               </Button>
             </div>

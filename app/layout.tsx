@@ -5,8 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider"
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Modern Landing Page',
-  description: 'A modern landing page with animations',
+  title: 'TND platform',
+  description: 'panis',
 }
 
 export default function RootLayout({

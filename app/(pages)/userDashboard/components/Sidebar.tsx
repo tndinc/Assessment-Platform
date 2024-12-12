@@ -63,9 +63,9 @@ export function Sidebar({
             className="w-15 h-15 rounded-full"
           />
         )}
-        <div className="text-center">
-          <h2 className="text-lg font-semibold">{userName}</h2>
-          <p className="text-sm text-muted-foreground">{userEmail}</p>
+        <div className="text-center text-black dark:text-white">
+          <h2 className="text-lg font-semibold text-black dark:text-white">{userName}</h2>
+          <p className="text-sm text-muted-foreground text-black dark:text-white">{userEmail}</p>
         </div>
       </div>
       <nav className="flex flex-col gap-2">
@@ -98,7 +98,7 @@ export function Sidebar({
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40">
+      <div className="bg-navbarLight/40 dark:bg-newDarkGreen/40 text-black dark:text-white">
         {sidebarContent}
       </div>
 
@@ -110,7 +110,7 @@ export function Sidebar({
       </Sheet>
 
       {/* Content Section */}
-      <div className="flex-1 p-4">{renderContent()}</div>
+      <div className="flex-1 p-4 bg-creamLight dark:bg-newDarkBlue">{renderContent()}</div>
     </>
   );
 }
