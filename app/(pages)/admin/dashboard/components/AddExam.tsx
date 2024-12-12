@@ -30,6 +30,8 @@ const AddExam: React.FC<AddExamProps> = ({ onExamAdded }) => {
   const [examDesc, setExamDesc] = useState<string>("");
   const [examTimeLimit, setExamTimeLimit] = useState<number>(0);
   const [examPoints, setExamPoints] = useState<number>(0);
+  const [subject, setSubject] = useState<string>("");
+  const [deadline, setDeadline] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -53,6 +55,8 @@ const AddExam: React.FC<AddExamProps> = ({ onExamAdded }) => {
     setExamDesc("");
     setExamTimeLimit(0);
     setExamPoints(0);
+    setSubject("");
+    setDeadline("");
     setError(null);
   };
 
@@ -62,6 +66,8 @@ const AddExam: React.FC<AddExamProps> = ({ onExamAdded }) => {
     if (
       !courseId ||
       examTitle.trim() === "" ||
+      subject.trim() === "" ||
+      deadline.trim() === "" ||
       examTimeLimit <= 0 ||
       examPoints <= 0
     ) {
@@ -77,8 +83,10 @@ const AddExam: React.FC<AddExamProps> = ({ onExamAdded }) => {
           exam_desc: examDesc,
           exam_time_limit: examTimeLimit,
           exam_points: examPoints,
+          subject: subject,
+          deadline: deadline,
           exam_created_by: loggedInUser,
-          exam_time_created: new Date().toISOString(), // Use ISO format for consistency
+          exam_time_created: new Date().toISOString(),
         },
       ]);
 
@@ -86,7 +94,7 @@ const AddExam: React.FC<AddExamProps> = ({ onExamAdded }) => {
         throw insertError;
       }
 
-      onExamAdded(); // Refresh the exam list
+      onExamAdded();
       resetForm();
       setOpen(false);
     } catch (err) {
@@ -155,6 +163,34 @@ const AddExam: React.FC<AddExamProps> = ({ onExamAdded }) => {
                 value={examDesc}
                 onChange={(e) => setExamDesc(e.target.value)}
                 placeholder="Enter exam description"
+                className="col-span-3"
+                required
+              />
+            </div>
+            {/* Subject */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="subject" className="col-span-1">
+                Subject:
+              </label>
+              <Input
+                id="subject"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Enter subject"
+                className="col-span-3"
+                required
+              />
+            </div>
+            {/* Deadline */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="deadline" className="col-span-1">
+                Deadline:
+              </label>
+              <Input
+                id="deadline"
+                type="datetime-local"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
                 className="col-span-3"
                 required
               />

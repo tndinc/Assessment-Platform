@@ -25,6 +25,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
 import Loading from "../../../../../components/Loading";
 import AddExam from "../components/AddExam";
 import { useRouter } from "next/navigation";
@@ -39,25 +40,33 @@ interface Exam {
   exam_id: number; // exam ID
   exam_title: string; // title of the exam
   exam_desc: string; // description of the exam
+  subject: string; // subject of the exam
+  deadline: string; // deadline of the exam
   exam_time_limit: number; // time limit in minutes
   exam_points: number; // points for the exam
   exam_created_by: string; // created by
   exam_time_created: string; // creation timestamp
   course_tbl: Course; // course_tbl as an object, not an array
-  status: string; // Add the status property
+  status: string; // status property
 }
 
 const ManageExam = () => {
   const [exams, setExams] = useState<Exam[]>([]);
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingExamId, setLoadingExamId] = useState<number | null>(null); // To track which exam is being loaded
 
   useEffect(() => {
     const fetchExams = async () => {
-      const { data, error } = await supabase.from("exam_tbl").select(`
+      const { data, error } = await supabase
+        .from("exam_tbl")
+        .select(
+          `
             exam_id, 
             exam_title, 
             exam_desc, 
+            subject, 
+            deadline, 
             exam_time_limit, 
             exam_points,
             exam_created_by,
@@ -66,12 +75,13 @@ const ManageExam = () => {
             course_tbl (
               course_name
             )
-          `);
+          `
+        )
+        .order("exam_time_created", { ascending: false }); // Order by newest first;
 
       if (error) {
         console.error("Error fetching exams:", error);
       } else {
-        // Type assertion to ensure TypeScript knows the shape of data
         const examsWithCourseName: Exam[] = data.map((exam: any) => ({
           ...exam,
           course_tbl: exam.course_tbl || { course_name: "N/A" }, // Default to a fallback object
@@ -90,31 +100,52 @@ const ManageExam = () => {
   };
 
   const handleDelete = async (exam_id: number) => {
+    console.log("Exam ID to delete:", exam_id);
+    if (!exam_id) {
+      console.error("Invalid exam_id:", exam_id);
+      return;
+    }
+
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this exam?"
     );
     if (!confirmDelete) return;
 
-    const { error } = await supabase
-      .from("exam_tbl")
-      .delete()
-      .eq("exam_id", exam_id);
+    try {
+      const { error } = await supabase
+        .from("exam_tbl")
+        .delete()
+        .eq("exam_id", exam_id);
 
-    if (error) {
-      console.error("Error deleting exam:", error);
-    } else {
+      if (error) {
+        console.error("Error deleting exam:", error);
+        alert("An error occurred while deleting the exam. Please try again.");
+        return;
+      }
+
+      // Update the UI by removing the deleted exam
       setExams((prevExams) =>
         prevExams.filter((exam) => exam.exam_id !== exam_id)
       );
+
+      alert("Exam deleted successfully!");
+    } catch (err) {
+      console.error("Unexpected error during deletion:", err);
+      alert("Unexpected error occurred. Please try again later.");
     }
   };
 
   const handleExamAdded = () => {
     const fetchExams = async () => {
-      const { data, error } = await supabase.from("exam_tbl").select(`
+      const { data, error } = await supabase
+        .from("exam_tbl")
+        .select(
+          `
           exam_id, 
           exam_title, 
           exam_desc, 
+          subject, 
+          deadline, 
           exam_time_limit, 
           exam_points,
           exam_created_by,
@@ -123,11 +154,12 @@ const ManageExam = () => {
           course_tbl (
             course_name
           )
-        `);
+        `
+        )
+        .order("exam_time_created", { ascending: false }); // Order by newest first
       if (error) {
         console.error("Error fetching exams:", error);
       } else {
-        // Type assertion to ensure TypeScript knows the shape of data
         const examsWithCourseName: Exam[] = data.map((exam: any) => ({
           ...exam,
           course_tbl: exam.course_tbl || { course_name: "N/A" }, // Default to a fallback object
@@ -137,6 +169,20 @@ const ManageExam = () => {
       }
     };
     fetchExams();
+  };
+  const handleManageClick = async (exam_id: number) => {
+    setLoadingExamId(exam_id); // Set loading state to true for this exam
+    // Simulate a delay or API call
+    try {
+      // You can replace this with your actual logic (e.g., API call or navigation)
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate a 1-second delay
+      // After the action, navigate to the exam manage page
+      router.push(`/admin/dashboard/dashboardSettings/${exam_id}`);
+    } catch (error) {
+      console.error("Error during manage click:", error);
+    } finally {
+      setLoadingExamId(null); // Reset loading state after the action is done
+    }
   };
 
   if (loading) return <Loading />;
@@ -162,13 +208,14 @@ const ManageExam = () => {
                 <TableHead>Exam Title</TableHead>
                 <TableHead>Course</TableHead>
                 <TableHead>Description</TableHead>
+                <TableHead>Subject</TableHead>
+                <TableHead>Deadline</TableHead>
                 <TableHead>Time Limit (mins)</TableHead>
                 <TableHead>Points</TableHead>
                 <TableHead>Created By</TableHead>
                 <TableHead>Created Time</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Manage</TableHead>
-
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
@@ -185,10 +232,13 @@ const ManageExam = () => {
                   </TableCell>
                   <TableCell>{exam.course_tbl.course_name}</TableCell>
                   <TableCell>{exam.exam_desc}</TableCell>
+                  <TableCell>{exam.subject}</TableCell>
+                  <TableCell>
+                    {new Date(exam.deadline).toLocaleString()}
+                  </TableCell>
                   <TableCell>{exam.exam_time_limit}</TableCell>
                   <TableCell>{exam.exam_points}</TableCell>
                   <TableCell>{exam.exam_created_by}</TableCell>
-
                   <TableCell>
                     {new Date(exam.exam_time_created).toLocaleString()}
                   </TableCell>
@@ -207,13 +257,10 @@ const ManageExam = () => {
                   <TableCell>
                     <Button
                       variant="bluelogin"
-                      onClick={() => {
-                        router.push(
-                          `/admin/dashboard/dashboardSettings/${exam.exam_id}`
-                        );
-                      }}
+                      onClick={() => handleManageClick(exam.exam_id)}
+                      disabled={loadingExamId === exam.exam_id} // Disable button while loading
                     >
-                      Manage
+                      {loadingExamId === exam.exam_id ? "Loading..." : "Manage"}
                     </Button>
                   </TableCell>
                   <TableCell>
