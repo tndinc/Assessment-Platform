@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import ExamHeader from "./components/ExamHeader";
 import QuestionNavigation from "./components/QuestionNavigation";
@@ -20,6 +21,7 @@ const openai = new OpenAI({
 });
 
 const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
+  const router = useRouter();
   const { exam_id } = params;
   const supabase = createClient();
   const [examData, setExamData] = useState<any>(null);
@@ -129,7 +131,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
     exam_id: string;
     total_score: number;
     topic_scores: Record<string, { score: number; total: number }>;
-    ai_feedback: string;
+    strength_analysis: string; // Updated field
+    weakness_analysis: string; // Updated field
+    overall_feedback: string; // Updated field
   }) => {
     try {
       const { data, error } = await supabase
@@ -149,6 +153,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
     const topicScoresTemp: Record<string, { score: number; total: number }> =
       {};
 
+    // Calculate total score and topic scores
     questions.forEach((question) => {
       const { question_id, question_points, topic_id, question_answer } =
         question;
@@ -171,14 +176,18 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
     try {
       const topicFeedback = Object.entries(topicScoresTemp)
         .map(([topic, { score, total }]) => {
+          // Find the topic title based on the topic_id
           const topicTitle =
-            questions.find((q) => q.topic_id === topic)?.topic_title ||
-            `Topic ${topic}`;
-          const percentage = ((score / total) * 100).toFixed(2);
-          const strength = percentage >= 75 ? "strength" : "weakness";
+            questions.find((q) => q.topic_id.toString() === topic)
+              ?.topic_title || `Topic ${topic}`; // Fallback if topic title is not found
+
+          const percentage = ((score / total) * 100).toFixed(2); // Calculate percentage and format
+          const strength = percentage >= 75 ? "strength" : "weakness"; // Determine strength or weakness
+
+          // Return formatted feedback string
           return `Topic: ${topicTitle} - ${percentage}% (${strength})`;
         })
-        .join("\n");
+        .join("\n"); // Join the individual topic feedback into a single string
 
       const detailedFeedback = questions
         .map((question) => {
@@ -196,7 +205,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
       const prompt = `You completed an exam with the following performance:\n\n${topicFeedback}.\n\nProvide specific feedback based on these details:\n\n${detailedFeedback}.\n\nHighlight strengths, weaknesses, and suggestions for improvement.`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4",
         messages: [{ role: "user", content: prompt }],
       });
 
@@ -204,26 +213,80 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
         response.choices[0]?.message?.content.trim() ||
         "No feedback available.";
 
-      setFeedback(aiFeedback);
+      // Split feedback into sections
+      const strengthsMatch = aiFeedback.match(
+        /Strengths:([\s\S]+?)(?=\nWeaknesses:|$)/
+      );
+      const weaknessesMatch = aiFeedback.match(
+        /Weaknesses:([\s\S]+?)(?=\nOverall feedback:|$)/
+      );
+      const overallFeedbackMatch = aiFeedback.match(
+        /Overall feedback:([\s\S]+)/
+      );
 
-      if (!user) {
-        console.error("User is not authenticated");
-        return;
-      }
+      // Store each part of the feedback
+      const strengths = strengthsMatch
+        ? strengthsMatch[1].trim()
+        : "No Strengths Provided";
+      const weaknesses = weaknessesMatch
+        ? weaknessesMatch[1].trim()
+        : "No Weaknesses Provided";
+      const overallFeedback = overallFeedbackMatch
+        ? overallFeedbackMatch[1].trim()
+        : `Strengths: ${strengths}\nWeaknesses: ${weaknesses}`;
 
+      // Save the exam results and feedback in the database
       await saveExamResults({
         user_id: user.id,
         exam_id,
         total_score: totalScore,
         topic_scores: topicScoresTemp,
-        ai_feedback: aiFeedback,
+        strength_analysis: strengths,
+        weakness_analysis: weaknesses,
+        overall_feedback: overallFeedback,
       });
+
+      // Update state with feedback sections for navigation
+      setFeedbackSections({
+        strengths,
+        weaknesses,
+        overallFeedback,
+      });
+      setCurrentFeedbackIndex(0); // Start at the first feedback section
     } catch (err) {
       console.error("Error generating feedback or saving results:", err);
       setFeedback("Could not generate feedback. Please try again later.");
     }
 
     setIsSubmitted(true);
+  };
+
+  // State to handle feedback sections and navigation
+  const [feedbackSections, setFeedbackSections] = useState({
+    strengths: "",
+    weaknesses: "",
+    overallFeedback: "",
+  });
+  const [currentFeedbackIndex, setCurrentFeedbackIndex] = useState(0);
+
+  // Handle Next button click for navigating feedback sections
+  const handleNextFeedback = () => {
+    if (currentFeedbackIndex < Object.values(feedbackSections).length - 1) {
+      setCurrentFeedbackIndex((prevIndex) => prevIndex + 1);
+    }
+  };
+
+  // Handle Previous button click for navigating feedback sections
+  const handlePreviousFeedback = () => {
+    if (currentFeedbackIndex > 0) {
+      setCurrentFeedbackIndex((prevIndex) => prevIndex - 1);
+    }
+  };
+
+  // Display feedback based on current index
+  const getFeedbackToDisplay = () => {
+    const keys = Object.keys(feedbackSections);
+    return feedbackSections[keys[currentFeedbackIndex]];
   };
 
   if (!examData || questions.length === 0) {
@@ -234,11 +297,21 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-4">
         <Card className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
-          <CardHeader className="bg-blue-500 text-white p-6">
-            <CardTitle className="text-3xl font-bold text-center">
+          <CardHeader className="bg-blue-500 text-white p-6 relative">
+            {/* Exam Feedback Title */}
+            <CardTitle className="text-3xl font-bold text-center w-full">
               Exam Feedback
             </CardTitle>
+
+            {/* Close Button aligned to the top-right corner of the CardHeader */}
+            <Button
+              onClick={() => router.push("/userDashboard")}
+              className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white transition-all duration-300 ease-in-out transform hover:scale-105"
+            >
+              Close
+            </Button>
           </CardHeader>
+
           <CardContent className="p-6">
             <div className="text-center mb-6">
               <p className="text-2xl font-semibold text-gray-800">
@@ -263,12 +336,13 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                 %
               </p>
             </div>
+
+            {/* Topic Score Progress Section */}
             <div className="grid gap-4 mb-6">
               {Object.entries(topicScores).map(([topic, { score, total }]) => {
-                // Find the topic title using topic_id from questions
                 const topicTitle =
                   questions.find((q) => q.topic_id.toString() === topic)
-                    ?.topic_title || `Topic ${topic}`; // Fallback in case topic title is not found
+                    ?.topic_title || `Topic ${topic}`;
                 const percentage = (score / total) * 100;
                 return (
                   <div key={topic} className="bg-gray-50 p-4 rounded-lg">
@@ -285,29 +359,60 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                 );
               })}
             </div>
+
+            {/* AI Feedback Section */}
             <Card className="bg-blue-50 border-blue-200 mb-6">
               <CardHeader>
                 <CardTitle className="text-xl font-semibold text-blue-800">
-                  AI Feedback
+                  {currentFeedbackIndex === 0
+                    ? "Strengths"
+                    : currentFeedbackIndex === 1
+                    ? "Weaknesses"
+                    : "Overall Feedback"}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-700">{feedback}</p>
+                <p className="text-gray-700">{getFeedbackToDisplay()}</p>
               </CardContent>
             </Card>
-            <div className="text-center">
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-4">
               <Button
-                onClick={toggleQuestionReview}
-                variant={showQuestionReview ? "secondary" : "default"}
-                className="transition-all duration-300 ease-in-out transform hover:scale-105"
+                onClick={handlePreviousFeedback}
+                disabled={currentFeedbackIndex === 0}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
               >
-                {showQuestionReview
-                  ? "Hide Question Review"
-                  : "Show Question Review"}
+                Previous
+              </Button>
+              <Button
+                onClick={handleNextFeedback}
+                disabled={
+                  currentFeedbackIndex ===
+                  Object.values(feedbackSections).length - 1
+                }
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
+                Next
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* "Show Question Review" Button Centered Outside the Card */}
+        <div className="flex justify-center items-center gap-4 mt-4 w-full max-w-4xl">
+          <Button
+            onClick={toggleQuestionReview}
+            variant={showQuestionReview ? "secondary" : "default"}
+            className="transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            {showQuestionReview
+              ? "Hide Question Review"
+              : "Show Question Review"}
+          </Button>
+        </div>
+
+        {/* Question Review Section */}
         {showQuestionReview && (
           <Card className="w-full max-w-4xl mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
             <CardHeader className="bg-indigo-500 text-white p-6">
@@ -344,8 +449,10 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                           {question.question_answer}
                         </span>
                       </p>
-                      {answers[question.question_id]?.trim() !==
-                        question.question_answer.trim() && (
+                      {answers[question.question_id]?.trim() ===
+                      question.question_answer.trim() ? (
+                        <p className="text-green-500 font-semibold">Correct</p>
+                      ) : (
                         <p className="text-red-500 font-semibold">Incorrect</p>
                       )}
                     </CardContent>
