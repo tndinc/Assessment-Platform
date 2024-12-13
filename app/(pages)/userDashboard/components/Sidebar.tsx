@@ -1,15 +1,14 @@
-import { LayoutDashboard, BookOpen, History, Layers } from "lucide-react";
+import { LayoutDashboard, BookOpen, History, Layers, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { User } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import TakeExam from "./dashboardSettings/takeExams/page";
+import { DashboardContent } from "./dashboardSettings/dashboard/dashboard-content";
 const supabase = createClient();
 
 interface SidebarProps {
-  open: boolean;
-  onClose: () => void;
   activeItem: string;
   setActiveItem: (item: string) => void;
 }
@@ -21,13 +20,9 @@ const navItems = [
   { name: "Subject", icon: Layers },
 ];
 
-export function Sidebar({
-  open,
-  onClose,
-  activeItem,
-  setActiveItem,
-}: SidebarProps) {
+export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
   const [user, setUser] = useState<User | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -37,11 +32,11 @@ export function Sidebar({
           error,
         } = await supabase.auth.getUser();
         if (error) {
-          console.error("Error fetching user:", error.message);
+          console.error("Error fetching user:");
         }
         setUser(user);
       } catch (error) {
-        console.error("Unexpected error fetching user:", error);
+        console.error("Unexpected error fetching user:");
       }
     };
 
@@ -74,7 +69,10 @@ export function Sidebar({
             key={item.name}
             variant={activeItem === item.name ? "secondary" : "ghost"}
             className="justify-start w-full"
-            onClick={() => setActiveItem(item.name)}
+            onClick={() => {
+              setActiveItem(item.name);
+              setIsMobileMenuOpen(false);
+            }}
           >
             <item.icon className="mr-2 h-4 w-4" />
             {item.name}
@@ -87,7 +85,7 @@ export function Sidebar({
   const renderContent = () => {
     switch (activeItem) {
       case "Dashboard":
-        return <h1>Dashboard</h1>;
+        return <DashboardContent />;
       case "Take Exam":
         return <TakeExam />;
       default:
@@ -96,14 +94,23 @@ export function Sidebar({
   };
 
   return (
-    <>
+    <div className="flex h-full max-w-full overflow-x-hidden">
       {/* Desktop Sidebar */}
-      <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40">
+      <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40 w-64">
         {sidebarContent}
       </div>
 
+      {/* Mobile Menu Icon */}
+      <Button
+        variant="ghost"
+        className="fixed top-4 left-4 z-50 lg:hidden"
+        onClick={() => setIsMobileMenuOpen(true)}
+      >
+        <Menu className="h-6 w-6" />
+      </Button>
+
       {/* Mobile Sidebar */}
-      <Sheet open={open} onOpenChange={onClose}>
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="w-[240px] sm:w-[300px] p-0">
           {sidebarContent}
         </SheetContent>
@@ -111,6 +118,6 @@ export function Sidebar({
 
       {/* Content Section */}
       <div className="flex-1 p-4">{renderContent()}</div>
-    </>
+    </div>
   );
 }

@@ -55,7 +55,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
           throw new Error("User not authenticated");
         }
       } catch (error) {
-        console.error("Error fetching user:", error);
+        console.error("Error fetching user:");
       }
     };
 
@@ -107,7 +107,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 
         setQuestions(questionsWithChoices);
       } catch (err) {
-        console.error("Error fetching exam data:", err);
+        console.error("Error fetching exam data:");
       }
     };
 
@@ -141,10 +141,8 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
         .insert([resultData]);
 
       if (error) throw error;
-
-      console.log("Exam results saved successfully:", data);
     } catch (err) {
-      console.error("Error saving exam results:", err);
+      console.error("Error saving exam results:");
     }
   };
 
@@ -254,7 +252,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
       });
       setCurrentFeedbackIndex(0); // Start at the first feedback section
     } catch (err) {
-      console.error("Error generating feedback or saving results:", err);
+      console.error("Error generating feedback or saving results:");
       setFeedback("Could not generate feedback. Please try again later.");
     }
 

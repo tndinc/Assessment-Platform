@@ -39,7 +39,7 @@ export function Header() {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      console.log("User signed out successfully");
+
       // Redirect user to login or homepage after logout
       window.location.href = "/";
     } catch (error) {
@@ -52,10 +52,9 @@ export function Header() {
   const profilePicture = user?.user_metadata?.avatar_url || "";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
+    <header className="sticky top-0 z-50 w-full border-b bg-white shadow dark:bg-gray-800 dark:border-gray-700">
+      <div className="flex h-16 items-center justify-between px-4 w-full">
+        <div className="flex items-center space-x-2 ml-12 lg:ml-0">
           <a href="/" className="text-lg font-bold text-gray-800">
             Logo
           </a>

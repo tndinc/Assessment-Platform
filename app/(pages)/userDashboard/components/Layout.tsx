@@ -1,34 +1,25 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
-import { Sidebar } from "./Sidebar"
-import { Button } from "@/components/ui/button"
-import { Menu } from 'lucide-react'
-import { Header } from './Header'
+import { Sidebar } from "./Sidebar";
+
+import { Header } from "./Header";
 
 import { User } from "@supabase/supabase-js";
-
 
 interface UserInfoProps {
   user: User | null;
 }
 export function Layout({ children }: { children: React.ReactNode }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [activeItem, setActiveItem] = useState('Dashboard')
+  const [activeItem, setActiveItem] = useState("Dashboard");
   const [user, setUser] = useState<User | null>(null); // stores the authenticated user fetched from supabase ; null - wala pa logged in from the start
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header user={user}/>
+      <Header user={user} />
       <div className="flex-1 flex">
-        <Sidebar 
-          open={sidebarOpen} 
-          onClose={() => setSidebarOpen(false)} 
-          activeItem={activeItem}
-          setActiveItem={setActiveItem}
-          user={user}
-        />
+        <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
         {/* <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <Button
             variant="outline"
@@ -43,7 +34,5 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </main> */}
       </div>
     </div>
-  )
+  );
 }
-
-
