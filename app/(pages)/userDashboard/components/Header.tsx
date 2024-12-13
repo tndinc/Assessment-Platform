@@ -35,6 +35,18 @@ export function Header() {
     fetchUser();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      console.log("User signed out successfully");
+      // Redirect user to login or homepage after logout
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error during sign out:");
+    }
+  };
+
   // Extract user profile info
   const userName = user?.user_metadata?.full_name || "User";
   const profilePicture = user?.user_metadata?.avatar_url || "";
@@ -97,7 +109,7 @@ export function Header() {
                 <UserIcon className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <UserIcon className="mr-2 h-4 w-4" />
                 <span>Logout</span>
               </DropdownMenuItem>
