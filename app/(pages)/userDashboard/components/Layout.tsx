@@ -18,7 +18,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header user={user} />
-      <div className="flex-1 flex">
+      <div className="flex-1 flex dark:bg-[#243642]">
         <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
         {/* <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <Button

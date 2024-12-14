@@ -83,7 +83,7 @@ export function RecentActivity() {
   }, [user]);
 
   return (
-    <div className="space-y-8 h-96 overflow-y-auto border border-gray-200 rounded-lg p-4">
+    <div className="space-y-8 h-96 overflow-y-auto rounded-lg p-2">
       {activities.map((activity) => (
         <div key={activity.id} className="flex items-center">
           <Avatar className="h-9 w-9">

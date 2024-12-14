@@ -11,9 +11,8 @@ import { UpcomingExams } from "./upcoming-exam";
 export function DashboardContent() {
   return (
     <div className="grid gap-4 sm:gap-6 lg:gap-8">
-      <h1 className="text-3xl font-semibold mb-6">Dashboard</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
             <svg
@@ -36,7 +35,7 @@ export function DashboardContent() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average Grade</CardTitle>
             <svg
@@ -61,7 +60,7 @@ export function DashboardContent() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Completed Assignments
@@ -87,7 +86,7 @@ export function DashboardContent() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Study Hours</CardTitle>
             <svg
@@ -112,7 +111,7 @@ export function DashboardContent() {
         </Card>
       </div>
       <div className="grid gap-4 md:gap-6 lg:gap-8 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-full lg:col-span-4">
+        <Card className="col-span-full lg:col-span-4 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
           <CardHeader>
             <CardTitle>Grade Overview</CardTitle>
           </CardHeader>
@@ -120,7 +119,7 @@ export function DashboardContent() {
             <Overview />
           </CardContent>
         </Card>
-        <Card className="col-span-full md:col-span-1 lg:col-span-3">
+        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>Your latest academic activities</CardDescription>
@@ -129,7 +128,7 @@ export function DashboardContent() {
             <RecentActivity />
           </CardContent>
         </Card>
-        <Card className="col-span-full md:col-span-1 lg:col-span-3">
+        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
           <CardHeader>
             <CardTitle>Upcoming Exams</CardTitle>
             <CardDescription>Prepare for your next challenges</CardDescription>

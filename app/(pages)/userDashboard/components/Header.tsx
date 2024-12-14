@@ -1,4 +1,4 @@
-import { Bell, Moon, Sun, User as UserIcon } from "lucide-react";
+import { User as UserIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { HeaderNotifcations } from "@/components/headernotif";
 
 const supabase = createClient();
 
@@ -52,32 +54,23 @@ export function Header() {
   const profilePicture = user?.user_metadata?.avatar_url || "";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white shadow dark:bg-gray-800 dark:border-gray-700">
+    <header className="sticky top-0 z-50 w-full border-b bg-white/50 dark:bg-[#243642]/80 dark:border-gray-700">
       <div className="flex h-16 items-center justify-between px-4 w-full">
         <div className="flex items-center space-x-2 ml-12 lg:ml-0">
-          <a href="/" className="text-lg font-bold text-gray-800">
-            Logo
-          </a>
+          <img
+            src="/TND.png" // path to your logo image in the public folder
+            alt="Your Brand"
+            className="h-10 md:h-10" // adjust size of the logo
+          />
         </div>
 
         {/* Right Section */}
         <div className="flex items-center space-x-4">
           {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          >
-            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
+          <ThemeToggle />
 
           {/* Notifications */}
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
-          </Button>
+          <HeaderNotifcations />
 
           {/* User Dropdown */}
           <DropdownMenu>

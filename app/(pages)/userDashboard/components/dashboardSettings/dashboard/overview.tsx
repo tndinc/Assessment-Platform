@@ -72,11 +72,6 @@ export function Overview() {
   }, [userId]); // Re-fetch when the userId is set
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Grade Overview</CardTitle>
-      </CardHeader>
-      <CardContent>
         <ChartContainer
           config={{
             grade: {
@@ -104,7 +99,7 @@ export function Overview() {
               />
               <Bar
                 dataKey="grade"
-                fill="var(--color-grade)"
+                className="fill-[#D7D3BF] dark:fill-[#384B70]"
                 radius={[4, 4, 0, 0]}
                 barSize={50}
               />
@@ -112,7 +107,5 @@ export function Overview() {
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
-      </CardContent>
-    </Card>
   );
 }

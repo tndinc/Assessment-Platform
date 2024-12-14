@@ -39,7 +39,7 @@ export default function Notification() {
         <Button
           variant="ghost"
           size="icon"
-          className="relative bg-transparent border-0"
+          className="relative bg-transparent border-0 bg-[#F1F0E8] hover:bg-[#E5E1DA] dark:bg-[#507687]/40 dark:hover:bg-[#507687]/10"
           aria-label={`${notifications.length} unread notifications`}
         >
           <Bell className="h-4 w-4" />

@@ -60,7 +60,6 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
         )}
         <div className="text-center text-black dark:text-white">
           <h2 className="text-lg font-semibold text-black dark:text-white">{userName}</h2>
-          <p className="text-sm text-muted-foreground text-black dark:text-white">{userEmail}</p>
         </div>
       </div>
       <nav className="flex flex-col gap-2">
@@ -68,12 +67,19 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
           <Button
             key={item.name}
             variant={activeItem === item.name ? "secondary" : "ghost"}
-            className="justify-start w-full"
+            className={`
+              justify-start w-full 
+              ${activeItem === item.name ? "bg-[#B3C8CF] dark:bg-[#526D82]" : "text-black dark:text-white"}
+              hover:bg-[#89A8B2] dark:hover:text-white hover:text-black
+              dark:hover:bg-[#526D82]/40
+              transition-colors
+            `}
             onClick={() => {
               setActiveItem(item.name);
               setIsMobileMenuOpen(false);
             }}
           >
+            
             <item.icon className="mr-2 h-4 w-4" />
             {item.name}
           </Button>
@@ -96,7 +102,7 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
   return (
     <div className="flex h-full max-w-full overflow-x-hidden">
       {/* Desktop Sidebar */}
-      <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40 w-64">
+      <div className="hidden border-r bg-[#ECEBDE/30] lg:block dark:bg-[#243642]/80 w-64">
         {sidebarContent}
       </div>
 
