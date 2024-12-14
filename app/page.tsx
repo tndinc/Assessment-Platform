@@ -1,7 +1,7 @@
 import Header from "./landingpage/components/header";
 import HeroSection from "./landingpage/components/hero-section";
 import FeaturesSection from "./landingpage/components/features-section";
-import TestimonialsSection from "./landingpage/components/testimonials-section";
+import TestimonialsSection from "./landingpage/components/teaminfo-section";
 import CTASection from "./landingpage/components/cta-section";
 
 export default function Home() {

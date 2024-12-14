@@ -44,9 +44,9 @@ const teaminfo = [
   },
 ];
 
-export default function TeamSection() {
+export default function TeaminfoSection() {
   return (
-    <section className="w-full py-20 bg-creamLight dark:bg-newDarkBlue">
+    <section className="w-full py-20 bg-white/50 dark:bg-[#243642]">
       <div className="w-full max-w-[2000px] mx-auto px-4 md:px-6">
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
           Our Team
@@ -71,7 +71,7 @@ function TeamCard({ name, role, content, avatar, index }) {
   return (
     <motion.div
       ref={ref}
-      className="bg-[#F0ECE3] dark:bg-[#35374B] p-6 rounded-lg shadow-md"
+      className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 p-6 rounded-lg shadow-md"
       initial={{ opacity: 0, y: 50 }}
       animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
       transition={{ duration: 0.5, delay: index * 0.2 }}

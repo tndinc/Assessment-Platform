@@ -42,7 +42,6 @@ export default function Header() {
             alt="Your Brand"
             className="h-10 md:h-10" // adjust size of the logo
           />
-          <span className="mt-3 text-xl font-bold text-[#89A8B2] dark:text-[#89A8B2]">TND</span>
         </motion.div>
         <motion.div
           initial={{ opacity: 0, x: 20 }}

@@ -37,12 +37,12 @@ export function LoginDialog() {
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="bg-white dark:bg-gray-800 text-sm md:text-base"
+          className="bg-[#F1F0E8] hover:bg-[#E5E1DA] dark:bg-[#507687]/40 dark:hover:bg-[#507687]/10 text-sm md:text-base"
         >
           Log In
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-gray-800">
+      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-[#243642]">
         <DialogHeader>
           <DialogTitle className="text-gray-900 dark:text-white text-lg md:text-xl">
             Log in to your account
@@ -54,7 +54,7 @@ export function LoginDialog() {
         <div className="flex items-center justify-center p-4">
           <Button
             variant="outline"
-            className="w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm md:text-base"
+            className="w-full bg-[#B3C8CF] hover:bg-[#89A8B2] dark:bg-[#526D82] dark:hover:bg-[#27374D] text-gray-900 dark:text-white text-sm md:text-base"
             onClick={login}
           >
             <Google className="mr-2 h-4 w-4 md:h-5 md:w-5" />
