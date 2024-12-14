@@ -2,30 +2,51 @@ import { Book, GraduationCap, Lightbulb, Pencil } from "lucide-react";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">
-          Loading Knowledge...
+        <h1 className="text-5xl font-bold text-white mb-4 animate-pulse">
+          Loading Knowledge
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-          Please wait while we prepare your learning experience.
+        <p className="text-xl text-gray-300 mb-12">
+          Preparing your learning experience...
         </p>
 
-        <div className="flex justify-center space-x-4 mb-8">
-          <Book className="w-8 h-8 text-blue-500 animate-bounce" />
-          <GraduationCap className="w-8 h-8 text-green-500 animate-bounce [animation-delay:0.1s]" />
-          <Lightbulb className="w-8 h-8 text-yellow-500 animate-bounce [animation-delay:0.2s]" />
-          <Pencil className="w-8 h-8 text-red-500 animate-bounce [animation-delay:0.3s]" />
+        <div className="relative w-48 h-48 mx-auto mb-12">
+          <div
+            className="absolute inset-0 rounded-full border-t-4 border-b-4 border-indigo-500"
+            style={{ animation: "spin 3s linear infinite" }}
+          ></div>
+          <div
+            className="absolute inset-0 rounded-full border-r-4 border-l-4 border-pink-500"
+            style={{ animation: "spin 3s linear infinite reverse" }}
+          ></div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="grid grid-cols-2 gap-4">
+              <Book
+                className="w-10 h-10 text-blue-400"
+                style={{ animation: "float 3s ease-in-out infinite" }}
+              />
+              <GraduationCap
+                className="w-10 h-10 text-green-400"
+                style={{ animation: "float 3s ease-in-out infinite 0.2s" }}
+              />
+              <Lightbulb
+                className="w-10 h-10 text-yellow-400"
+                style={{ animation: "float 3s ease-in-out infinite 0.4s" }}
+              />
+              <Pencil
+                className="w-10 h-10 text-red-400"
+                style={{ animation: "float 3s ease-in-out infinite 0.6s" }}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="relative w-64 h-4 bg-gray-200 rounded-full overflow-hidden">
-          <div className="absolute top-0 left-0 h-full w-full bg-gradient-to-r from-blue-500 to-indigo-600 animate-pulse"></div>
-        </div>
-
-        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-8 text-sm text-gray-400 max-w-md mx-auto italic">
           "The capacity to learn is a gift; the ability to learn is a skill; the
-          willingness to learn is a choice." - Brian Herbert
+          willingness to learn is a choice."
         </p>
+        <p className="mt-2 text-sm text-gray-500">- Brian Herbert</p>
       </div>
     </div>
   );

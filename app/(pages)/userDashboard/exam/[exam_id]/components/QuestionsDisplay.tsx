@@ -1,21 +1,24 @@
-import { useState, useEffect } from "react";
+"use client";
 
-// Define types for the question and its choices
+import { Card, CardContent, CardTitle } from "@/components/ui/card";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
+
 interface Choice {
-  question_txt: string; // Text of the choice
+  question_txt: string;
 }
 
 interface Question {
-  question_id: string | number; // ID of the question
-  question_desc: string; // Description or text of the question
-  choices?: Choice[]; // Array of choices (optional)
+  question_id: string | number;
+  question_desc: string;
+  choices?: Choice[];
 }
 
 interface QuestionDisplayProps {
-  question: Question | null; // The current question (nullable)
-  answer: string | null; // The currently selected answer
-  onAnswer: (questionId: string | number, answer: string) => void; // Function to handle answer selection
-  isSubmitted: boolean; // Whether the question is submitted
+  question: Question | null;
+  answer: string | null;
+  onAnswer: (questionId: string | number, answer: string) => void;
+  isSubmitted: boolean;
 }
 
 export default function QuestionDisplay({
@@ -24,56 +27,80 @@ export default function QuestionDisplay({
   onAnswer,
   isSubmitted,
 }: QuestionDisplayProps) {
-  const [timeSpent, setTimeSpent] = useState(0);
-
-  useEffect(() => {
-    if (!question) return; // Ensure question exists
-    const timer = setInterval(() => {
-      setTimeSpent((prevTime) => prevTime + 1);
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [question?.question_id]); // Optional chaining to avoid runtime errors
-
   const renderChoices = () => {
     if (!question?.choices || question.choices.length === 0) {
-      return <div>No choices available for this question.</div>;
+      return (
+        <div className="flex items-center justify-center h-32 bg-yellow-50 rounded-lg border border-yellow-200">
+          <div className="flex items-center text-yellow-700">
+            <AlertCircle className="w-5 h-5 mr-2" />
+            <span>No choices available for this question.</span>
+          </div>
+        </div>
+      );
     }
 
     return (
-      <ul className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {question.choices.map((choice, index) => (
-          <li key={index} className="p-2 bg-gray-100 rounded hover:bg-gray-200 transition-colors duration-200">
-            <label className="flex items-center space-x-2">
-              <input
-                type="radio"
-                name={`question-${question.question_id}`}
-                value={choice.question_txt}
-                checked={answer === choice.question_txt}
-                onChange={() => onAnswer(question.question_id, choice.question_txt)}
-                disabled={isSubmitted}
-                className="form-radio"
-              />
-              <span>{choice.question_txt}</span>
-            </label>
-          </li>
+          <motion.div
+            key={index}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Card
+              className={`cursor-pointer transition-all duration-200 ${
+                answer === choice.question_txt
+                  ? "border-primary shadow-lg"
+                  : "hover:border-gray-300"
+              }`}
+              onClick={() =>
+                !isSubmitted &&
+                onAnswer(question.question_id, choice.question_txt)
+              }
+            >
+              <CardContent className="p-4 flex items-center justify-between">
+                <p className="text-lg">{choice.question_txt}</p>
+                {answer === choice.question_txt && (
+                  <CheckCircle2 className="w-6 h-6 text-primary" />
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
-      </ul>
+      </div>
     );
   };
 
   if (!question) {
-    return <div>Loading question...</div>;
+    return (
+      <Card className="w-full max-w-4xl mx-auto">
+        <CardContent className="flex items-center justify-center h-64">
+          <div className="animate-pulse flex space-x-4">
+            <div className="rounded-full bg-slate-200 h-10 w-10"></div>
+            <div className="flex-1 space-y-6 py-1">
+              <div className="h-2 bg-slate-200 rounded"></div>
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="h-2 bg-slate-200 rounded col-span-2"></div>
+                  <div className="h-2 bg-slate-200 rounded col-span-1"></div>
+                </div>
+                <div className="h-2 bg-slate-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 mb-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">Question {question.question_id}</h2>
-        <span className="text-sm text-gray-500">Time: {timeSpent}s</span>
-      </div>
-      <p className="mb-4 text-gray-800 font-medium">{question.question_desc}</p>
-      {renderChoices()}
-    </div>
+    <Card className="w-full max-w-4xl mx-auto">
+      <CardContent className="space-y-6 pt-6">
+        <CardTitle className="text-2xl font-bold">
+          {question.question_desc}
+        </CardTitle>
+        {renderChoices()}
+      </CardContent>
+    </Card>
   );
 }

@@ -8,6 +8,7 @@ import QuestionNavigation from "./components/QuestionNavigation";
 import QuestionDisplay from "./components/QuestionsDisplay";
 import ProgressBar from "./components/ProgressBar";
 import SubmitButton from "./components/SubmitButton";
+import Loading from "@/components/Loading";
 import OpenAI from "openai";
 import { User } from "@supabase/supabase-js";
 
@@ -37,6 +38,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
   >({});
   const [user, setUser] = useState<User | null>(null);
   const [showQuestionReview, setShowQuestionReview] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleQuestionReview = () => {
     setShowQuestionReview((prev) => !prev);
@@ -72,7 +74,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
           .single();
         if (examError) throw examError;
         setExamData(exam);
-        setTimeRemaining(exam.exam_time_limit);
+        setTimeRemaining(exam.exam_time_limit * 60);
 
         const { data: topics, error: topicsError } = await supabase
           .from("topic_tbl")
@@ -150,6 +152,8 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
     let totalScore = 0;
     const topicScoresTemp: Record<string, { score: number; total: number }> =
       {};
+    // Set loading state to true
+    setIsLoading(true);
 
     // Calculate total score and topic scores
     questions.forEach((question) => {
@@ -255,7 +259,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
       console.error("Error generating feedback or saving results:");
       setFeedback("Could not generate feedback. Please try again later.");
     }
-
+    setIsLoading(false);
     setIsSubmitted(true);
   };
 
@@ -291,212 +295,255 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
     return <div>Loading...</div>;
   }
 
-  if (isSubmitted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-4">
-        <Card className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
-          <CardHeader className="bg-blue-500 text-white p-6 relative">
-            {/* Exam Feedback Title */}
-            <CardTitle className="text-3xl font-bold text-center w-full">
-              Exam Feedback
-            </CardTitle>
-
-            {/* Close Button aligned to the top-right corner of the CardHeader */}
-            <Button
-              onClick={() => router.push("/userDashboard")}
-              className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white transition-all duration-300 ease-in-out transform hover:scale-105"
-            >
-              Close
-            </Button>
-          </CardHeader>
-
-          <CardContent className="p-6">
-            <div className="text-center mb-6">
-              <p className="text-2xl font-semibold text-gray-800">
-                Your Total Score
-              </p>
-              <p className="text-5xl font-bold text-blue-600 mt-2">
-                {score} /{" "}
-                {Object.values(topicScores).reduce(
-                  (acc, { total }) => acc + total,
-                  0
-                )}
-              </p>
-              <p className="text-lg font-medium text-gray-700 mt-2">
-                {(
-                  (score /
-                    Object.values(topicScores).reduce(
-                      (acc, { total }) => acc + total,
-                      0
-                    )) *
-                  100
-                ).toFixed(2)}
-                %
-              </p>
-            </div>
-
-            {/* Topic Score Progress Section */}
-            <div className="grid gap-4 mb-6">
-              {Object.entries(topicScores).map(([topic, { score, total }]) => {
-                const topicTitle =
-                  questions.find((q) => q.topic_id.toString() === topic)
-                    ?.topic_title || `Topic ${topic}`;
-                const percentage = (score / total) * 100;
-                return (
-                  <div key={topic} className="bg-gray-50 p-4 rounded-lg">
-                    <p className="font-semibold text-gray-700 mb-2">
-                      {topicTitle}
-                    </p>
-                    <div className="flex items-center">
-                      <Progress value={percentage} className="flex-grow mr-4" />
-                      <span className="text-sm font-medium text-gray-600">
-                        {percentage.toFixed(2)}%
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* AI Feedback Section */}
-            <Card className="bg-blue-50 border-blue-200 mb-6">
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold text-blue-800">
-                  {currentFeedbackIndex === 0
-                    ? "Strengths"
-                    : currentFeedbackIndex === 1
-                    ? "Weaknesses"
-                    : "Overall Feedback"}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700">{getFeedbackToDisplay()}</p>
-              </CardContent>
-            </Card>
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between mt-4">
-              <Button
-                onClick={handlePreviousFeedback}
-                disabled={currentFeedbackIndex === 0}
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Previous
-              </Button>
-              <Button
-                onClick={handleNextFeedback}
-                disabled={
-                  currentFeedbackIndex ===
-                  Object.values(feedbackSections).length - 1
-                }
-                className="bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                Next
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* "Show Question Review" Button Centered Outside the Card */}
-        <div className="flex justify-center items-center gap-4 mt-4 w-full max-w-4xl">
-          <Button
-            onClick={toggleQuestionReview}
-            variant={showQuestionReview ? "secondary" : "default"}
-            className="transition-all duration-300 ease-in-out transform hover:scale-105"
-          >
-            {showQuestionReview
-              ? "Hide Question Review"
-              : "Show Question Review"}
-          </Button>
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col relative">
+      {/* Full-page loading spinner if loading */}
+      {isLoading ? (
+        <div className="loading-overlay">
+          <Loading /> {/* Full-page loading spinner */}
         </div>
+      ) : (
+        <>
+          {isSubmitted ? (
+            <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-4">
+              <Card className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
+                <CardHeader className="bg-blue-500 text-white p-6 relative">
+                  {/* Exam Feedback Title */}
+                  <CardTitle className="text-3xl font-bold text-center w-full">
+                    Exam Feedback
+                  </CardTitle>
 
-        {/* Question Review Section */}
-        {showQuestionReview && (
-          <Card className="w-full max-w-4xl mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
-            <CardHeader className="bg-indigo-500 text-white p-6">
-              <CardTitle className="text-2xl font-bold">
-                Question Review
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              <div className="space-y-6">
-                {questions.map((question) => (
-                  <Card
-                    key={question.question_id}
-                    className="bg-gray-50 border-gray-200"
+                  {/* Close Button aligned to the top-right corner of the CardHeader */}
+                  <Button
+                    onClick={() => router.push("/userDashboard")}
+                    className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white transition-all duration-300 ease-in-out transform hover:scale-105"
                   >
+                    Close
+                  </Button>
+                </CardHeader>
+
+                <CardContent className="p-6">
+                  <div className="text-center mb-6">
+                    <p className="text-2xl font-semibold text-gray-800">
+                      Your Total Score
+                    </p>
+                    <p className="text-5xl font-bold text-blue-600 mt-2">
+                      {score} /{" "}
+                      {Object.values(topicScores).reduce(
+                        (acc, { total }) => acc + total,
+                        0
+                      )}
+                    </p>
+                    <p className="text-lg font-medium text-gray-700 mt-2">
+                      {(
+                        (score /
+                          Object.values(topicScores).reduce(
+                            (acc, { total }) => acc + total,
+                            0
+                          )) *
+                        100
+                      ).toFixed(2)}
+                      %
+                    </p>
+                  </div>
+
+                  {/* Topic Score Progress Section */}
+                  <div className="grid gap-4 mb-6">
+                    {Object.entries(topicScores).map(
+                      ([topic, { score, total }]) => {
+                        const topicTitle =
+                          questions.find((q) => q.topic_id.toString() === topic)
+                            ?.topic_title || `Topic ${topic}`;
+                        const percentage = (score / total) * 100;
+                        return (
+                          <div
+                            key={topic}
+                            className="bg-gray-50 p-4 rounded-lg"
+                          >
+                            <p className="font-semibold text-gray-700 mb-2">
+                              {topicTitle}
+                            </p>
+                            <div className="flex items-center">
+                              <Progress
+                                value={percentage}
+                                className="flex-grow mr-4"
+                              />
+                              <span className="text-sm font-medium text-gray-600">
+                                {percentage.toFixed(2)}%
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
+
+                  {/* AI Feedback Section */}
+                  <Card className="bg-blue-50 border-blue-200 mb-6">
                     <CardHeader>
-                      <CardTitle className="text-lg font-semibold text-gray-800">
-                        {`Q${question.number}: ${question.question_desc}`}
+                      <CardTitle className="text-xl font-semibold text-blue-800">
+                        {currentFeedbackIndex === 0
+                          ? "Strengths"
+                          : currentFeedbackIndex === 1
+                          ? "Weaknesses"
+                          : "Overall Feedback"}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="mb-2">
-                        <span className="font-medium text-gray-700">
-                          Your Answer:
-                        </span>{" "}
-                        <span className="text-gray-600">
-                          {answers[question.question_id] || "No Answer"}
-                        </span>
-                      </p>
-                      <p className="mb-2">
-                        <span className="font-medium text-gray-700">
-                          Correct Answer:
-                        </span>{" "}
-                        <span className="text-gray-600">
-                          {question.question_answer}
-                        </span>
-                      </p>
-                      {answers[question.question_id]?.trim() ===
-                      question.question_answer.trim() ? (
-                        <p className="text-green-500 font-semibold">Correct</p>
-                      ) : (
-                        <p className="text-red-500 font-semibold">Incorrect</p>
-                      )}
+                      <p className="text-gray-700">{getFeedbackToDisplay()}</p>
                     </CardContent>
                   </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-    );
-  }
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <ExamHeader
-        title={examData.exam_title}
-        timeRemaining={timeRemaining}
-        instructions={examData.exam_desc || "Answer all questions."}
-      />
-      <div className="flex-grow flex flex-col md:flex-row">
-        <QuestionNavigation
-          questions={questions}
-          currentQuestion={currentQuestion}
-          setCurrentQuestion={setCurrentQuestion}
-          answers={answers}
-        />
-        <main className="flex-grow p-2 md:p-6 overflow-y-auto">
-          <QuestionDisplay
-            question={questions[currentQuestion - 1]}
-            answer={answers[questions[currentQuestion - 1]?.question_id]}
-            onAnswer={handleAnswer}
-            isSubmitted={isSubmitted}
-          />
-        </main>
-      </div>
-      <footer className="bg-white shadow-md p-4">
-        <ProgressBar
-          totalQuestions={questions.length}
-          answeredQuestions={Object.keys(answers).length}
-        />
-        <SubmitButton
-          onSubmit={handleSubmit}
-          disabled={Object.keys(answers).length === 0}
-        />
-      </footer>
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-between mt-4">
+                    <Button
+                      onClick={handlePreviousFeedback}
+                      disabled={currentFeedbackIndex === 0}
+                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      onClick={handleNextFeedback}
+                      disabled={
+                        currentFeedbackIndex ===
+                        Object.values(feedbackSections).length - 1
+                      }
+                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                    >
+                      Next
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* "Show Question Review" Button Centered Outside the Card */}
+              <div className="flex justify-center items-center gap-4 mt-4 w-full max-w-4xl">
+                <Button
+                  onClick={toggleQuestionReview}
+                  variant={showQuestionReview ? "secondary" : "default"}
+                  className="transition-all duration-300 ease-in-out transform hover:scale-105"
+                >
+                  {showQuestionReview
+                    ? "Hide Question Review"
+                    : "Show Question Review"}
+                </Button>
+              </div>
+
+              {/* Question Review Section */}
+              {showQuestionReview && (
+                <Card className="w-full max-w-4xl mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
+                  <CardHeader className="bg-indigo-500 text-white p-6">
+                    <CardTitle className="text-2xl font-bold">
+                      Question Review
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <div className="space-y-6">
+                      {questions.map((question) => (
+                        <Card
+                          key={question.question_id}
+                          className="bg-gray-50 border-gray-200"
+                        >
+                          <CardHeader>
+                            <CardTitle className="text-lg font-semibold text-gray-800">
+                              {`Q${question.number}: ${question.question_desc}`}
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="mb-2">
+                              <span className="font-medium text-gray-700">
+                                Your Answer:
+                              </span>{" "}
+                              <span className="text-gray-600">
+                                {answers[question.question_id] || "No Answer"}
+                              </span>
+                            </p>
+                            <p className="mb-2">
+                              <span className="font-medium text-gray-700">
+                                Correct Answer:
+                              </span>{" "}
+                              <span className="text-gray-600">
+                                {question.question_answer}
+                              </span>
+                            </p>
+                            {answers[question.question_id]?.trim() ===
+                            question.question_answer.trim() ? (
+                              <p className="text-green-500 font-semibold">
+                                Correct
+                              </p>
+                            ) : (
+                              <p className="text-red-500 font-semibold">
+                                Incorrect
+                              </p>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          ) : (
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+              {isLoading && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <Loading />
+                </div>
+              )}
+              <ExamHeader
+                title={examData.exam_title}
+                timeRemaining={timeRemaining}
+                instructions={examData.exam_desc || "Answer all questions."}
+              />
+              <div className="flex-grow flex flex-col md:flex-row">
+                <aside className="w-full md:w-64 bg-white shadow-md md:shadow-lg">
+                  <QuestionNavigation
+                    questions={questions}
+                    currentQuestion={currentQuestion}
+                    setCurrentQuestion={setCurrentQuestion}
+                    answers={answers}
+                  />
+                </aside>
+                <main className="flex-grow p-4 md:p-6 overflow-y-auto">
+                  <div className="max-w-3xl mx-auto">
+                    <QuestionDisplay
+                      question={questions[currentQuestion - 1]}
+                      questionIndex={currentQuestion}
+                      answer={
+                        answers[questions[currentQuestion - 1]?.question_id]
+                      }
+                      onAnswer={handleAnswer}
+                      isSubmitted={isSubmitted}
+                    />
+                  </div>
+                </main>
+              </div>
+              <footer className="bg-white shadow-md p-4 sticky bottom-0 left-0 right-0">
+                <div className="max-w-7xl mx-auto">
+                  <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
+                    <div className="w-full sm:w-2/3">
+                      <ProgressBar
+                        totalQuestions={questions.length}
+                        answeredQuestions={Object.keys(answers).length}
+                      />
+                    </div>
+                    <div className="w-full sm:w-1/3">
+                      <SubmitButton
+                        onSubmit={handleSubmit}
+                        disabled={
+                          Object.keys(answers).length !== questions.length
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

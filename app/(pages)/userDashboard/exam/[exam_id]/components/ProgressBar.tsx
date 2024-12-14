@@ -1,22 +1,49 @@
+import { useEffect, useState } from "react";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { motion } from "framer-motion";
+
 interface ProgressBarProps {
-  totalQuestions: number; // Total number of questions in the exam
-  answeredQuestions: number; // Number of questions that have been answered
+  totalQuestions: number;
+  answeredQuestions: number;
 }
 
-export default function ProgressBar({ totalQuestions, answeredQuestions }: ProgressBarProps) {
-  const progress = (answeredQuestions / totalQuestions) * 100;
+export default function ProgressBar({
+  totalQuestions,
+  answeredQuestions,
+}: ProgressBarProps) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const calculatedProgress = (answeredQuestions / totalQuestions) * 100;
+    setProgress(calculatedProgress);
+  }, [answeredQuestions, totalQuestions]);
 
   return (
-    <div className="mb-2 md:mb-4">
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
-        <div
-          className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-in-out"
-          style={{ width: `${progress}%` }}
-        ></div>
+    <div className="w-full max-w-md mx-auto mb-6">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-sm font-medium text-gray-700">Exam Progress</span>
+        <Badge variant="secondary" className="text-xs font-semibold">
+          {answeredQuestions} / {totalQuestions}
+        </Badge>
       </div>
-      <p className="text-xs md:text-sm text-gray-600 text-center">
-        {answeredQuestions} of {totalQuestions} answered
-      </p>
+      <Progress value={progress} className="h-2" />
+      <motion.div
+        className="mt-2 text-center"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {progress === 100 ? (
+          <span className="text-green-600 font-semibold">
+            All questions answered!
+          </span>
+        ) : (
+          <span className="text-sm text-gray-600">
+            {Math.round(progress)}% complete
+          </span>
+        )}
+      </motion.div>
     </div>
   );
 }

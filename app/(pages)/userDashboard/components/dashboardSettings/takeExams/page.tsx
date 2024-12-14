@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import LoadingPage from "@/components/Loading";
 
 const supabase = createClient();
 
@@ -86,7 +85,7 @@ const ManageExams = () => {
     }).format(date);
   };
 
-  if (loading) return <LoadingPage />;
+  if (loading) return <h1>Loading...</h1>;
 
   return (
     <div className="grid gap-4 sm:gap-6 lg:gap-8">
