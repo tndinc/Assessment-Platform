@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
+import { Users } from 'lucide-react';
 import Image from "next/image";
 
 const teaminfo = [
@@ -51,7 +52,7 @@ export default function TeaminfoSection() {
         <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
           Our Team
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {teaminfo.map((teaminfo, index) => (
           <TeamCard key={index} {...teaminfo} index={index} />
         ))}
@@ -79,9 +80,6 @@ function TeamCard({ name, role, content, avatar, index }) {
       {isTNDIncorp ? (
         // Custom layout for TND incorp card
         <div className="flex flex-col items-center text-center">
-          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-            {name}
-          </h3>
           <Image
             src={avatar}
             alt={name}
@@ -98,7 +96,7 @@ function TeamCard({ name, role, content, avatar, index }) {
             alt={name}
             width={100}
             height={100}
-            className="rounded-lg mr-4"
+            className="rounded-full mr-4"
           />
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white">

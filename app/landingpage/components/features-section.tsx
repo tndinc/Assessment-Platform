@@ -3,28 +3,31 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
-import { Rocket, Shield, Zap } from "lucide-react";
+import { BookOpenText,
+  MessageCircleCode,
+  Swords
+ } from 'lucide-react';
 import Image from "next/image";
 
 const features = [
   {
-    icon: Rocket,
-    title: "Lightning Fast",
-    description: "Our platform is optimized for speed and performance.",
-    image: "/placeholder.svg?height=300&width=400",
+    icon: BookOpenText,
+    title: "Academic",
+    description: "TND is made for students and teachers",
+    image: "/SAMPLE IMAGE.png?height=300&width=400",
   },
   {
-    icon: Shield,
-    title: "Secure by Design",
+    icon: MessageCircleCode,
+    title: "Feedbacks",
     description:
-      "Your data is protected with state-of-the-art security measures.",
-    image: "/placeholder.svg?height=300&width=400",
+      "Insigts made from analyzed data gathered from you",
+    image: "/SAMPLE IMAGE.png?height=300&width=400",
   },
   {
-    icon: Zap,
-    title: "Powerful Features",
-    description: "Access a wide range of tools to boost your productivity.",
-    image: "/placeholder.svg?height=300&width=400",
+    icon: Swords,
+    title: "Creative features",
+    description: "Access a wide range of fun to boost your productivity",
+    image: "/SAMPLE IMAGE.png?height=300&width=400",
   },
 ];
 

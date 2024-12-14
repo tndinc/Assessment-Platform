@@ -15,7 +15,7 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            Welcome to the Future
+            Welcome to TND
           </motion.h1>
           <motion.p
             className="text-xl mb-8 text-gray-600 dark:text-gray-300"
@@ -23,7 +23,7 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            Experience the next generation of web applications
+            An insight - driven platform utilizing data mining and analytics
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -45,7 +45,7 @@ export default function HeroSection() {
           transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
         >
           <Image
-            src="/placeholder.svg?height=400&width=600"
+            src="/SAMPLE IMAGE.png?height=400&width=600"
             alt="Hero Image"
             width={600}
             height={400}

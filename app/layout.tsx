@@ -5,8 +5,8 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Modern Landing Page",
-  description: "A modern landing page with animations",
+  title: "TND Platform",
+  description: "THESIS 2 SYSTEM PLATFORM",
 };
 
 export default function RootLayout({
@@ -16,6 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/TND.png" type="image/png" />
+      </head>
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
