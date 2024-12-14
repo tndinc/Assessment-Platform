@@ -21,9 +21,9 @@ export default function QuestionNavigation({
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <nav className="w-full md:w-64 bg-white shadow-lg rounded-lg p-4 md:h-[calc(100vh-12rem)] flex flex-col">
+    <nav className="w-full md:w-64 bg-gradient-to-b from-[#B3C8CF] to-[#E5E1DA] text-gray-800 dark:bg-gradient-to-b dark:from-[#508C9B] dark:to-[#526D82] dark:text-white-800 p-4 md:h-[calc(100vh-12rem)] flex flex-col">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold text-gray-800">Questions</h2>
+        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">Questions</h2>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="md:hidden text-gray-600 hover:text-gray-800 transition-colors duration-200"
@@ -51,7 +51,7 @@ export default function QuestionNavigation({
                   className={`w-full text-left p-3 rounded-lg text-sm md:text-base transition-all duration-200 flex items-center justify-between
                     ${
                       isCurrent
-                        ? "bg-blue-500 text-white shadow-md"
+                        ? "bg-[#89A8B2] text-gray-800 dark:bg-[#27374D]/70 text-white shadow-md"
                         : isAnswered
                         ? "bg-green-100 text-gray-800 hover:bg-green-200"
                         : "bg-gray-100 text-gray-800 hover:bg-gray-200"

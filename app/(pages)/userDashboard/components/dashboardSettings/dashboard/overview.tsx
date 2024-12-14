@@ -12,20 +12,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const supabase = createClient();
 
+type ExamResult = {
+  total_score: number;
+  exam_tbl: {
+    subject: string;
+    exam_points: number;
+  };
+};
+
+type TransformedData = {
+  subject: string;
+  grade: number;
+};
+
 export function Overview() {
-  const [chartData, setChartData] = useState([]);
-  const [userId, setUserId] = useState<string | null>(null); // State to store user ID
+  const [chartData, setChartData] = useState<TransformedData[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Fetch the current user
         const {
           data: { user },
         } = await supabase.auth.getUser();
 
         if (user) {
-          setUserId(user.id); // Store user ID for later use
+          setUserId(user.id);
         } else {
           throw new Error("User not authenticated");
         }
@@ -39,10 +51,9 @@ export function Overview() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!userId) return; // Wait for user ID to be available
+      if (!userId) return;
 
       try {
-        // Fetch data from `exam_results` and join with `exam_tbl`
         const { data, error } = await supabase
           .from("exam_results")
           .select(
@@ -51,61 +62,60 @@ export function Overview() {
             exam_tbl(subject, exam_points)
           `
           )
-          .eq("user_id", userId); // Use dynamic user ID
+          .eq("user_id", userId);
 
         if (error) throw error;
 
-        // Transform data for the chart
-        const transformedData = data.map((result) => {
+        const transformedData: TransformedData[] = (data as unknown as ExamResult[]).map((result) => {
           const { subject, exam_points } = result.exam_tbl;
-          const grade = ((result.total_score / exam_points) * 100).toFixed(2); // Calculate grade as percentage
+          const grade = ((result.total_score / exam_points) * 100).toFixed(2);
           return { subject, grade: Number(grade) };
         });
 
         setChartData(transformedData);
       } catch (err) {
-        console.error("Error fetching data:");
+        console.error("Error fetching data:", err);
       }
     };
 
     fetchData();
-  }, [userId]); // Re-fetch when the userId is set
+  }, [userId]);
 
   return (
-        <ChartContainer
-          config={{
-            grade: {
-              label: "Grade",
-              color: "hsl(var(--chart-1))",
-            },
-          }}
-          className="min-h-[350px]"
-        >
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={chartData}>
-              <XAxis
-                dataKey="subject"
-                stroke="#888888"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                stroke="#888888"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => `${value}%`}
-              />
-              <Bar
-                dataKey="grade"
-                className="fill-[#8E806A] dark:fill-[#508C9B]"
-                radius={[4, 4, 0, 0]}
-                barSize={50}
-              />
-              <ChartTooltip content={<ChartTooltipContent />} cursor={false} />
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+    <ChartContainer
+      config={{
+        grade: {
+          label: "Grade",
+          color: "hsl(var(--chart-1))",
+        },
+      }}
+      className="min-h-[350px]"
+    >
+      <ResponsiveContainer width="100%" height={350}>
+        <BarChart data={chartData}>
+          <XAxis
+            dataKey="subject"
+            stroke="#888888"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+          />
+          <YAxis
+            stroke="#888888"
+            fontSize={12}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(value) => `${value}%`}
+          />
+          <Bar
+            dataKey="grade"
+            className="fill-[#8E806A] dark:fill-[#508C9B]"
+            radius={[4, 4, 0, 0]}
+            barSize={50}
+          />
+          <ChartTooltip content={<ChartTooltipContent />} cursor={false} />
+        </BarChart>
+      </ResponsiveContainer>
+    </ChartContainer>
   );
 }

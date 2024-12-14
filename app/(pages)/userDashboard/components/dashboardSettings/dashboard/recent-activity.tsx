@@ -10,8 +10,15 @@ interface User {
   [key: string]: any;
 }
 
+interface Activity {
+  id: string;
+  type: string;
+  course: string;
+  timestamp: string;
+}
+
 export function RecentActivity() {
-  const [activities, setActivities] = useState([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -60,7 +67,7 @@ export function RecentActivity() {
         }
 
         if (data && data.length > 0) {
-          const transformedActivities = data.map((activity) => ({
+          const transformedActivities: Activity[] = data.map((activity) => ({
             id: activity.id,
             type: "Exam Completed",
             course: activity.exam_tbl
