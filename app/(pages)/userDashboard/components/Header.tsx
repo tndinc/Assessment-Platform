@@ -52,60 +52,6 @@ export function Header() {
   const profilePicture = user?.user_metadata?.avatar_url || "";
 
   return (
-<<<<<<< HEAD
-    <header className="sticky top-0 z-50 w-full border-b bg-[#AEC2B6]/90 dark:bg-newDarkBlue/90 backdrop-blur-sm">
-      <div className="container flex h-14 items-center">
-        <div className="mr-4 hidden md:flex ml-5  ">
-        <img
-            src="/TND.png" // path to your logo image in the public folder
-            alt="Your Brand"
-            className="h-10 md:h-10" // adjust size of the logo
-          />
-          <span className="mt-3 text-xl font-bold text-[#89A8B2] dark:text-[#89A8B2]">TND</span>
-          </div>
-        <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <div className="w-full flex-1 md:w-auto md:flex-none" />
-          <nav className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-              <span className="sr-only">Notifications</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-            >
-              <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  {profilePicture ? (
-                    <img
-                      src={profilePicture}
-                      alt="User Avatar"
-                      className="h-8 w-8 rounded-full"
-                    />
-                  ) : (
-                    <UserIcon className="h-8 w-8 text-gray-600" /> // Default icon if no avatar
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuItem>
-                  <UserIcon className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <UserIcon className="mr-2 h-4 w-4" />
-                  <span>Logout</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </nav>
-=======
     <header className="sticky top-0 z-50 w-full border-b bg-white shadow dark:bg-gray-800 dark:border-gray-700">
       <div className="flex h-16 items-center justify-between px-4 w-full">
         <div className="flex items-center space-x-2 ml-12 lg:ml-0">
@@ -168,7 +114,6 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
->>>>>>> ian2
         </div>
       </div>
     </header>

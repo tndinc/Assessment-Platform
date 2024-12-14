@@ -96,11 +96,7 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
   return (
     <div className="flex h-full max-w-full overflow-x-hidden">
       {/* Desktop Sidebar */}
-<<<<<<< HEAD
-      <div className="bg-[#B2C8BA]/90 dark:bg-newDarkBlue/90 text-black dark:text-white">
-=======
       <div className="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40 w-64">
->>>>>>> ian2
         {sidebarContent}
       </div>
 
@@ -121,12 +117,7 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
       </Sheet>
 
       {/* Content Section */}
-<<<<<<< HEAD
-      <div className="flex-1 p-4 bg-[#B2C8BA]/80 dark:bg-newDarkBlue">{renderContent()}</div>
-    </>
-=======
       <div className="flex-1 p-4">{renderContent()}</div>
     </div>
->>>>>>> ian2
   );
 }

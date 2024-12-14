@@ -2,11 +2,7 @@ import { Book, GraduationCap, Lightbulb, Pencil } from "lucide-react";
 
 export default function Loading() {
   return (
-<<<<<<< HEAD
-    <div className="flex items-center justify-center min-h-screen w-full bg-creamLight dark:bg-newDarkBlue">
-=======
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-indigo-950">
->>>>>>> ian2
       <div className="text-center">
         <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-100 mb-4">
           Loading Knowledge...

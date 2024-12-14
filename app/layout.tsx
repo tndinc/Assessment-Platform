@@ -5,15 +5,9 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-<<<<<<< HEAD
-  title: 'TND platform',
-  description: 'panis',
-}
-=======
   title: "Modern Landing Page",
   description: "A modern landing page with animations",
 };
->>>>>>> ian2
 
 export default function RootLayout({
   children,
