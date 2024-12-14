@@ -24,7 +24,7 @@ export function LoginDialog() {
         // redirect eme eme
         provider: "google",
         options: {
-          redirectTo: "http://localhost:3000//loading",
+          redirectTo: "http://localhost:3000/userDashboard",
         },
       });
     } catch (error) {
