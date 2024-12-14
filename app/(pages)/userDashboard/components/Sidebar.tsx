@@ -49,7 +49,7 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
   const profilePicture = user?.user_metadata?.avatar_url || "";
 
   const sidebarContent = (
-    <div className="flex h-full flex-col gap-4 p-4">
+    <div className="flex h-screen flex-col gap-4 p-4">
       <div className="flex flex-col items-center gap-2">
         {profilePicture && (
           <img

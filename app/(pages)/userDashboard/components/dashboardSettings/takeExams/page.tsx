@@ -88,16 +88,15 @@ const ManageExams = () => {
   if (loading) return <h1>Loading...</h1>;
 
   return (
-    <div className="grid gap-4 sm:gap-6 lg:gap-8">
-      <h1 className="text-3xl font-semibold mb-6">Take Exam</h1>
+    <div className="grid gap-4 sm:gap-6 lg:gap-8 mt-10">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {exams.map((exam) => (
           <Card
             key={exam.exam_id}
-            className="w-full bg-white dark:bg-gray-800 shadow-md hover:shadow-lg transition-shadow duration-300 border border-blue-100 dark:border-blue-900"
+            className="w-full bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 shadow-md hover:shadow-lg transition-shadow duration-300"
           >
-            <CardHeader className="bg-blue-700 dark:bg-blue-900 p-4">
-              <CardTitle className="text-xl font-bold truncate text-white">
+            <CardHeader className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 p-4">
+              <CardTitle className="text-xl font-bold truncate text-gray-800 dark:text-white">
                 {exam.exam_title}
               </CardTitle>
             </CardHeader>
@@ -120,9 +119,9 @@ const ManageExams = () => {
                 Due: {convertToPHT(exam.deadline)}
               </p>
             </CardContent>
-            <CardFooter className="bg-blue-50 dark:bg-blue-800 p-4">
+            <CardFooter className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 p-4">
               <Button
-                className="w-full py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 text-white font-semibold transition-colors duration-300"
+                className="w-full py-2 bg-[#8E806A]/70 hover:bg-[#8E806A] dark:bg-[#508C9B]/50 dark:hover:bg-[#508C9B]/20 text-gray-900 dark:text-white font-semibold transition-colors duration-300"
                 onClick={() => handleTakeExam(exam.exam_id)}
                 disabled={loadingExamId === exam.exam_id}
               >
