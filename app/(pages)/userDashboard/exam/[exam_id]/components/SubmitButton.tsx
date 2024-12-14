@@ -1,20 +1,39 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
+
 interface SubmitButtonProps {
-  onSubmit: () => void; // Function to handle the button click
-  disabled: boolean; // Whether the button is disabled
+  onSubmit: () => void;
+  disabled: boolean;
+  isLoading?: boolean;
 }
 
-export default function SubmitButton({ onSubmit, disabled }: SubmitButtonProps) {
+export default function SubmitButton({
+  onSubmit,
+  disabled,
+  isLoading = false,
+}: SubmitButtonProps) {
   return (
-    <button
-      onClick={onSubmit}
-      disabled={disabled}
-      className={`w-full py-2 px-4 rounded-lg text-white font-semibold text-sm md:text-base transition-colors duration-200 ${
-        disabled
-          ? 'bg-gray-400 cursor-not-allowed'
-          : 'bg-green-500 hover:bg-green-600'
-      }`}
+    <motion.div
+      whileHover={{ scale: disabled ? 1 : 1.02 }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
     >
-      Submit Exam
-    </button>
+      <Button
+        onClick={onSubmit}
+        disabled={disabled || isLoading}
+        className="w-full py-6 text-lg font-semibold transition-all duration-200 bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500"
+      >
+        {isLoading ? (
+          <>
+            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            Submitting...
+          </>
+        ) : (
+          "Submit Exam"
+        )}
+      </Button>
+    </motion.div>
   );
 }
