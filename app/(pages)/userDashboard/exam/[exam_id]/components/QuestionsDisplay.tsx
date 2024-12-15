@@ -94,7 +94,7 @@ export default function QuestionDisplay({
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto">
+    <Card className="w-full max-w-4xl mx-auto dark:bg-[#243642]">
       <CardContent className="space-y-6 pt-6">
         <CardTitle className="text-2xl font-bold">
           {question.question_desc}
