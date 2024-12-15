@@ -23,7 +23,10 @@ export default function SubmitButton({
       <Button
         onClick={onSubmit}
         disabled={disabled || isLoading}
-        className="w-full py-6 text-lg font-semibold transition-all duration-200 bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500"
+        className="w-full py-6 text-lg font-semibold transition-all duration-200 
+        bg-gradient-to-r from-[#9EDF9C]/90 to-[#62825D] hover:from-[#9EDF9C]/80 hover:to-[#62825D]/70 disabled:from-gray-400 disabled:to-gray-500 text-gray-900
+        dark:bg-gradient-to-r dark:from-[#47663B]/90 dark:to-[#1F4529]/90 dark:hover:from-[#47663B] dark:hover:to-[#1F4529]
+        dark:disabled:from-gray-400 dark:disabled:to-gray-500 dark:text-gray-300"
       >
         {isLoading ? (
           <>

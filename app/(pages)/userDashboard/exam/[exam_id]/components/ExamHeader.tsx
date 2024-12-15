@@ -14,7 +14,7 @@ export default function ExamHeader({
   instructions,
 }: ExamHeaderProps) {
   return (
-    <header className="bg-gradient-to-r from-[#B3C8CF] to-[#E5E1DA] text-gray-800 dark:bg-gradient-to-r dark:from-[#508C9B] dark:to-[#526D82] dark:text-white-800 shadow-lg p-4 md:p-6">
+    <header className="bg-gradient-to-t from-[#B3C8CF] to-[#E5E1DA] text-gray-800 dark:bg-gradient-to-t dark:from-[#508C9B] dark:to-[#526D82] dark:text-white-800 shadow-lg p-4 md:p-6">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <h1 className="text-2xl md:text-3xl font-bold mb-2 md:mb-0">

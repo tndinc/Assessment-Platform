@@ -506,7 +506,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                     answers={answers}
                   />
                 </aside>
-                <main className="flex-grow p-4 md:p-6 overflow-y-auto">
+                <main className="flex-grow p-4 md:p-6 overflow-y-auto bg-gradient-to-b from-[#B3C8CF] to-[#E5E1DA] text-gray-800 dark:bg-gradient-to-b dark:from-[#508C9B] dark:to-[#526D82] dark:text-white-800">
                   <div className="max-w-3xl mx-auto">
                     <QuestionDisplay
                       question={questions[currentQuestion - 1]}
@@ -520,7 +520,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                   </div>
                 </main>
               </div>
-              <footer className="bg-white shadow-md p-4 sticky bottom-0 left-0 right-0">
+              <footer className="bg-white shadow-md p-4 sticky bottom-0 left-0 right-0 
+              bg-gradient-to-t from-[#B3C8CF] to-[#E5E1DA] text-gray-800 
+              dark:bg-gradient-to-t dark:from-[#508C9B] dark:to-[#526D82] dark:text-white-800">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
                     <div className="w-full sm:w-2/3">

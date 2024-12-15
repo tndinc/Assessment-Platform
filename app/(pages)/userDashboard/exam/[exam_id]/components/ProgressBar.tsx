@@ -22,7 +22,7 @@ export default function ProgressBar({
   return (
     <div className="w-full max-w-md mx-auto mb-6">
       <div className="flex justify-between items-center mb-2">
-        <span className="text-sm font-medium text-gray-700">Exam Progress</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Exam Progress</span>
         <Badge variant="secondary" className="text-xs font-semibold">
           {answeredQuestions} / {totalQuestions}
         </Badge>
@@ -35,7 +35,7 @@ export default function ProgressBar({
         transition={{ duration: 0.5 }}
       >
         {progress === 100 ? (
-          <span className="text-green-600 font-semibold">
+          <span className="text-[#527853] dark:text-[#9EDF9C]/90 font-semibold">
             All questions answered!
           </span>
         ) : (
