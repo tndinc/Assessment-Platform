@@ -121,20 +121,20 @@ export function DashboardContent() {
         </Card>
         <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest academic activities</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RecentActivity />
-          </CardContent>
-        </Card>
-        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
-          <CardHeader>
             <CardTitle>Upcoming Exams</CardTitle>
             <CardDescription>Prepare for your next challenges</CardDescription>
           </CardHeader>
           <CardContent>
             <UpcomingExams />
+          </CardContent>
+        </Card>
+        <Card className="col-span-full bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Your latest academic activities</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RecentActivity />
           </CardContent>
         </Card>
       </div>
