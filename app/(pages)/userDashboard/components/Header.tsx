@@ -62,6 +62,12 @@ export function Header() {
             alt="Your Brand"
             className="h-10 md:h-10" // adjust size of the logo
           />
+          <span className="text-2xl font-bold text-primary tracking-tight">
+            TND
+          </span>
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wide">
+            INC.
+          </span>
         </div>
 
         {/* Right Section */}
