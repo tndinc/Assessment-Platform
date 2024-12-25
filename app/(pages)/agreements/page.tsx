@@ -67,7 +67,7 @@ const AgreementsAndTermsPage = () => {
 
   // If `user_section` exists, redirect to `/userDashboard`
   if (userSection) {
-    router.push("/userDashboard");
+    router.push("/user-dashboard");
     return null; // Prevent rendering anything else after redirection
   }
 

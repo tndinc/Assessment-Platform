@@ -14,7 +14,7 @@ const AdminPages = () => {
     const loggedInUser = sessionStorage.getItem("admin_user");
     if (!loggedInUser) {
       // Redirect to login if no admin_user in sessionStorage
-      router.push("/login");
+      router.push("/");
     } else {
       // Set the adminUser from sessionStorage
       console.log(loggedInUser);

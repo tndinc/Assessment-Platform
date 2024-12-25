@@ -67,6 +67,22 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.3 }}
     >
+      {/* Logo with TND Incorporations */}
+      <div className="flex items-center gap-3 lg:hidden justify-center mb-4">
+        <img
+          src="/TND.png"
+          alt="TND Incorporations Logo"
+          className="h-10 w-auto"
+        />
+        <div className="text-left">
+          <h1 className="text-lg font-bold text-black dark:text-white">TND</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Incorporations
+          </p>
+        </div>
+      </div>
+
+      {/* User Info */}
       <div className="flex flex-col items-center gap-4">
         <Avatar className="h-20 w-20">
           <AvatarImage src={profilePicture} alt={userName} />
@@ -81,22 +97,18 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
           </p>
         </div>
       </div>
+
+      {/* Navigation Items */}
       <nav className="flex flex-col gap-2">
         {navItems.map((item) => (
           <Button
             key={item.name}
             variant={activeItem === item.name ? "secondary" : "ghost"}
-            className={`
-              justify-start w-full text-left
-              ${
-                activeItem === item.name
-                  ? "bg-[#B3C8CF] dark:bg-[#526D82]"
-                  : "text-black dark:text-white"
-              }
-              hover:bg-[#89A8B2] dark:hover:text-white hover:text-black
-              dark:hover:bg-[#526D82]/40
-              transition-colors
-            `}
+            className={`justify-start w-full text-left ${
+              activeItem === item.name
+                ? "bg-[#B3C8CF] dark:bg-[#526D82]"
+                : "text-black dark:text-white"
+            } hover:bg-[#89A8B2] dark:hover:text-white hover:text-black dark:hover:bg-[#526D82]/40 transition-colors`}
             onClick={() => {
               setActiveItem(item.name);
               setIsMobileMenuOpen(false);

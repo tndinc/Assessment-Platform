@@ -72,7 +72,7 @@ export default function ChooseSection() {
 
       // Check if the user already has a `user_section`
       if (profileData && profileData.user_section) {
-        router.push("/userDashboard"); // Redirect to dashboard if user already has a section
+        router.push("/user-dashboard"); // Redirect to dashboard if user already has a section
         return;
       }
 
@@ -149,7 +149,7 @@ export default function ChooseSection() {
       }
 
       // Redirect after successful update
-      router.push("/userDashboard");
+      router.push("/user-dashboard");
     } catch (error) {
       console.error("Unexpected error:", error);
     } finally {

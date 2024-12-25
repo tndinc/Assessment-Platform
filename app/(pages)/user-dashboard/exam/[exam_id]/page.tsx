@@ -315,7 +315,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 
                   {/* Close Button aligned to the top-right corner of the CardHeader */}
                   <Button
-                    onClick={() => router.push("/userDashboard")}
+                    onClick={() => router.push("/user-dashboard")}
                     className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white transition-all duration-300 ease-in-out transform hover:scale-105"
                   >
                     Close
