@@ -6,7 +6,15 @@ import { createClient } from "@/utils/supabase/client";
 const supabase = createClient();
 
 export function UpcomingExams() {
-  const [exams, setExams] = useState([]);
+  // Define the type for exam entries
+  type Exam = {
+    id: number;
+    subject: string;
+    date: string;
+    time: string;
+  };
+
+  const [exams, setExams] = useState<Exam[]>([]); // State type is now an array of Exam objects
 
   useEffect(() => {
     const fetchExams = async () => {

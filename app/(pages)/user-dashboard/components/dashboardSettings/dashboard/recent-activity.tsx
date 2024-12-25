@@ -1,3 +1,5 @@
+"use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
@@ -6,24 +8,43 @@ const supabase = createClient();
 
 interface User {
   id: string;
-  email: string;
-  [key: string]: any;
+  email: string | undefined;
+}
+
+interface ExamTableData {
+  exam_title: string;
+  subject: string;
+}
+
+interface ExamResult {
+  id: string;
+  created_at: string;
+  exam_tbl: ExamTableData;
+}
+
+interface Activity {
+  id: string;
+  type: string;
+  course: string;
+  timestamp: string;
 }
 
 export function RecentActivity() {
-  const [activities, setActivities] = useState([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const {
-          data: { user },
+          data: { user: authUser },
         } = await supabase.auth.getUser();
-
-        setUser(user);
-
-        if (!user) {
+        if (authUser) {
+          setUser({
+            id: authUser.id,
+            email: authUser.email,
+          });
+        } else {
           throw new Error("User not authenticated");
         }
       } catch (error) {
@@ -39,7 +60,7 @@ export function RecentActivity() {
       if (!user) return;
 
       try {
-        const { data, error } = await supabase
+        const { data, error } = (await supabase
           .from("exam_results")
           .select(
             `
@@ -52,30 +73,26 @@ export function RecentActivity() {
           `
           )
           .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
+          .order("created_at", { ascending: false })) as {
+          data: ExamResult[] | null;
+          error: any;
+        };
 
-        if (error) {
-          console.error("Fetch error:", error);
-          return;
-        }
+        if (error) throw error;
+        if (!data) return;
 
-        if (data && data.length > 0) {
-          const transformedActivities = data.map((activity) => ({
-            id: activity.id,
-            type: "Exam Completed",
-            course: activity.exam_tbl
-              ? `${activity.exam_tbl.exam_title} - ${activity.exam_tbl.subject}`
-              : "Unknown Exam",
-            timestamp: new Date(activity.created_at).toLocaleString(),
-          }));
+        const transformedActivities = data.map((activity) => ({
+          id: activity.id,
+          type: "Exam Completed",
+          course: activity.exam_tbl
+            ? `${activity.exam_tbl.exam_title} - ${activity.exam_tbl.subject}`
+            : "Unknown Exam",
+          timestamp: new Date(activity.created_at).toLocaleString(),
+        }));
 
-          setActivities(transformedActivities);
-        } else {
-          console.warn("No activities found for the user.");
-          setActivities([]);
-        }
+        setActivities(transformedActivities);
       } catch (err) {
-        console.error("Unexpected error fetching activities:", err);
+        console.error("Error fetching activities:", err);
       }
     };
 

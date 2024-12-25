@@ -63,7 +63,7 @@ const UserDashboard = () => {
 
   return (
     <>
-      <Layout user={user}></Layout>
+      <Layout />
     </>
   );
 };

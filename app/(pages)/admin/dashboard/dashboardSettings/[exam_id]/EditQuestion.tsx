@@ -21,17 +21,25 @@ const supabase = createClient();
 
 interface EditQuestionProps {
   questionId: number;
-  onQuestionUpdated: () => void;
+  questionText?: string; // Make questionText optional
+  questionPoints?: number; // Make questionPoints optional
+  choices?: string[]; // Make choices optional
+  correctChoice?: number | null; // Make correctChoice optional
+  onQuestionUpdated: () => void; // Define the function type
 }
 
 const EditQuestion: React.FC<EditQuestionProps> = ({
   questionId,
+  questionText, // Provide default values
+  questionPoints,
+  choices = ["", "", "", ""],
+  correctChoice = null,
   onQuestionUpdated,
 }) => {
-  const [questionText, setQuestionText] = useState("");
-  const [questionPoints, setQuestionPoints] = useState(0);
-  const [choices, setChoices] = useState<string[]>(["", "", "", ""]);
-  const [correctChoice, setCorrectChoice] = useState<number | null>(null);
+  const [localQuestionText, setQuestionText] = useState(questionText); // Use props if available
+  const [localQuestionPoints, setQuestionPoints] = useState(questionPoints); // Use props if available
+  const [localChoices, setChoices] = useState(choices); // Use props if available
+  const [localCorrectChoice, setCorrectChoice] = useState(correctChoice); // Use props if available
   const [isOpen, setIsOpen] = useState(false); // State for modal open/close
 
   // Fetch question details when the component mounts

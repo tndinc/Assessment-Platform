@@ -184,7 +184,8 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
               ?.topic_title || `Topic ${topic}`; // Fallback if topic title is not found
 
           const percentage = ((score / total) * 100).toFixed(2); // Calculate percentage and format
-          const strength = percentage >= 75 ? "strength" : "weakness"; // Determine strength or weakness
+          const percentageValue = parseFloat(percentage);
+          const strength = percentageValue >= 75 ? "strength" : "weakness"; // Determine strength or weakness
 
           // Return formatted feedback string
           return `Topic: ${topicTitle} - ${percentage}% (${strength})`;
@@ -212,7 +213,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
       });
 
       const aiFeedback =
-        response.choices[0]?.message?.content.trim() ||
+        response?.choices?.[0]?.message?.content?.trim() ||
         "No feedback available.";
 
       // Split feedback into sections
@@ -239,7 +240,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 
       // Save the exam results and feedback in the database
       await saveExamResults({
-        user_id: user.id,
+        user_id: user?.id || "",
         exam_id,
         total_score: totalScore,
         topic_scores: topicScoresTemp,
@@ -261,6 +262,13 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
     }
     setIsLoading(false);
     setIsSubmitted(true);
+  };
+
+  // Define the type for feedback sections
+  type FeedbackSections = {
+    strengths: string;
+    weaknesses: string;
+    overallFeedback: string;
   };
 
   // State to handle feedback sections and navigation
@@ -287,7 +295,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 
   // Display feedback based on current index
   const getFeedbackToDisplay = () => {
-    const keys = Object.keys(feedbackSections);
+    const keys = Object.keys(feedbackSections) as (keyof FeedbackSections)[];
     return feedbackSections[keys[currentFeedbackIndex]];
   };
 
@@ -510,7 +518,6 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                   <div className="max-w-3xl mx-auto">
                     <QuestionDisplay
                       question={questions[currentQuestion - 1]}
-                      questionIndex={currentQuestion}
                       answer={
                         answers[questions[currentQuestion - 1]?.question_id]
                       }

@@ -1,11 +1,18 @@
 "use client";
-
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 
-const teamInfo = [
+// Define the type for each team member
+interface TeamMember {
+  name: string;
+  role: string;
+  content: string;
+  avatar: string;
+}
+
+const teamInfo: TeamMember[] = [
   {
     name: "TND incorp",
     role: "TANOD",
@@ -137,7 +144,15 @@ export default function ModernTeamCarousel() {
   );
 }
 
-function TeamCard({ name, role, content, avatar }) {
+// Define props for TeamCard component
+interface TeamCardProps {
+  name: string;
+  role: string;
+  content: string;
+  avatar: string;
+}
+
+function TeamCard({ name, role, content, avatar }: TeamCardProps) {
   const isTNDIncorp = name === "TND incorp";
 
   return (

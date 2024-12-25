@@ -11,6 +11,17 @@ import DeleteQuestion from "./DeleteQuestion";
 import DeleteTopic from "./DeleteTopic";
 
 const supabase = createClient();
+interface ChoiceType {
+  choices_id: number; // Assuming each choice has a unique ID
+  question_txt: string; // The text of the choice
+}
+interface QuestionType {
+  question_id: number; // Unique identifier for the question
+  question_desc: string; // The description or text of the question
+  question_points: number; // Points assigned to the question
+  question_answer: string; // The correct answer text
+  choices: ChoiceType[]; // List of choices
+}
 
 const ExamSection = () => {
   const [topics, setTopics] = useState<any[]>([]);
@@ -204,7 +215,7 @@ const ExamSection = () => {
                 </div>
 
                 {topic.questions && topic.questions.length > 0 ? (
-                  topic.questions.map((question) => (
+                  topic.questions.map((question: QuestionType) => (
                     <Card
                       key={question.question_id}
                       className="mb-4 bg-gray-100 dark:bg-gray-700 dark:text-white"

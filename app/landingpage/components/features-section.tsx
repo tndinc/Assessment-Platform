@@ -1,15 +1,19 @@
 "use client";
-
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
-import { BookOpenText,
-  MessageCircleCode,
-  Swords
- } from 'lucide-react';
+import { BookOpenText, MessageCircleCode, Swords } from "lucide-react";
 import Image from "next/image";
 
-const features = [
+// Define the feature type
+interface Feature {
+  icon: React.ElementType; // Icon is a React component
+  title: string;
+  description: string;
+  image: string;
+}
+
+const features: Feature[] = [
   {
     icon: BookOpenText,
     title: "Academic",
@@ -19,8 +23,7 @@ const features = [
   {
     icon: MessageCircleCode,
     title: "Feedbacks",
-    description:
-      "Insigts made from analyzed data gathered from you",
+    description: "Insights made from analyzed data gathered from you",
     image: "/SAMPLE IMAGE.png?height=300&width=400",
   },
   {
@@ -48,7 +51,22 @@ export default function FeaturesSection() {
   );
 }
 
-function FeatureCard({ icon: Icon, title, description, image, index }) {
+// Define the props for the FeatureCard component
+interface FeatureCardProps {
+  icon: React.ElementType; // Icon is a React component
+  title: string;
+  description: string;
+  image: string;
+  index: number;
+}
+
+function FeatureCard({
+  icon: Icon,
+  title,
+  description,
+  image,
+  index,
+}: FeatureCardProps) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
