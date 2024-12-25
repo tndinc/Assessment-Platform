@@ -8,135 +8,120 @@ import {
 import { Overview } from "./overview";
 import { RecentActivity } from "./recent-activity";
 import { UpcomingExams } from "./upcoming-exam";
+import { BookOpen, GraduationCap, CheckSquare, Clock } from "lucide-react";
+
 export function DashboardContent() {
   return (
-    <div className="grid gap-4 sm:gap-6 lg:gap-8">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">6</div>
-            <p className="text-xs text-muted-foreground">
-              +2 from last semester
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Grade</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">85.6%</div>
-            <p className="text-xs text-muted-foreground">
-              +2.1% from last semester
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Completed Assignments
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <rect width="20" height="14" x="2" y="5" rx="2" />
-              <path d="M2 10h20" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">28/30</div>
-            <p className="text-xs text-muted-foreground">
-              2 assignments remaining
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Study Hours</CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">32.5h</div>
-            <p className="text-xs text-muted-foreground">
-              +5.2h from last week
-            </p>
-          </CardContent>
-        </Card>
+    <div className="space-y-6 p-4 sm:p-6 lg:p-8">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">Your Dashboard</h1>
+        <p className="text-muted-foreground">
+          Here's an overview of your academic progress and upcoming tasks. Stay
+          focused and keep up the great work!
+        </p>
       </div>
-      <div className="grid gap-4 md:gap-6 lg:gap-8 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-full lg:col-span-4 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          {
+            title: "Total Courses",
+            value: "6",
+            change: "+2 from last semester",
+            icon: BookOpen,
+            description: "You're enrolled in 6 courses this semester.",
+          },
+          {
+            title: "Average Grade",
+            value: "85.6%",
+            change: "+2.1% from last semester",
+            icon: GraduationCap,
+            description: "Great job! Your grades are improving.",
+          },
+          {
+            title: "Completed Assignments",
+            value: "28/30",
+            change: "2 assignments remaining",
+            icon: CheckSquare,
+            description: "Almost there! Don't forget the last two.",
+          },
+          {
+            title: "Study Hours",
+            value: "32.5h",
+            change: "+5.2h from last week",
+            icon: Clock,
+            description: "Your dedication is paying off!",
+          },
+        ].map((item, index) => (
+          <Card
+            key={index}
+            className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 transition-all hover:shadow-md"
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {item.title}
+              </CardTitle>
+              <item.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{item.value}</div>
+              <p className="text-xs text-muted-foreground">{item.change}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {item.description}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="col-span-full lg:col-span-4 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 transition-all hover:shadow-md">
           <CardHeader>
             <CardTitle>Grade Overview</CardTitle>
+            <CardDescription>
+              Track your performance across all courses. The chart shows your
+              grades over time.
+            </CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
             <Overview />
           </CardContent>
         </Card>
-        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
+        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 transition-all hover:shadow-md">
           <CardHeader>
             <CardTitle>Upcoming Exams</CardTitle>
-            <CardDescription>Prepare for your next challenges</CardDescription>
+            <CardDescription>
+              Stay prepared for your next challenges. Click on an exam to see
+              more details or start a practice test.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <UpcomingExams />
           </CardContent>
         </Card>
-        <Card className="col-span-full bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
+        <Card className="col-span-full bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 transition-all hover:shadow-md">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest academic activities</CardDescription>
+            <CardDescription>
+              Keep track of your latest academic activities. This includes
+              recently submitted assignments, attended classes, and study
+              sessions.
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <RecentActivity />
           </CardContent>
         </Card>
+      </div>
+
+      <div className="text-center text-sm text-muted-foreground">
+        <p>
+          Need help? Contact your academic advisor or visit the student support
+          center.
+        </p>
+        <p>
+          Remember: Your education is an investment in yourself. Make every
+          moment count!
+        </p>
       </div>
     </div>
   );

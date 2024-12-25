@@ -304,6 +304,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
         </div>
       ) : (
         <>
+          {/* Feedback Review */}
           {isSubmitted ? (
             <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-4">
               <Card className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
@@ -492,6 +493,8 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                   <Loading />
                 </div>
               )}
+          {/* EXAM QUESTIONS DESIGN*/}
+
               <ExamHeader
                 title={examData.exam_title}
                 timeRemaining={timeRemaining}
@@ -523,16 +526,13 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
               <footer className="bg-white shadow-md p-4 sticky bottom-0 left-0 right-0">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
-                    {/* Progress Bar Section */}
                     <div className="w-full sm:w-2/3">
                       <ProgressBar
                         totalQuestions={questions.length}
                         answeredQuestions={Object.keys(answers).length}
                       />
                     </div>
-
-                    {/* Submit Button Section */}
-                    <div className="w-full sm:w-1/3 flex justify-end">
+                    <div className="w-full sm:w-1/3">
                       <SubmitButton
                         onSubmit={handleSubmit}
                         disabled={
@@ -552,3 +552,6 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 };
 
 export default ExamInterface;
+
+can you split in another tsx form the {/* Feedback Review */} & {/* EXAM QUESTIONS DESIGN*/}
+without error. Ensure typescript safety in all aspects. Provide me the full source code. Dont change the functions on my code just rely on it

@@ -19,19 +19,24 @@ export default function SubmitButton({
     <motion.div
       whileHover={{ scale: disabled ? 1 : 1.02 }}
       whileTap={{ scale: disabled ? 1 : 0.98 }}
+      className="w-full max-w-md mx-auto" // Center the button on the screen for all devices
     >
       <Button
         onClick={onSubmit}
         disabled={disabled || isLoading}
-        className="w-full py-6 text-lg font-semibold transition-all duration-200 bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 disabled:from-gray-400 disabled:to-gray-500"
+        className="w-full py-4 md:py-6 text-base md:text-lg font-semibold transition-all duration-200 
+        bg-gradient-to-r from-green-400 to-green-600 
+        hover:from-green-500 hover:to-green-700 
+        disabled:from-gray-400 disabled:to-gray-500 
+        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
       >
         {isLoading ? (
-          <>
-            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-            Submitting...
-          </>
+          <div className="flex items-center justify-center">
+            <Loader2 className="w-5 h-5 md:w-6 md:h-6 mr-2 animate-spin" />
+            <span className="text-sm md:text-base">Submitting...</span>
+          </div>
         ) : (
-          "Submit Exam"
+          <span className="text-sm md:text-base">Submit Exam</span>
         )}
       </Button>
     </motion.div>
