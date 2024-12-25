@@ -30,7 +30,7 @@ const UserDashboard = () => {
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("user_section")
-        .eq("id", user.id) // Assuming `id` is the primary key that links profiles to auth users
+        .eq("id", user.id)
         .single();
 
       if (profileError) {

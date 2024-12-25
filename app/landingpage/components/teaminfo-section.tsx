@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 
@@ -80,8 +80,12 @@ export default function ModernTeamCarousel() {
   }, [currentIndex, nextSlide]);
 
   return (
-    <section className="w-full py-12 md:py-20 bg-gradient-to-b from-white/50 to-[#D7D3BF]/30 dark:from-[#243642] dark:to-[#384B70]/30">
-      <div className="w-full max-w-[2000px] mx-auto px-4 md:px-6">
+    <section className="relative w-full py-12 md:py-20 bg-gradient-to-br from-white/50 via-blue-50/50 to-blue-100/30 dark:from-[#243642] dark:via-[#1a2830] dark:to-[#152028]">
+      <div className="absolute inset-0 w-full h-full">
+        <div className="absolute top-20 right-10 w-72 h-72 bg-blue-400/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 left-10 w-72 h-72 bg-purple-400/10 rounded-full blur-3xl" />
+      </div>
+      <div className="w-full max-w-[2000px] mx-auto px-4 md:px-6 relative">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12 text-gray-900 dark:text-white">
           Meet Our Innovative Team
         </h2>
@@ -89,7 +93,7 @@ export default function ModernTeamCarousel() {
           <motion.div
             className="flex transition-transform ease-in-out duration-500"
             style={{
-              x: `calc(-${currentIndex * 100}%)`,
+              transform: `translateX(-${currentIndex * 100}%)`,
             }}
           >
             {teamInfo.map((member, index) => (
@@ -105,6 +109,7 @@ export default function ModernTeamCarousel() {
               </motion.div>
             ))}
           </motion.div>
+
           <div className="absolute top-1/2 transform -translate-y-1/2 left-0 right-0 flex justify-between px-4">
             <button
               onClick={prevSlide}
@@ -122,6 +127,7 @@ export default function ModernTeamCarousel() {
             </button>
           </div>
         </div>
+
         <div className="flex justify-center mt-6 md:mt-8">
           {teamInfo.map((_, index) => (
             <button
