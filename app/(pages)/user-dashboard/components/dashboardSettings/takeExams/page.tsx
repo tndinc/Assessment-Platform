@@ -61,7 +61,7 @@ const ManageExams = () => {
     setLoadingExamId(exam_id); // Set loading for the selected exam
     // Simulate a small delay to show loading indication (optional)
     setTimeout(() => {
-      router.push(`/userDashboard/exam/${exam_id}`);
+      router.push(`/user-dashboard/exam/${exam_id}`);
     }, 500); // Optional delay for the loading indicator
   };
 

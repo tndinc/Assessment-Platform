@@ -14,9 +14,8 @@ pnpm dev
 bun dev
 ```
 
+after that run "npm install"
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-
 
 ## Learn More
 
@@ -26,4 +25,3 @@ To learn more about this project, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 - [Learn Supabase with Next.JS] https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs?queryGroups=language&language=ts
 - [Learn shadcn with Nex.js] https://ui.shadcn.com/docs/installation/next
-

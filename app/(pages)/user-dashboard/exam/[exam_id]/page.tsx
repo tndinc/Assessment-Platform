@@ -184,7 +184,8 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
               ?.topic_title || `Topic ${topic}`; // Fallback if topic title is not found
 
           const percentage = ((score / total) * 100).toFixed(2); // Calculate percentage and format
-          const strength = percentage >= 75 ? "strength" : "weakness"; // Determine strength or weakness
+          const percentageValue = parseFloat(percentage);
+          const strength = percentageValue >= 75 ? "strength" : "weakness"; // Determine strength or weakness
 
           // Return formatted feedback string
           return `Topic: ${topicTitle} - ${percentage}% (${strength})`;
@@ -212,7 +213,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
       });
 
       const aiFeedback =
-        response.choices[0]?.message?.content.trim() ||
+        response?.choices?.[0]?.message?.content?.trim() ||
         "No feedback available.";
 
       // Split feedback into sections
@@ -239,7 +240,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 
       // Save the exam results and feedback in the database
       await saveExamResults({
-        user_id: user.id,
+        user_id: user?.id || "",
         exam_id,
         total_score: totalScore,
         topic_scores: topicScoresTemp,
@@ -261,6 +262,13 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
     }
     setIsLoading(false);
     setIsSubmitted(true);
+  };
+
+  // Define the type for feedback sections
+  type FeedbackSections = {
+    strengths: string;
+    weaknesses: string;
+    overallFeedback: string;
   };
 
   // State to handle feedback sections and navigation
@@ -287,7 +295,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 
   // Display feedback based on current index
   const getFeedbackToDisplay = () => {
-    const keys = Object.keys(feedbackSections);
+    const keys = Object.keys(feedbackSections) as (keyof FeedbackSections)[];
     return feedbackSections[keys[currentFeedbackIndex]];
   };
 
@@ -315,7 +323,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 
                   {/* Close Button aligned to the top-right corner of the CardHeader */}
                   <Button
-                    onClick={() => router.push("/userDashboard")}
+                    onClick={() => router.push("/user-dashboard")}
                     className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white transition-all duration-300 ease-in-out transform hover:scale-105"
                   >
                     Close
@@ -510,7 +518,6 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                   <div className="max-w-3xl mx-auto">
                     <QuestionDisplay
                       question={questions[currentQuestion - 1]}
-                      questionIndex={currentQuestion}
                       answer={
                         answers[questions[currentQuestion - 1]?.question_id]
                       }
@@ -525,13 +532,16 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
               dark:bg-gradient-to-t dark:from-[#508C9B] dark:to-[#526D82] dark:text-white-800">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
+                    {/* Progress Bar Section */}
                     <div className="w-full sm:w-2/3">
                       <ProgressBar
                         totalQuestions={questions.length}
                         answeredQuestions={Object.keys(answers).length}
                       />
                     </div>
-                    <div className="w-full sm:w-1/3">
+
+                    {/* Submit Button Section */}
+                    <div className="w-full sm:w-1/3 flex justify-end">
                       <SubmitButton
                         onSubmit={handleSubmit}
                         disabled={
