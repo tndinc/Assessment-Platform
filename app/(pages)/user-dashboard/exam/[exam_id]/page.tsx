@@ -313,11 +313,11 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
       ) : (
         <>
           {isSubmitted ? (
-            <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-4">
-              <Card className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
-                <CardHeader className="bg-blue-500 text-white p-6 relative">
+            <div className="min-h-screen bg-gradient-to-t from-[#B3C8CF] to-[#E5E1DA] text-gray-800 dark:bg-gradient-to-t dark:from-[#243642]/90 dark:to-[#243642] flex flex-col items-center justify-center p-4">
+              <Card className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 border-gray-300 dark:border-gray-700">
+                <CardHeader className="text-white p-6 relative bg-[#D7D3BF]/30 dark:bg-[#384B70]/60">
                   {/* Exam Feedback Title */}
-                  <CardTitle className="text-3xl font-bold text-center w-full">
+                  <CardTitle className="text-3xl font-bold text-center w-full text-gray-800 dark:text-gray-300">
                     Exam Feedback
                   </CardTitle>
 
@@ -332,17 +332,17 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 
                 <CardContent className="p-6">
                   <div className="text-center mb-6">
-                    <p className="text-2xl font-semibold text-gray-800">
+                    <p className="text-2xl font-semibold text-gray-800 dark:text-gray-300">
                       Your Total Score
                     </p>
-                    <p className="text-5xl font-bold text-blue-600 mt-2">
+                    <p className="text-5xl font-bold text-blue-600 dark:text-blue-500 mt-2">
                       {score} /{" "}
                       {Object.values(topicScores).reduce(
                         (acc, { total }) => acc + total,
                         0
                       )}
                     </p>
-                    <p className="text-lg font-medium text-gray-700 mt-2">
+                    <p className="text-lg font-medium text-gray-800 dark:text-gray-300 mt-2">
                       {(
                         (score /
                           Object.values(topicScores).reduce(
@@ -366,9 +366,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                         return (
                           <div
                             key={topic}
-                            className="bg-gray-50 p-4 rounded-lg"
+                            className="p-4 rounded-lg bg-[#D7D3BF]/30 dark:bg-[#384B70]/70"
                           >
-                            <p className="font-semibold text-gray-700 mb-2">
+                            <p className="font-semibold text-gray-800 dark:text-gray-300 mb-2">
                               {topicTitle}
                             </p>
                             <div className="flex items-center">
@@ -376,7 +376,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                                 value={percentage}
                                 className="flex-grow mr-4"
                               />
-                              <span className="text-sm font-medium text-gray-600">
+                              <span className="text-sm font-medium text-gray-800 dark:text-gray-300">
                                 {percentage.toFixed(2)}%
                               </span>
                             </div>
@@ -387,9 +387,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                   </div>
 
                   {/* AI Feedback Section */}
-                  <Card className="bg-blue-50 border-blue-200 mb-6">
+                  <Card className=" border-blue-200 mb-6 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30">
                     <CardHeader>
-                      <CardTitle className="text-xl font-semibold text-blue-800">
+                      <CardTitle className="text-xl font-semibold text-gray-800 dark:text-gray-300">
                         {currentFeedbackIndex === 0
                           ? "Strengths"
                           : currentFeedbackIndex === 1
@@ -398,7 +398,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-gray-700">{getFeedbackToDisplay()}</p>
+                      <p className="text-gray-800 dark:text-gray-300">{getFeedbackToDisplay()}</p>
                     </CardContent>
                   </Card>
 
@@ -440,9 +440,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
 
               {/* Question Review Section */}
               {showQuestionReview && (
-                <Card className="w-full max-w-4xl mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
-                  <CardHeader className="bg-indigo-500 text-white p-6">
-                    <CardTitle className="text-2xl font-bold">
+                <Card className="w-full max-w-4xl mt-8 shadow-lg rounded-lg overflow-hidden bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 border-gray-300 dark:border-gray-700">
+                  <CardHeader className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/60 text-white p-6">
+                    <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-300">
                       Question Review
                     </CardTitle>
                   </CardHeader>
@@ -451,27 +451,27 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                       {questions.map((question) => (
                         <Card
                           key={question.question_id}
-                          className="bg-gray-50 border-gray-200"
+                          className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/70 border-gray-300 dark:border-gray-700"
                         >
                           <CardHeader>
-                            <CardTitle className="text-lg font-semibold text-gray-800">
+                            <CardTitle className="text-lg font-semibold text-gray-800 dark:text-gray-300">
                               {`Q${question.number}: ${question.question_desc}`}
                             </CardTitle>
                           </CardHeader>
                           <CardContent>
                             <p className="mb-2">
-                              <span className="font-medium text-gray-700">
+                              <span className="font-medium text-gray-800 dark:text-gray-300">
                                 Your Answer:
                               </span>{" "}
-                              <span className="text-gray-600">
+                              <span className="text-gray-800 dark:text-gray-300">
                                 {answers[question.question_id] || "No Answer"}
                               </span>
                             </p>
                             <p className="mb-2">
-                              <span className="font-medium text-gray-700">
+                              <span className="font-medium text-gray-800 dark:text-gray-300">
                                 Correct Answer:
                               </span>{" "}
-                              <span className="text-gray-600">
+                              <span className="text-gray-800 dark:text-gray-300">
                                 {question.question_answer}
                               </span>
                             </p>
