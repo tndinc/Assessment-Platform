@@ -101,12 +101,12 @@ export function RecentActivity() {
     <div className="space-y-8 h-96 overflow-y-auto rounded-lg p-2">
       {activities.map((activity) => (
         <div key={activity.id} className="flex items-center">
-          <div className="h-9 w-9 bg-green-500 dark:bg-[#556E53] text-white rounded-full flex items-center justify-center">
+          <div className="h-9 w-9 bg-[#72BF78] dark:bg-[#556E53] text-white rounded-full flex items-center justify-center">
             <CheckCircle className="h-5 w-5" />{" "}
             {/* Displaying a checkmark icon from Lucide React */}
           </div>
           <div className="ml-4 space-y-1 flex-grow">
-            <p className="text-sm dark:text-[#A0D683] font-medium leading-none">{activity.type}</p>
+            <p className="text-sm text-[#118B50] dark:text-[#A0D683] font-medium leading-none">{activity.type}</p>
             <p className="text-xs text-muted-foreground">{activity.course}</p>
           </div>
           <div className="ml-auto font-medium text-xs text-muted-foreground whitespace-nowrap">

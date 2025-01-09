@@ -65,8 +65,8 @@ export function Header() {
     <motion.header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         isScrolled
-          ? "bg-white/80 dark:bg-[#092635]/90 backdrop-blur-sm shadow-md"
-          : "bg-white/50 dark:bg-[#092635]/80"
+          ? "bg-[#FEFAF6]/50 dark:bg-[#092635]/50 backdrop-blur-sm shadow-md"
+          : "bg-[#FEFAF6]/20 dark:bg-[#092635]/80"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}

@@ -54,10 +54,10 @@ export function DashboardContent() {
         ].map((item, index) => (
           <Card
             key={index}
-            className="bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md"
+            className="bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md "
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm dark:text-[#67C6E3] font-medium">
+              <CardTitle className="text-sm text-[#74512D] dark:text-[#67C6E3] font-medium">
                 {item.title}
               </CardTitle>
               <item.icon className="h-4 w-4 text-muted-foreground" />
@@ -74,9 +74,9 @@ export function DashboardContent() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-full lg:col-span-4 bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md">
+        <Card className="col-span-full lg:col-span-4 bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md ">
           <CardHeader>
-            <CardTitle className="dark:text-[#67C6E3]">Grade Overview</CardTitle>
+            <CardTitle className="text-[#74512D] dark:text-[#67C6E3]">Grade Overview</CardTitle>
             <CardDescription>
               Track your performance across all courses. The chart shows your
               grades over time.
@@ -86,9 +86,9 @@ export function DashboardContent() {
             <Overview />
           </CardContent>
         </Card>
-        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md">
+        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md">
           <CardHeader>
-            <CardTitle className="dark:text-[#67C6E3]">Upcoming Exams</CardTitle>
+            <CardTitle className="text-[#74512D] dark:text-[#67C6E3]">Upcoming Exams</CardTitle>
             <CardDescription>
               Stay prepared for your next challenges. Click on an exam to see
               more details or start a practice test.
@@ -98,9 +98,9 @@ export function DashboardContent() {
             <UpcomingExams />
           </CardContent>
         </Card>
-        <Card className="col-span-full bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md">
+        <Card className="col-span-full bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md">
           <CardHeader>
-            <CardTitle className="dark:text-[#67C6E3]">Recent Activity</CardTitle>
+            <CardTitle className="text-[#74512D] dark:text-[#67C6E3]">Recent Activity</CardTitle>
             <CardDescription>
               Keep track of your latest academic activities. This includes
               recently submitted assignments, attended classes, and study
