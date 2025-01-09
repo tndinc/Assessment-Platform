@@ -48,9 +48,9 @@ export function LoginDialog() {
           Login
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-[#243642] rounded-2xl shadow-2xl border-0">
+      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-[#092635] rounded-2xl shadow-2xl border-0">
         <DialogHeader>
-          <DialogTitle className="text-3xl font-bold text-center text-gray-800 dark:text-white">
+          <DialogTitle className="text-3xl font-bold text-center dark:text-[#67C6E3]">
             Welcome Back!
           </DialogTitle>
           <DialogDescription className="text-gray-600 dark:text-gray-300 text-center text-lg mt-2">
@@ -63,7 +63,7 @@ export function LoginDialog() {
           </div>
           <Button
             variant="outline"
-            className={`w-full bg-[#B3C8CF] hover:bg-[#89A8B2] dark:bg-[#526D82] dark:hover:bg-[#27374D] text-gray-800 dark:text-white border-none shadow-md hover:shadow-lg transition-all duration-300 text-lg font-semibold py-3 px-4 rounded-xl flex items-center justify-center space-x-3 ${
+            className={`w-full bg-[#B3C8CF] hover:bg-[#89A8B2] dark:bg-[#254B62]/50 dark:hover:bg-[#254B62] text-gray-800 dark:text-white border-none shadow-md hover:shadow-lg transition-all duration-300 text-lg font-semibold py-3 px-4 rounded-xl flex items-center justify-center space-x-3 ${
               mounted ? "animate-fade-in-up" : "opacity-0"
             }`}
             onClick={login}
