@@ -57,7 +57,7 @@ export function DashboardContent() {
             className="bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md"
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+              <CardTitle className="text-sm dark:text-[#67C6E3] font-medium">
                 {item.title}
               </CardTitle>
               <item.icon className="h-4 w-4 text-muted-foreground" />
@@ -76,7 +76,7 @@ export function DashboardContent() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-full lg:col-span-4 bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md">
           <CardHeader>
-            <CardTitle>Grade Overview</CardTitle>
+            <CardTitle className="dark:text-[#67C6E3]">Grade Overview</CardTitle>
             <CardDescription>
               Track your performance across all courses. The chart shows your
               grades over time.
@@ -88,7 +88,7 @@ export function DashboardContent() {
         </Card>
         <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md">
           <CardHeader>
-            <CardTitle>Upcoming Exams</CardTitle>
+            <CardTitle className="dark:text-[#67C6E3]">Upcoming Exams</CardTitle>
             <CardDescription>
               Stay prepared for your next challenges. Click on an exam to see
               more details or start a practice test.
@@ -100,7 +100,7 @@ export function DashboardContent() {
         </Card>
         <Card className="col-span-full bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md">
           <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
+            <CardTitle className="dark:text-[#67C6E3]">Recent Activity</CardTitle>
             <CardDescription>
               Keep track of your latest academic activities. This includes
               recently submitted assignments, attended classes, and study
