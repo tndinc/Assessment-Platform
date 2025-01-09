@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { HeaderNotifications } from "@/components/headernotif";
 import { motion } from "framer-motion";
 
 const supabase = createClient();
@@ -66,8 +65,8 @@ export function Header() {
     <motion.header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         isScrolled
-          ? "bg-white/80 dark:bg-[#243642]/90 backdrop-blur-sm shadow-md"
-          : "bg-white/50 dark:bg-[#243642]/80"
+          ? "bg-white/80 dark:bg-[#092635]/90 backdrop-blur-sm shadow-md"
+          : "bg-white/50 dark:bg-[#092635]/80"
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
@@ -115,7 +114,6 @@ export function Header() {
             transition={{ delay: 0.2 }}
           >
             <ThemeToggle />
-            {/* <HeaderNotifications /> */}
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

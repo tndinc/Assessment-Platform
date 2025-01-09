@@ -106,9 +106,9 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
             variant={activeItem === item.name ? "secondary" : "ghost"}
             className={`justify-start w-full text-left ${
               activeItem === item.name
-                ? "bg-[#B3C8CF] dark:bg-[#526D82]"
+                ? "bg-[#B3C8CF] dark:bg-[#254B62]/50"
                 : "text-black dark:text-white"
-            } hover:bg-[#89A8B2] dark:hover:text-white hover:text-black dark:hover:bg-[#526D82]/40 transition-colors`}
+            } hover:bg-[#89A8B2] dark:hover:text-white hover:text-black dark:hover:bg-[#254B62] transition-colors`}
             onClick={() => {
               setActiveItem(item.name);
               setIsMobileMenuOpen(false);
@@ -143,7 +143,7 @@ export function Sidebar({ activeItem, setActiveItem }: SidebarProps) {
     <div className="flex h-full max-w-full overflow-x-hidden">
       {/* Desktop Sidebar */}
       <motion.div
-        className="hidden border-r bg-[#ECEBDE/30] lg:block dark:bg-[#243642]/80 w-64 shadow-lg"
+        className="hidden border-r lg:block w-64 shadow-lg"
         initial={{ x: -100 }}
         animate={{ x: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}

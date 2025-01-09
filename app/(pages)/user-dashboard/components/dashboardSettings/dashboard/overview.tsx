@@ -111,7 +111,7 @@ export function Overview() {
           />
           <Bar
             dataKey="grade"
-            className="fill-[#8E806A] dark:fill-[#508C9B]"
+            className="fill-[#8E806A] dark:fill-[#526D82]"
             radius={[4, 4, 0, 0]}
             barSize={50}
           />

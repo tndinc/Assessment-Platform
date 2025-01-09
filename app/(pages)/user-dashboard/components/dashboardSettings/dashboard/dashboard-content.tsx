@@ -54,7 +54,7 @@ export function DashboardContent() {
         ].map((item, index) => (
           <Card
             key={index}
-            className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 transition-all hover:shadow-md"
+            className="bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md"
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -74,7 +74,7 @@ export function DashboardContent() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-full lg:col-span-4 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 transition-all hover:shadow-md">
+        <Card className="col-span-full lg:col-span-4 bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md">
           <CardHeader>
             <CardTitle>Grade Overview</CardTitle>
             <CardDescription>
@@ -86,7 +86,7 @@ export function DashboardContent() {
             <Overview />
           </CardContent>
         </Card>
-        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 transition-all hover:shadow-md">
+        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md">
           <CardHeader>
             <CardTitle>Upcoming Exams</CardTitle>
             <CardDescription>
@@ -98,7 +98,7 @@ export function DashboardContent() {
             <UpcomingExams />
           </CardContent>
         </Card>
-        <Card className="col-span-full bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 transition-all hover:shadow-md">
+        <Card className="col-span-full bg-[#D7D3BF]/30 dark:bg-[#27374D] transition-all hover:shadow-md">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>

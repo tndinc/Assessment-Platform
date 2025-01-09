@@ -8,7 +8,7 @@ export function Layout() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
-      <div className="flex-1 flex dark:bg-[#243642]">
+      <div className="flex-1 flex dark:bg-[#092635]">
         <Sidebar activeItem={activeItem} setActiveItem={setActiveItem} />
       </div>
     </div>
