@@ -25,8 +25,10 @@ export default function SubmitButton({
         onClick={onSubmit}
         disabled={disabled || isLoading}
         className="w-full py-4 md:py-6 text-base md:text-lg font-semibold transition-all duration-200 
-        bg-gradient-to-r from-green-400 to-green-600 
-        hover:from-green-500 hover:to-green-700 
+        bg-[#1F4529]/80
+        hover:bg-[#1F4529]
+        dark:bg-[#387F39]/80
+        dark:hover:bg-[#387F39]
         disabled:from-gray-400 disabled:to-gray-500 
         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
       >
@@ -36,7 +38,7 @@ export default function SubmitButton({
             <span className="text-sm md:text-base">Submitting...</span>
           </div>
         ) : (
-          <span className="text-sm md:text-base">Submit Exam</span>
+          <span className="text-sm md:text-base dark:text-gray-200 text-white-800">Submit Exam</span>
         )}
       </Button>
     </motion.div>

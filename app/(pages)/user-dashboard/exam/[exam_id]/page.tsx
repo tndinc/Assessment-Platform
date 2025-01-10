@@ -313,7 +313,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
       ) : (
         <>
           {isSubmitted ? (
-            <div className="min-h-screen bg-gradient-to-t from-[#B3C8CF] to-[#E5E1DA] text-gray-800 dark:bg-gradient-to-t dark:from-[#243642]/90 dark:to-[#243642] flex flex-col items-center justify-center p-4">
+            <div className="min-h-screen bg-gradient-to-t from-[#B3C8CF] to-[#E5E1DA] text-gray-800 dark:bg-gradient-to-b dark:from-[#092635] dark:to-[#092635]/90 flex flex-col items-center justify-center p-4">
               <Card className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 border-gray-300 dark:border-gray-700">
                 <CardHeader className="text-white p-6 relative bg-[#D7D3BF]/30 dark:bg-[#384B70]/60">
                   {/* Exam Feedback Title */}
@@ -514,7 +514,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                     answers={answers}
                   />
                 </aside>
-                <main className="flex-grow p-4 md:p-6 overflow-y-auto bg-gradient-to-b from-[#B3C8CF] to-[#E5E1DA] text-gray-800 dark:bg-gradient-to-b dark:from-[#508C9B] dark:to-[#526D82] dark:text-white-800">
+                <main className="flex-grow p-4 md:p-6 overflow-y-auto 
+                bg-gradient-to-t from-[#FEFAF6] to-[#B3C8CF] text-gray-800 
+                dark:bg-gradient-to-t dark:from-[#092635] dark:to-[#092635]/90 dark:text-gray-800">
                   <div className="max-w-3xl mx-auto">
                     <QuestionDisplay
                       question={questions[currentQuestion - 1]}
@@ -528,8 +530,8 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                 </main>
               </div>
               <footer className="bg-white shadow-md p-4 sticky bottom-0 left-0 right-0 
-              bg-gradient-to-t from-[#B3C8CF] to-[#E5E1DA] text-gray-800 
-              dark:bg-gradient-to-t dark:from-[#508C9B] dark:to-[#526D82] dark:text-white-800">
+              bg-gradient-to-b from-[#FEFAF6] to-[#B3C8CF] text-gray-800 
+              dark:bg-gradient-to-b dark:from-[#092635] dark:to-[#092635]/90 dark:text-gray-800">
                 <div className="max-w-7xl mx-auto">
                   <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
                     {/* Progress Bar Section */}

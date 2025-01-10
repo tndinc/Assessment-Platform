@@ -48,7 +48,7 @@ export default function QuestionDisplay({
             whileTap={{ scale: 0.98 }}
           >
             <Card
-              className={`cursor-pointer transition-all duration-200 ${
+              className={`cursor-pointer transition-all duration-200 bg-[#D7D3BF] dark:bg-[#344C64] ${
                 answer === choice.question_txt
                   ? "border-primary shadow-lg"
                   : "hover:border-gray-300"
@@ -94,7 +94,7 @@ export default function QuestionDisplay({
   }
 
   return (
-    <Card className="w-full max-w-4xl mx-auto dark:bg-[#243642]">
+    <Card className="w-full max-w-6xl mx-auto bg-[#E5E1DA] dark:bg-[#27374D]">
       <CardContent className="space-y-6 pt-6">
         <CardTitle className="text-2xl font-bold">
           {question.question_desc}

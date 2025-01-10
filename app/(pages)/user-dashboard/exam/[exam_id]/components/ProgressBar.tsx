@@ -35,11 +35,11 @@ export default function ProgressBar({
         transition={{ duration: 0.5 }}
       >
         {progress === 100 ? (
-          <span className="text-[#527853] dark:text-[#9EDF9C]/90 font-semibold">
+          <span className="text-[#527853] dark:text-[#387F39] font-semibold">
             All questions answered!
           </span>
         ) : (
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-gray-800 dark:text-gray-200">
             {Math.round(progress)}% complete
           </span>
         )}
