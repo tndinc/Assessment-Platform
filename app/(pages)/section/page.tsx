@@ -158,10 +158,16 @@ export default function ChooseSection() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-cyan-500 to-blue-500 p-4">
-      <Card className="w-full max-w-md shadow-2xl bg-white/90 backdrop-blur-sm">
+    <div className="min-h-screen flex items-center justify-center p-4
+    bg-[#FEFAF6]
+    dark:bg-[#092635]">
+      <Card className="w-full max-w-md shadow-2xl 
+      bg-[#E5E1DA]
+      dark:bg-[#27374D]">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-blue-500">
+          <CardTitle className="text-3xl font-bold text-center bg-clip-text 
+          text-[#74512D]
+          dark:text-[#67C6E3]">
             Choose Your Section
           </CardTitle>
         </CardHeader>
@@ -170,7 +176,8 @@ export default function ChooseSection() {
             <div className="space-y-2">
               <label
                 htmlFor="section"
-                className="text-sm font-medium text-gray-700"
+                className="text-sm font-medium text-gray-700 \
+                dark:text-gray-300"
               >
                 Select your class section
               </label>
@@ -214,7 +221,9 @@ export default function ChooseSection() {
             </div>
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full font-semibold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
+              bg-[#B3C8CF]/60 hover:bg-[#B3C8CF] text-gray-800 
+              dark:bg-[#254B62]/50 dark:hover:bg-[#254B62] dark:text-gray-200"
               disabled={!selectedCourse || loading || fetchingCourses}
             >
               {loading ? (
