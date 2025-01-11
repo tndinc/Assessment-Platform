@@ -300,7 +300,7 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
   };
 
   if (!examData || questions.length === 0) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

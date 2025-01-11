@@ -85,7 +85,7 @@ const ManageExams = () => {
     }).format(date);
   };
 
-  if (loading) return <h1>Loading...</h1>;
+  if (loading) return "Loading your exams...";
 
   return (
     <div className="grid gap-4 sm:gap-6 lg:gap-8 mt-10">
