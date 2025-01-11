@@ -74,7 +74,7 @@ export default function AgreementsAndTerms() {
           (prevText) => prevText + termsAndConditions[currentIndex]
         );
         setCurrentIndex((prevIndex) => prevIndex + 1);
-      }, 10); // Adjust the speed of the typewriter effect here
+      }, 0.7); // Adjust the speed of the typewriter effect here
 
       return () => clearTimeout(timer);
     } else {
@@ -94,10 +94,16 @@ export default function AgreementsAndTerms() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-500 to-purple-600 p-4">
-      <Card className="w-full max-w-4xl shadow-2xl bg-white/90 backdrop-blur-sm">
+    <div className="min-h-screen flex items-center justify-center p-4
+    bg-[#FEFAF6]
+    dark:bg-[#092635]">
+      <Card className="w-full max-w-4xl shadow-2xl backdrop-blur-sm
+      bg-[#E5E1DA]
+      dark:bg-[#27374D]">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
+          <CardTitle className="text-3xl font-bold text-center bg-clip-text 
+          text-[#74512D]
+          dark:text-[#67C6E3]">
             Agreements and Terms
           </CardTitle>
           <p className="text-center text-gray-500">
@@ -105,8 +111,8 @@ export default function AgreementsAndTerms() {
           </p>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="h-[60vh] border rounded-md p-4 bg-white/50">
-            <pre className="font-mono text-sm whitespace-pre-wrap text-gray-800">
+          <ScrollArea className="h-[60vh] border rounded-md p-4 bg-white/30 dark:bg-white/10">
+            <pre className="font-mono text-sm whitespace-pre-wrap text-gray-800 dark:text-gray-200">
               {displayedText}
             </pre>
           </ScrollArea>
@@ -124,7 +130,7 @@ export default function AgreementsAndTerms() {
             <label
               htmlFor="agree"
               className={`text-sm ${
-                typewriterComplete ? "text-gray-700" : "text-gray-400"
+                typewriterComplete ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-600"
               }`}
             >
               I agree to the terms and conditions
@@ -133,7 +139,9 @@ export default function AgreementsAndTerms() {
           <Button
             onClick={handleNext}
             disabled={!agreed || isLoading}
-            className="w-full max-w-xs bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full max-w-xs text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
+            bg-[#B3C8CF]/60 hover:bg-[#B3C8CF] text-gray-800 
+            dark:bg-[#254B62]/50 dark:hover:bg-[#254B62] dark:text-gray-200"
           >
             {isLoading ? "Loading..." : "Next"}
           </Button>
