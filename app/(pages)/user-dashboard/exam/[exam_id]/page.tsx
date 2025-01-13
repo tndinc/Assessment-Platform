@@ -302,9 +302,12 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
   if (!examData || questions.length === 0) {
     return <Loading />;
   }
+  
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col relative">
+    <div className="min-h-screen flex flex-col relative
+      bg-[#FEFAF6]
+      dark:bg-[#092635]">
       {/* Full-page loading spinner if loading */}
       {isLoading ? (
         <div className="loading-overlay">
@@ -314,10 +317,16 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
         <>
           {isSubmitted ? (
             <div className="min-h-screen bg-gradient-to-t from-[#B3C8CF] to-[#E5E1DA] text-gray-800 dark:bg-gradient-to-b dark:from-[#092635] dark:to-[#092635]/90 flex flex-col items-center justify-center p-4">
-              <Card className="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 border-gray-300 dark:border-gray-700">
-                <CardHeader className="text-white p-6 relative bg-[#D7D3BF]/30 dark:bg-[#384B70]/60">
+              <Card className="w-full max-w-4xl shadow-lg rounded-lg overflow-hidden border-gray-300 dark:border-gray-700
+                  bg-[#E5E1DA]
+                  dark:bg-[#27374D]">
+                <CardHeader className="text-white p-6 relative 
+                  bg-[#D7D3BF]
+                  dark:bg-[#344C64]">
                   {/* Exam Feedback Title */}
-                  <CardTitle className="text-3xl font-bold text-center w-full text-gray-800 dark:text-gray-300">
+                  <CardTitle className="text-3xl font-bold text-center w-full 
+                  text-[#74512D]
+                  dark:text-[#67C6E3]">
                     Exam Feedback
                   </CardTitle>
 
