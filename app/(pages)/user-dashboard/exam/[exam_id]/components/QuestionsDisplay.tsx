@@ -40,7 +40,7 @@ export default function QuestionDisplay({
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-4 border-red-500">
         {question.choices.map((choice, index) => (
           <motion.div
             key={index}
@@ -94,7 +94,7 @@ export default function QuestionDisplay({
   }
 
   return (
-    <Card className="w-full max-w-6xl mx-auto bg-[#E5E1DA] dark:bg-[#27374D]">
+    <Card className="w-auto h-auto mx-auto bg-[#E5E1DA] dark:bg-[#27374D] border-blue-500 border-4">
       <CardContent className="space-y-6 pt-6">
         <CardTitle className="text-2xl font-bold">
           {question.question_desc}

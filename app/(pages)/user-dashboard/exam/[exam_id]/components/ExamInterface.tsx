@@ -137,14 +137,14 @@ const ExamInterface = ({
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FEFAF6] dark:bg-[#092635]">
+    <div className="min-h-screen flex flex-col bg-[#FEFAF6] dark:bg-[#092635] border-blue-500 border-4"> 
       <ExamHeader
         title={examData.exam_title}
         timeRemaining={timeRemaining}
         instructions={examData.exam_desc || "Answer all questions."}
       />
-      <div className="flex-grow flex flex-col md:flex-row">
-        <aside className="w-full md:w-64 bg-white shadow-md md:shadow-lg">
+      <div className="flex-grow flex flex-col md:flex-row h-auto border-yellow-800 border-4">
+        <aside className="w-full md:w-64 bg-[#FEFAF6] dark:bg-[#092635] h-auto shadow-md md:shadow-lg border-green-500 border-4">
           <QuestionNavigation
             questions={questions}
             currentQuestion={currentQuestion}
@@ -152,8 +152,9 @@ const ExamInterface = ({
             answers={answers}
           />
         </aside>
-        <main className="flex-grow p-4 md:p-6 overflow-y-auto bg-gradient-to-t from-[#FEFAF6] to-[#B3C8CF] text-gray-800 dark:bg-gradient-to-t dark:from-[#092635] dark:to-[#092635]/90 dark:text-gray-800">
-          <div className="max-w-3xl mx-auto">
+        <main className="flex-grow h-auto p-4 md:p-6 bg-gradient-to-t from-[#FEFAF6] to-[#B3C8CF] text-gray-800 
+        dark:bg-gradient-to-t dark:from-[#092635] dark:to-[#092635]/90 dark:text-gray-800 border-red-400 border-4">
+          <div className="h-full w-full">
             <QuestionDisplay
               question={questions[currentQuestion - 1]}
               answer={answers[questions[currentQuestion - 1]?.question_id]}

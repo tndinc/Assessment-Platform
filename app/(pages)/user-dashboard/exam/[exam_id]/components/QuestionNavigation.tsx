@@ -22,7 +22,7 @@ export default function QuestionNavigation({
 
   return (
     <nav className="w-full md:w-64 bg-gradient-to-t from-[#FEFAF6] to-[#B3C8CF] text-gray-800 
-    dark:bg-gradient-to-t dark:from-[#092635] dark:to-[#092635]/90 dark:text-white p-4 md:h-[calc(100vh-12rem)] flex flex-col">
+    dark:bg-gradient-to-t dark:from-[#092635] dark:to-[#092635]/90 dark:text-white p-4 md:h-[calc(100vh-12rem)] flex flex-col border-yellow-500 border-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-gray-800 dark:text-gray-300">Questions</h2>
         <button

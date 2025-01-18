@@ -105,17 +105,17 @@ const ExamPage = ({ params }: { params: { exam_id: string } }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative bg-[#FEFAF6] dark:bg-[#092635]">
+    <div className="min-h-screen flex flex-col relative bg-[#FEFAF6] dark:bg-[#092635] border-red-500 border-4">
       {isSubmitted ? (
         <ExamFeedback {...feedbackData} />
       ) : (
         <ExamInterface 
-          exam_id={exam_id} 
+          exam_id={exam_id}
           onSubmit={handleExamSubmit}
         />
       )}
     </div>
-  );
+  )
 };
 
 export default ExamPage;
