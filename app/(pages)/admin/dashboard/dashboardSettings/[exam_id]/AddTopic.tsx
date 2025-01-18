@@ -84,7 +84,7 @@ const AddTopic = ({
     <div className="flex flex-col space-y-2">
       <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
         <DialogTrigger asChild>
-          <Button className="dark:bg-blue-500">
+          <Button>
             {" "}
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Topic
