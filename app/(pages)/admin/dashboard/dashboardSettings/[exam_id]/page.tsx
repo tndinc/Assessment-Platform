@@ -14,6 +14,7 @@ import LoadingPage from "@/components/Loading";
 import ExamSection from "./ExamSection";
 import { PlusCircle } from "lucide-react";
 import AddTopic from "./AddTopic";
+import AutoGenerateForm from "./AutoGenerate";
 
 const supabase = createClient();
 
@@ -50,6 +51,7 @@ export default function ManageExamPage() {
     course_id: 0,
     status: "open",
   });
+  const [contentAdded, setContentAdded] = useState(false);
 
   useEffect(() => {
     const fetchExamData = async () => {
@@ -115,6 +117,22 @@ export default function ManageExamPage() {
     fetchCourses();
   }, [exam_id]);
 
+  const handleContentAdded = () => {
+    const fetchUpdatedTopics = async () => {
+      const { data, error } = await supabase
+        .from("topic_tbl")
+        .select()
+        .eq("exam_id", exam_id);
+      if (error) {
+        console.error("Error fetching updated topics:", error);
+      } else {
+        setTopics(data);
+      }
+    };
+    fetchUpdatedTopics();
+    setContentAdded(true);
+    console.log("Content added successfully!");
+  };
   const handleTopicAdded = () => {
     // Fetch topics again after adding
     const fetchUpdatedTopics = async () => {
@@ -282,7 +300,13 @@ export default function ManageExamPage() {
 
         <div className="flex flex-grow space-x-4">
           {topics.length === 0 ? (
-            <AddTopic examId={exam_id} onTopicAdded={handleTopicAdded} />
+            <>
+              <AddTopic examId={exam_id} onTopicAdded={handleTopicAdded} />
+              <AutoGenerateForm
+                examId={exam_id}
+                onContentAdded={handleContentAdded}
+              />
+            </>
           ) : (
             <ExamSection />
           )}

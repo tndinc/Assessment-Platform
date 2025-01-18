@@ -45,10 +45,10 @@ export default function Header() {
             transition={{ delay: 0.3 }}
             className="flex flex-col"
           >
-            <span className="text-2xl font-bold text-primary tracking-tight">
+            <span className="text-2xl font-bold text-primary tracking-tight hidden sm:block">
               TND
             </span>
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wide">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wide hidden sm:block">
               INCORPORATIONS
             </span>
           </motion.div>
