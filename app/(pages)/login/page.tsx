@@ -50,7 +50,7 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 dark:from-gray-900 dark:to-purple-900 overflow-hidden">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-gray-900 dark:to-cyan-900 overflow-hidden">
       <ModernBackground />
       <Header />
       <motion.div
@@ -60,7 +60,7 @@ const Login = () => {
       >
         <Card className="max-w-md w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-3xl font-bold text-center text-purple-700 dark:text-purple-300">
+            <CardTitle className="text-3xl font-bold text-center text-blue-600 dark:text-blue-300">
               Teacher's Portal
             </CardTitle>
             <CardDescription className="text-center text-gray-600 dark:text-gray-300">
@@ -81,9 +81,9 @@ const Login = () => {
                     value={adminUser}
                     onChange={(e) => setAdminUser(e.target.value)}
                     required
-                    className="pl-10 bg-white/50 dark:bg-gray-700/50 border-purple-300 dark:border-purple-600 focus:border-purple-500 focus:ring-purple-500"
+                    className="pl-10 bg-white/50 dark:bg-gray-700/50 border-blue-300 dark:border-blue-600 focus:border-blue-500 focus:ring-cyan-500"
                   />
-                  <Pencil className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 h-5 w-5" />
+                  <Pencil className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 h-5 w-5" />
                 </div>
               </div>
               <div className="space-y-2">
@@ -98,9 +98,9 @@ const Login = () => {
                     value={adminPsw}
                     onChange={(e) => setAdminPsw(e.target.value)}
                     required
-                    className="pl-10 bg-white/50 dark:bg-gray-700/50 border-purple-300 dark:border-purple-600 focus:border-purple-500 focus:ring-purple-500"
+                    className="pl-10 bg-white/50 dark:bg-gray-700/50 border-blue-300 dark:border-blue-600 focus:border-blue-500 focus:ring-cyan-500"
                   />
-                  <Book className="absolute left-3 top-1/2 transform -translate-y-1/2 text-purple-500 h-5 w-5" />
+                  <Book className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-500 h-5 w-5" />
                 </div>
               </div>
               {errorMessage && (
@@ -110,7 +110,7 @@ const Login = () => {
               )}
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white font-bold py-3 rounded-full transition duration-300 ease-in-out transform hover:scale-105"
+                className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 dark:from-blue-700 dark:to-cyan-800 dark:hover:from-blue-800 dark:hover:to-cyan-900 text-white border-none shadow-md hover:shadow-lg transition-all duration-300 text-lg font-semibold py-3 px-4 rounded-xl flex items-center justify-center space-x-3"
               >
                 <GraduationCap className="mr-2 h-5 w-5" />
                 Enter Dashboard
