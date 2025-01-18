@@ -105,7 +105,7 @@ const ExamPage = ({ params }: { params: { exam_id: string } }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative bg-[#FEFAF6] dark:bg-[#092635] border-red-500 border-4">
+    <div className="min-h-screen flex flex-col relative bg-[#FEFAF6] dark:bg-[#092635]">
       {isSubmitted ? (
         <ExamFeedback {...feedbackData} />
       ) : (
