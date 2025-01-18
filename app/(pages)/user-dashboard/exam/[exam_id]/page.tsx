@@ -333,7 +333,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                   {/* Close Button aligned to the top-right corner of the CardHeader */}
                   <Button
                     onClick={() => router.push("/user-dashboard")}
-                    className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white transition-all duration-300 ease-in-out transform hover:scale-105"
+                    className="absolute top-4 right-4 transition-all duration-300 ease-in-out transform hover:scale-105
+                    bg-[#982B1C]/70 hover:bg-[#982B1C] text-gray-200 
+                    dark:bg-[#EF5A6F]/70 dark:hover:bg-[#EF5A6F] dark:text-gray-100"
                   >
                     Close
                   </Button>
@@ -416,7 +418,8 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                     <Button
                       onClick={handlePreviousFeedback}
                       disabled={currentFeedbackIndex === 0}
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                      className="bg-[#B3C8CF]/60 hover:bg-[#B3C8CF] text-[#]
+                      dark:bg-[#254B62]/50 dark:hover:bg-[#254B62] dark:text-[#]"
                     >
                       Previous
                     </Button>
@@ -426,7 +429,8 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                         currentFeedbackIndex ===
                         Object.values(feedbackSections).length - 1
                       }
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                      className="bg-[#B3C8CF]/60 hover:bg-[#B3C8CF] text-black-600
+                      dark:bg-[#254B62]/50 dark:hover:bg-[#254B62] dark:text-white-600"
                     >
                       Next
                     </Button>
@@ -451,7 +455,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
               {showQuestionReview && (
                 <Card className="w-full max-w-4xl mt-8 shadow-lg rounded-lg overflow-hidden bg-[#D7D3BF]/30 dark:bg-[#384B70]/30 border-gray-300 dark:border-gray-700">
                   <CardHeader className="bg-[#D7D3BF]/30 dark:bg-[#384B70]/60 text-white p-6">
-                    <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-300">
+                    <CardTitle className="text-2xl font-bold
+                    text-[#74512D]
+                    dark:text-[#67C6E3]">
                       Question Review
                     </CardTitle>
                   </CardHeader>
@@ -469,7 +475,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                           </CardHeader>
                           <CardContent>
                             <p className="mb-2">
-                              <span className="font-medium text-gray-800 dark:text-gray-300">
+                              <span className="font-medium
+                              text-[#088395]
+                              dark:text-[#37B7C3]">
                                 Your Answer:
                               </span>{" "}
                               <span className="text-gray-800 dark:text-gray-300">
@@ -477,7 +485,9 @@ const ExamInterface = ({ params }: { params: { exam_id: string } }) => {
                               </span>
                             </p>
                             <p className="mb-2">
-                              <span className="font-medium text-gray-800 dark:text-gray-300">
+                              <span className="font-medium
+                              text-[#1B9C85]
+                              dark:text-[#27E1C1]">
                                 Correct Answer:
                               </span>{" "}
                               <span className="text-gray-800 dark:text-gray-300">
