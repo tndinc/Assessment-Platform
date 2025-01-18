@@ -345,7 +345,6 @@ const AutoGenerateForm = ({
                   type="number"
                   min={1}
                   max={3}
-                  value={1}
                   onChange={(e) =>
                     setTopicCount(
                       Math.max(1, Math.min(3, Number(e.target.value)))
@@ -361,7 +360,6 @@ const AutoGenerateForm = ({
                   type="number"
                   min={5}
                   max={50}
-                  value={5}
                   onChange={(e) =>
                     setQuestionCount(
                       Math.max(5, Math.min(50, Number(e.target.value)))
