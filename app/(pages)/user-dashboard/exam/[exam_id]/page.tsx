@@ -110,12 +110,12 @@ const ExamPage = ({ params }: { params: { exam_id: string } }) => {
         <ExamFeedback {...feedbackData} />
       ) : (
         <ExamInterface 
-          exam_id={exam_id}
+          exam_id={exam_id} 
           onSubmit={handleExamSubmit}
         />
       )}
     </div>
-  )
+  );
 };
 
 export default ExamPage;
