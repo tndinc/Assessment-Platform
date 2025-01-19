@@ -90,7 +90,7 @@ const ExamFeedback = ({
                   <div className="flex items-center">
                     <Progress value={percentage} className="flex-grow mr-4" />
                     <span className="text-sm font-medium text-gray-800 dark:text-gray-300">
-                      {percentage.toFixed(2)}%
+                      {percentage.toFixed(2)}
                     </span>
                   </div>
                 </div>
