@@ -29,7 +29,7 @@ const UserDashboard = () => {
       // Step 2: Fetch the user's profile
       const { data: profile, error: profileError } = await supabase
         .from("profiles")
-        .select("user_section")
+        .select("user_section, status")
         .eq("id", user.id)
         .single();
 
@@ -39,13 +39,28 @@ const UserDashboard = () => {
         return;
       }
 
-      // Step 3: Check if `user_section` is null and redirect
+      // Step 3: Redirect based on profile data
       if (!profile || !profile.user_section) {
+        // If `user_section` is not set, redirect to agreements
         router.push("/agreements");
         return;
       }
 
-      setUser(user); // Set the user state only if everything is valid
+      if (profile.status === "pending") {
+        // If the status is pending, redirect to /confirmation
+        router.push("/confirmation");
+        return;
+      }
+
+      if (profile.status === "rejected") {
+        // If the status is rejected, redirect to home or show an appropriate message
+        console.error("User status is rejected.");
+        router.push("/");
+        return;
+      }
+
+      // If the status is approved, allow access to the dashboard
+      setUser(user);
     };
 
     fetchUserAndProfile();

@@ -30,6 +30,7 @@ import Notification from "@/components/Notification";
 import UserIcon from "@/app/(pages)/admin/dashboard/components/UserIcon";
 import ManageCourse from "./dashboardSettings/ManageCourse";
 import ManageExam from "./dashboardSettings/ManageExam";
+import ManageProfiles from "./dashboardSettings/AcceptStudents";
 
 export const description =
   "A products dashboard with a sidebar navigation and a main content area.";
@@ -41,6 +42,8 @@ export function AdminDashboard() {
   // Function to handle component selection
   const renderComponent = () => {
     switch (activeComponent) {
+      case "Accept Students":
+        return <ManageProfiles />;
       case "Manage Course":
         return <ManageCourse />;
       case "Manage Exam":
@@ -82,6 +85,18 @@ export function AdminDashboard() {
               >
                 <LineChart className="h-4 w-4" />
                 Dashboard
+              </Link>
+              <Link
+                href="#"
+                onClick={() => setActiveComponent("Accept Students")}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  activeComponent === "Accept Students"
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <Users className="h-4 w-4" />
+                Accept Students
               </Link>
               <Link
                 href="#"
@@ -157,33 +172,6 @@ export function AdminDashboard() {
               </Link>
             </nav>
           </div>
-          {/* <div className="mt-auto p-4">
-            <Card className="text-center">
-              <CardHeader>
-                <CardTitle>Follow Us</CardTitle>
-                <CardDescription>
-                  Stay connected with us on social media.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="flex gap-4">
-                <Button variant="ghost" asChild>
-                  <Link href="https://www.instagram.com" target="_blank">
-                    <Instagram className="h-6 w-6 text-muted-foreground hover:text-primary" />
-                  </Link>
-                </Button>
-                <Button variant="ghost" asChild>
-                  <Link href="https://www.facebook.com" target="_blank">
-                    <Facebook className="h-6 w-6 text-muted-foreground hover:text-primary" />
-                  </Link>
-                </Button>
-                <Button variant="ghost" asChild>
-                  <Link href="https://discord.com" target="_blank">
-                    <MessageSquare className="h-6 w-6 text-muted-foreground hover:text-primary" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-          </div> */}
         </div>
       </div>
       <div className="flex flex-col">
@@ -208,6 +196,14 @@ export function AdminDashboard() {
                 >
                   <LineChart className="h-5 w-5" />
                   Dashboard
+                </Link>
+                <Link
+                  href="#"
+                  onClick={() => setActiveComponent("Accept Students")}
+                  className="flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Users className="h-5 w-5" />
+                  Accept Students
                 </Link>
                 <Link
                   href="#"
