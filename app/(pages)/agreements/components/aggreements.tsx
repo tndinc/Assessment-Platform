@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,6 +11,9 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRouter } from "next/navigation";
+
+import ModernBackground from "@/components/ui/SchoolBackground";
+import { motion } from "framer-motion";
 
 const termsAndConditions = `Agreements and Terms of Use
 
@@ -64,7 +68,7 @@ export default function AgreementsAndTerms() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [agreed, setAgreed] = useState(false);
   const [typewriterComplete, setTypewriterComplete] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -74,7 +78,7 @@ export default function AgreementsAndTerms() {
           (prevText) => prevText + termsAndConditions[currentIndex]
         );
         setCurrentIndex((prevIndex) => prevIndex + 1);
-      }, 0.7); // Adjust the speed of the typewriter effect here
+      }, 0.7);
 
       return () => clearTimeout(timer);
     } else {
@@ -87,66 +91,79 @@ export default function AgreementsAndTerms() {
   };
 
   const handleNext = () => {
-    setIsLoading(true); // Set loading to true
+    setIsLoading(true);
     setTimeout(() => {
       router.push("/section");
-    }, 1000); // Simulate a delay for loading
+    }, 1000);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4
-    bg-[#FEFAF6]
-    dark:bg-[#092635]">
-      <Card className="w-full max-w-4xl shadow-2xl backdrop-blur-sm
-      bg-[#E5E1DA]
-      dark:bg-[#27374D]">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-3xl font-bold text-center bg-clip-text 
-          text-[#74512D]
-          dark:text-[#67C6E3]">
-            Agreements and Terms
-          </CardTitle>
-          <p className="text-center text-gray-500">
-            Please read and accept our terms to continue
-          </p>
-        </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-[60vh] border rounded-md p-4 bg-white/30 dark:bg-white/10">
-            <pre className="font-mono text-sm whitespace-pre-wrap text-gray-800 dark:text-gray-200">
-              {displayedText}
-            </pre>
-          </ScrollArea>
-        </CardContent>
-        <CardFooter className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="agree"
-              checked={agreed}
-              onChange={handleAgree}
-              disabled={!typewriterComplete}
-              className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500 disabled:opacity-50"
-            />
-            <label
-              htmlFor="agree"
-              className={`text-sm ${
-                typewriterComplete ? "text-gray-700 dark:text-gray-300" : "text-gray-400 dark:text-gray-600"
-              }`}
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-gray-900 dark:to-cyan-900 overflow-hidden">
+      <ModernBackground />
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card className="w-full max-w-4xl shadow-2xl backdrop-blur-sm bg-white/80 dark:bg-gray-800/80">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-3xl font-bold text-center text-blue-600 dark:text-blue-300">
+              Agreements and Terms
+            </CardTitle>
+            <p className="text-center text-gray-600 dark:text-gray-300">
+              Please read and accept our terms to continue
+            </p>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-[60vh] border rounded-md p-4 bg-white/50 dark:bg-gray-700/50">
+              <pre className="font-sans text-sm whitespace-pre-wrap text-gray-800 dark:text-gray-200">
+                {displayedText}
+              </pre>
+            </ScrollArea>
+          </CardContent>
+          <CardFooter className="flex flex-col items-center gap-4">
+            <motion.div
+              className="flex items-center gap-2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: typewriterComplete ? 1 : 0 }}
+              transition={{ duration: 0.3 }}
             >
-              I agree to the terms and conditions
-            </label>
-          </div>
-          <Button
-            onClick={handleNext}
-            disabled={!agreed || isLoading}
-            className="w-full max-w-xs text-white font-semibold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
-            bg-[#B3C8CF]/60 hover:bg-[#B3C8CF] text-gray-800 
-            dark:bg-[#254B62]/50 dark:hover:bg-[#254B62] dark:text-gray-200"
-          >
-            {isLoading ? "Loading..." : "Next"}
-          </Button>
-        </CardFooter>
-      </Card>
+              <input
+                type="checkbox"
+                id="agree"
+                checked={agreed}
+                onChange={handleAgree}
+                disabled={!typewriterComplete}
+                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 disabled:opacity-50"
+              />
+              <label
+                htmlFor="agree"
+                className={`text-sm ${
+                  typewriterComplete
+                    ? "text-gray-700 dark:text-gray-300"
+                    : "text-gray-400 dark:text-gray-600"
+                }`}
+              >
+                I agree to the terms and conditions
+              </label>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: typewriterComplete ? 1 : 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <Button
+                onClick={handleNext}
+                disabled={!agreed || isLoading}
+                className="w-full max-w-xs bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 dark:from-blue-700 dark:to-cyan-800 dark:hover:from-blue-800 dark:hover:to-cyan-900 text-white border-none shadow-md hover:shadow-lg transition-all duration-300 text-lg font-semibold py-3 px-4 rounded-xl flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? "Loading..." : "Next"}
+              </Button>
+            </motion.div>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </div>
   );
 }

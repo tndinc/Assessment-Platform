@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { Loader2 } from "lucide-react"; // Assuming you're using this for the loading spinner
@@ -19,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import LoadingPage from "@/components/Loading"; // Assuming you have a LoadingPage component
+import ModernBackground from "@/components/ui/SchoolBackground";
 
 const supabase = createClient();
 
@@ -158,16 +160,12 @@ export default function ChooseSection() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4
-    bg-[#FEFAF6]
-    dark:bg-[#092635]">
-      <Card className="w-full max-w-md shadow-2xl 
-      bg-[#E5E1DA]
-      dark:bg-[#27374D]">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-gray-900 dark:to-cyan-900 overflow-hidden">
+      <ModernBackground />
+
+      <Card className="w-full max-w-md bg-white/80 dark:bg-gray-800/80 backdrop-blur-md shadow-xl">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-center bg-clip-text 
-          text-[#74512D]
-          dark:text-[#67C6E3]">
+          <CardTitle className="text-3xl font-bold text-center text-blue-600 dark:text-blue-300">
             Choose Your Section
           </CardTitle>
         </CardHeader>
@@ -221,9 +219,7 @@ export default function ChooseSection() {
             </div>
             <Button
               type="submit"
-              className="w-full font-semibold py-2 px-4 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed
-              bg-[#B3C8CF]/60 hover:bg-[#B3C8CF] text-gray-800 
-              dark:bg-[#254B62]/50 dark:hover:bg-[#254B62] dark:text-gray-200"
+              className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 dark:from-blue-700 dark:to-cyan-800 dark:hover:from-blue-800 dark:hover:to-cyan-900 text-white border-none shadow-md hover:shadow-lg transition-all duration-300 text-lg font-semibold py-3 px-4 rounded-xl flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!selectedCourse || loading || fetchingCourses}
             >
               {loading ? (
@@ -237,7 +233,7 @@ export default function ChooseSection() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="text-center text-sm text-gray-500">
+        <CardFooter className="text-center text-sm text-gray-600 dark:text-gray-400">
           You can change your section later in your profile settings.
         </CardFooter>
       </Card>

@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Header from "./components/header";
-import ModernBackground from "./components/SchoolBackground";
+import ModernBackground from "../../../components/ui/SchoolBackground";
 
 import { Button } from "@/components/ui/button";
 import {
