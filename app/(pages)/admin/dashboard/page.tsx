@@ -31,6 +31,7 @@ import UserIcon from "@/app/(pages)/admin/dashboard/components/UserIcon";
 import ManageCourse from "./dashboardSettings/ManageCourse";
 import ManageExam from "./dashboardSettings/ManageExam";
 import ManageProfiles from "./dashboardSettings/AcceptStudents";
+import CheatingLogs from "./dashboardSettings/CheatingLogs";
 
 export const description =
   "A products dashboard with a sidebar navigation and a main content area.";
@@ -50,6 +51,8 @@ export function AdminDashboard() {
         return <ManageExam />;
       case "Students":
         return <h1>Students</h1>;
+      case "Students Cheating Logs":
+        return <CheatingLogs />;
       case "Student Ranking by Exam":
         return <h1>Student Ranking by Exam</h1>;
       case "Examinee Result":
@@ -133,6 +136,18 @@ export function AdminDashboard() {
               >
                 <Users className="h-4 w-4" />
                 Students
+              </Link>
+              <Link
+                href="#"
+                onClick={() => setActiveComponent("Students Cheating Logs")}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                  activeComponent === "Students"
+                    ? "bg-muted text-primary"
+                    : "text-muted-foreground hover:text-primary"
+                }`}
+              >
+                <Users className="h-4 w-4" />
+                Students Cheating Logs
               </Link>
               <Link
                 href="#"
@@ -228,6 +243,14 @@ export function AdminDashboard() {
                 >
                   <Users className="h-5 w-5" />
                   Students
+                </Link>
+                <Link
+                  href="#"
+                  onClick={() => setActiveComponent("Students Cheating Logs")}
+                  className="flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                >
+                  <Users className="h-5 w-5" />
+                  Students Cheating Logs
                 </Link>
                 <Link
                   href="#"

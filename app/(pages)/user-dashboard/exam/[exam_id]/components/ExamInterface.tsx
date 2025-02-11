@@ -12,13 +12,24 @@ import { User } from "@supabase/supabase-js";
 
 interface ExamInterfaceProps {
   exam_id: string;
-  onSubmit: (score: number, topicScores: Record<string, { score: number; total: number }>, answers: Record<number, any>, questions: any[]) => void;
+  onSubmit: (
+    score: number,
+    topicScores: Record<string, { score: number; total: number }>,
+    answers: Record<number, any>,
+    questions: any[]
+  ) => void;
 }
 
-const ExamInterface = ({ 
-  exam_id, 
-  onSubmit 
-}: ExamInterfaceProps) => {
+interface CheatingLog {
+  user_id: string;
+  exam_id: number;
+  copy_percentage: number;
+  time_spent_away: number;
+  cheat_risk_level: "Low" | "Medium" | "High";
+  timestamp: string;
+}
+
+const ExamInterface = ({ exam_id, onSubmit }: ExamInterfaceProps) => {
   const supabase = createClient();
   const [examData, setExamData] = useState<any>(null);
   const [questions, setQuestions] = useState<any[]>([]);
@@ -27,17 +38,19 @@ const ExamInterface = ({
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [copyStats, setCopyStats] = useState<Record<number, number>>({});
+  const [timeSpentAway, setTimeSpentAway] = useState(0);
+  const [awayStartTime, setAwayStartTime] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const {
           data: { user },
+          error,
         } = await supabase.auth.getUser();
+        if (error) throw error;
         setUser(user);
-        if (!user) {
-          throw new Error("User not authenticated");
-        }
       } catch (error) {
         console.error("Error fetching user:", error);
       }
@@ -49,6 +62,7 @@ const ExamInterface = ({
   useEffect(() => {
     const fetchExamData = async () => {
       try {
+        setIsLoading(true);
         const { data: exam, error: examError } = await supabase
           .from("exam_tbl")
           .select("*")
@@ -92,6 +106,8 @@ const ExamInterface = ({
         setQuestions(questionsWithChoices);
       } catch (err) {
         console.error("Error fetching exam data:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -100,11 +116,110 @@ const ExamInterface = ({
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeRemaining((prevTime) => (prevTime > 0 ? prevTime - 1 : 0));
+      setTimeRemaining((prevTime) => {
+        if (prevTime <= 0) {
+          clearInterval(timer);
+          handleSubmit();
+          return 0;
+        }
+        return prevTime - 1;
+      });
     }, 1000);
 
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const handleCopy = (event: ClipboardEvent) => {
+      const selection = window.getSelection()?.toString().trim();
+      if (selection && questions[currentQuestion - 1]) {
+        const questionId = questions[currentQuestion - 1].question_id;
+        setCopyStats((prevStats) => ({
+          ...prevStats,
+          [questionId]: (prevStats[questionId] || 0) + 1,
+        }));
+      }
+    };
+
+    document.addEventListener("copy", handleCopy);
+    return () => document.removeEventListener("copy", handleCopy);
+  }, [currentQuestion, questions]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setAwayStartTime(Date.now());
+      } else if (awayStartTime) {
+        const timeAway = Math.floor((Date.now() - awayStartTime) / 1000);
+        setTimeSpentAway((prev) => prev + timeAway);
+        setAwayStartTime(null);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [awayStartTime]);
+
+  const calculateCheatRisk = (
+    copyPercentage: number,
+    timeAway: number
+  ): "Low" | "Medium" | "High" => {
+    // Convert time away to minutes for easier calculation
+    const timeAwayMinutes = timeAway / 60;
+    // Risk based on copy percentage
+    if (copyPercentage >= 25) return "High"; // If student copied 25% or more of questions
+    if (copyPercentage >= 15) return "Medium"; // If student copied 15% or more of questions
+
+    // Risk based on time away
+    if (timeAwayMinutes > 10) return "High";
+    if (timeAwayMinutes > 5) return "Medium";
+
+    // Combined risk assessment
+    if (copyPercentage >= 10 && timeAwayMinutes > 3) return "Medium";
+    if (copyPercentage >= 5 && timeAwayMinutes > 2) return "Medium";
+
+    return "Low";
+  };
+
+  const calculateCopyPercentage = (): number => {
+    if (questions.length === 0) return 0;
+
+    const totalCopyAttempts = Object.values(copyStats).reduce(
+      (sum, count) => sum + count,
+      0
+    );
+    const averageCopiesPerQuestion = totalCopyAttempts / questions.length;
+
+    // Consider 1 copy per question as 100% and in each question it will total all questions to get the average  cheating score.
+    const copyPercentage = Math.min(averageCopiesPerQuestion * 100, 100);
+    return Math.round(copyPercentage * 10) / 10; // Round to 1 decimal place
+  };
+
+  const saveCheatingLogs = async () => {
+    if (!user) return;
+
+    try {
+      const copyPercentage = calculateCopyPercentage();
+      const cheatingLog: CheatingLog = {
+        user_id: user.id,
+        exam_id: parseInt(exam_id),
+        copy_percentage: copyPercentage,
+        time_spent_away: timeSpentAway,
+        cheat_risk_level: calculateCheatRisk(copyPercentage, timeSpentAway),
+        timestamp: new Date().toISOString(),
+      };
+
+      const { error } = await supabase
+        .from("cheating_logs")
+        .insert([cheatingLog]);
+
+      if (error) throw error;
+      console.log("Cheating logs saved successfully");
+    } catch (error) {
+      console.error("Error saving cheating logs:", error);
+    }
+  };
 
   const handleAnswer = (questionId: string | number, answer: string): void => {
     setAnswers((prevAnswers) => ({ ...prevAnswers, [questionId]: answer }));
@@ -122,34 +237,48 @@ const ExamInterface = ({
     }
   };
 
-  const handleSubmit = () => {
-    let totalScore = 0;
-    const topicScoresTemp: Record<string, { score: number; total: number }> = {};
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    try {
+      let totalScore = 0;
+      const topicScoresTemp: Record<string, { score: number; total: number }> =
+        {};
 
-    questions.forEach((question) => {
-      const { question_id, question_points, topic_id, question_answer } = question;
-      const correct = answers[question_id]?.trim() === question_answer.trim();
+      questions.forEach((question) => {
+        const { question_id, question_points, topic_id, question_answer } =
+          question;
+        const correct = answers[question_id]?.trim() === question_answer.trim();
 
-      if (!topicScoresTemp[topic_id]) {
-        topicScoresTemp[topic_id] = { score: 0, total: 0 };
-      }
+        if (!topicScoresTemp[topic_id]) {
+          topicScoresTemp[topic_id] = { score: 0, total: 0 };
+        }
 
-      topicScoresTemp[topic_id].total += question_points;
-      if (correct) {
-        totalScore += question_points;
-        topicScoresTemp[topic_id].score += question_points;
-      }
-    });
+        topicScoresTemp[topic_id].total += question_points;
+        if (correct) {
+          totalScore += question_points;
+          topicScoresTemp[topic_id].score += question_points;
+        }
+      });
 
-    onSubmit(totalScore, topicScoresTemp, answers, questions);
+      await saveCheatingLogs();
+      onSubmit(totalScore, topicScoresTemp, answers, questions);
+    } catch (error) {
+      console.error("Error submitting exam:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   if (!examData || questions.length === 0) {
     return <Loading />;
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FEFAF6] dark:bg-[#092635]"> 
+    <div className="min-h-screen flex flex-col bg-[#FEFAF6] dark:bg-[#092635]">
       <ExamHeader
         title={examData.exam_title}
         timeRemaining={timeRemaining}
@@ -164,8 +293,7 @@ const ExamInterface = ({
             answers={answers}
           />
         </aside>
-        <main className="flex-grow h-auto p-4 md:p-6 bg-gradient-to-t from-[#FEFAF6] to-[#B3C8CF] text-gray-800 
-        dark:bg-gradient-to-t dark:from-[#092635] dark:to-[#092635]/90 dark:text-gray-800">
+        <main className="flex-grow h-auto p-4 md:p-6 bg-gradient-to-t from-[#FEFAF6] to-[#B3C8CF] text-gray-800 dark:bg-gradient-to-t dark:from-[#092635] dark:to-[#092635]/90 dark:text-gray-800">
           <div className="h-full w-full">
             <QuestionDisplay
               question={questions[currentQuestion - 1]}
@@ -192,7 +320,9 @@ const ExamInterface = ({
             <div className="w-full sm:w-1/3 flex justify-end">
               <SubmitButton
                 onSubmit={handleSubmit}
-                disabled={Object.keys(answers).length !== questions.length}
+                disabled={
+                  Object.keys(answers).length !== questions.length || isLoading
+                }
               />
             </div>
           </div>
@@ -203,4 +333,3 @@ const ExamInterface = ({
 };
 
 export default ExamInterface;
-
