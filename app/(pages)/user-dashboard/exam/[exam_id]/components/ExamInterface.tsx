@@ -167,18 +167,17 @@ const ExamInterface = ({ exam_id, onSubmit }: ExamInterfaceProps) => {
   ): "Low" | "Medium" | "High" => {
     // Convert time away to minutes for easier calculation
     const timeAwayMinutes = timeAway / 60;
-
     // Risk based on copy percentage
-    if (copyPercentage > 75) return "High";
-    if (copyPercentage > 50) return "Medium";
+    if (copyPercentage >= 25) return "High"; // If student copied 25% or more of questions
+    if (copyPercentage >= 15) return "Medium"; // If student copied 15% or more of questions
 
     // Risk based on time away
     if (timeAwayMinutes > 10) return "High";
     if (timeAwayMinutes > 5) return "Medium";
 
     // Combined risk assessment
-    if (copyPercentage > 25 && timeAwayMinutes > 3) return "Medium";
-    if (copyPercentage > 40 && timeAwayMinutes > 2) return "Medium";
+    if (copyPercentage >= 10 && timeAwayMinutes > 3) return "Medium";
+    if (copyPercentage >= 5 && timeAwayMinutes > 2) return "Medium";
 
     return "Low";
   };
@@ -192,8 +191,8 @@ const ExamInterface = ({ exam_id, onSubmit }: ExamInterfaceProps) => {
     );
     const averageCopiesPerQuestion = totalCopyAttempts / questions.length;
 
-    // Consider 3 copies per question as 100%
-    const copyPercentage = Math.min((averageCopiesPerQuestion / 3) * 100, 100);
+    // Consider 1 copy per question as 100% and in each question it will total all questions to get the average  cheating score.
+    const copyPercentage = Math.min(averageCopiesPerQuestion * 100, 100);
     return Math.round(copyPercentage * 10) / 10; // Round to 1 decimal place
   };
 
