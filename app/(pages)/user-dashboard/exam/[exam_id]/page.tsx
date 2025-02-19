@@ -1,107 +1,156 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Check, Clock, Info } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
-import ExamInterface from "./components/ExamInterface";
-import ExamFeedback from "./components/ExamFeedback";
-import Loading from "@/components/Loading";
-import OpenAI from "openai";
+import { useParams } from "next/navigation";
 
-const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY || "",
-  dangerouslyAllowBrowser: true,
-});
+const supabase = createClient();
 
-const ExamPage = ({ params }: { params: { exam_id: string } }) => {
-  const { exam_id } = params;
-  const supabase = createClient();
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [feedbackData, setFeedbackData] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
+interface Question {
+  id: number;
+  question_txt: string;
+  exam_id: number;
+  points: number;
+  type: string;
+}
 
-  const handleExamSubmit = async (
-    score: number,
-    topicScores: Record<string, { score: number; total: number }>,
-    answers: Record<number, any>,
-    questions: any[]
-  ) => {
-    setIsLoading(true);
+interface Exam {
+  exam_id: number;
+  course_id: number;
+  exam_title: string;
+  exam_desc: string; // Updated from exam_dec to exam_desc
+  exam_time_limit: number;
+  exam_points: number;
+  exam_created_by: string;
+  status: string;
+  subject: string;
+  deadline: string;
+}
 
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
+export default function QuizPage() {
+  const params = useParams();
+  const examId = params.exam_id as string;
 
-      if (!user) {
-        throw new Error("User not authenticated");
+  const [exam, setExam] = useState<Exam | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchExamData() {
+      try {
+        // Fetch exam details
+        const { data: examData, error: examError } = await supabase
+          .from("exam_tbl")
+          .select("*")
+          .eq("exam_id", examId)
+          .single();
+
+        if (examError) throw examError;
+
+        // Fetch questions
+        const { data: questionData, error: questionError } = await supabase
+          .from("question_tbl2")
+          .select("*")
+          .eq("exam_id", examId);
+
+        if (questionError) throw questionError;
+
+        setExam(examData);
+        setQuestions(questionData);
+        setAnswers(Array(questionData.length).fill(""));
+        setTimeRemaining(examData.exam_time_limit * 60); // Convert minutes to seconds
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching exam data:", error);
+        setLoading(false);
       }
+    }
 
-      const topicFeedback = Object.entries(topicScores)
-        .map(([topic, { score, total }]) => {
-          const percentage = ((score / total) * 100).toFixed(2);
-          const percentageValue = parseFloat(percentage);
-          const strength = percentageValue >= 75 ? "strength" : "weakness";
-          return `Topic: ${topic} - ${percentage}% (${strength})`;
-        })
-        .join("\n");
+    fetchExamData();
+  }, [examId]);
 
-      const detailedFeedback = Object.entries(answers)
-        .map(([questionId, userAnswer]) => {
-          const question = questions.find(q => q.question_id.toString() === questionId);
-          if (!question) return ''; // Handle case where question is not found
-          const isCorrect = userAnswer.trim() === question.question_answer.trim();
-          return `Q: ${question.question_desc}\nYour Answer: ${userAnswer}\nCorrect Answer: ${question.question_answer}\nResult: ${isCorrect ? "Correct" : "Incorrect"}`;
-        })
-        .filter(feedback => feedback !== '') // Remove any empty feedback strings
-        .join("\n\n");
-
-      const prompt = `You completed an exam with the following performance:\n\n${topicFeedback}.\n\nProvide specific feedback based on these details:\n\n${detailedFeedback}.\n\nHighlight strengths, weaknesses, and suggestions for improvement.`;
-
-      const response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
-      });
-
-      const aiFeedback = response?.choices?.[0]?.message?.content?.trim() || "No feedback available.";
-
-      const strengthsMatch = aiFeedback.match(/Strengths:([\s\S]+?)(?=\nWeaknesses:|$)/);
-      const weaknessesMatch = aiFeedback.match(/Weaknesses:([\s\S]+?)(?=\nOverall feedback:|$)/);
-      const overallFeedbackMatch = aiFeedback.match(/Overall feedback:([\s\S]+)/);
-
-      const strengths = strengthsMatch ? strengthsMatch[1].trim() : "No Strengths Provided";
-      const weaknesses = weaknessesMatch ? weaknessesMatch[1].trim() : "No Weaknesses Provided";
-      const overallFeedback = overallFeedbackMatch ? overallFeedbackMatch[1].trim() : `Strengths: ${strengths}\nWeaknesses: ${weaknesses}`;
-
-      await supabase.from("exam_results").insert([{
-        user_id: user.id,
-        exam_id,
-        total_score: score,
-        topic_scores: topicScores,
-        strength_analysis: strengths,
-        weakness_analysis: weaknesses,
-        overall_feedback: overallFeedback,
-      }]);
-
-      setFeedbackData({
-        score,
-        topicScores,
-        feedbackSections: {
-          strengths,
-          weaknesses,
-          overallFeedback,
-        },
-        questions,
-        answers,
-      });
-
-      setIsSubmitted(true);
-    } catch (error) {
-      console.error("Error generating feedback or saving results:", error);
-    } finally {
-      setIsLoading(false);
+  const getDifficultyColor = (type: string) => {
+    switch (type.toLowerCase()) {
+      case "easy":
+        return "bg-emerald-500";
+      case "medium":
+        return "bg-amber-500";
+      case "hard":
+        return "bg-rose-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
-  if (isLoading) {
-    return <Loading />;
+  useEffect(() => {
+    if (timeRemaining <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeRemaining((prevTime) => {
+        if (prevTime <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeRemaining]);
+
+  const handleAnswer = (answer: string) => {
+    const newAnswers = [...answers];
+    newAnswers[currentQuestion] = answer;
+    setAnswers(newAnswers);
+  };
+
+  const navigateToQuestion = (index: number) => {
+    setCurrentQuestion(index);
+  };
+
+  const nextQuestion = () => {
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    }
+  };
+
+  const prevQuestion = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+    }
+  };
+
+  const progress =
+    (answers.filter((a) => a.trim() !== "").length / questions.length) * 100;
+
+  const allAnswered = answers.every((answer) => answer.trim() !== "");
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex justify-center items-center">
+        <div className="text-white text-xl">Loading exam...</div>
+      </div>
+    );
+  }
+
+  if (!exam || questions.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex justify-center items-center">
+        <div className="text-white text-xl">Exam not found</div>
+      </div>
+    );
   }
 
   return (
@@ -109,14 +158,10 @@ const ExamPage = ({ params }: { params: { exam_id: string } }) => {
       {isSubmitted ? (
         <ExamFeedback {...feedbackData} />
       ) : (
-        <ExamInterface 
-          exam_id={exam_id} 
-          onSubmit={handleExamSubmit}
-        />
+        <ExamInterface exam_id={exam_id} onSubmit={handleExamSubmit} />
       )}
     </div>
   );
-};
+}
 
 export default ExamPage;
-
