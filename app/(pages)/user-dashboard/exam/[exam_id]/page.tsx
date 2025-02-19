@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Check, Clock, Info } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { useParams } from "next/navigation";
+import JavaCompiler from "./components/JavaCompiler";
 
 const supabase = createClient();
 
@@ -14,6 +15,8 @@ interface Question {
   exam_id: number;
   points: number;
   type: string;
+  question_type: "text" | "java"; // Add this field to your question_tbl2
+  initial_code?: string; // Add this field for programming questions
 }
 
 interface Exam {
@@ -40,6 +43,11 @@ export default function QuizPage() {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showInstructions, setShowInstructions] = useState(true);
   const [loading, setLoading] = useState(true);
+
+  //java compiler
+  const [compilationResults, setCompilationResults] = useState<{
+    [key: number]: { output: string; memory: string; cpuTime: string };
+  }>({});
 
   useEffect(() => {
     async function fetchExamData() {
@@ -104,10 +112,22 @@ export default function QuizPage() {
     return () => clearInterval(timer);
   }, [timeRemaining]);
 
-  const handleAnswer = (answer: string) => {
+  // Modify handleAnswer to handle both text and Java answers
+  const handleAnswer = (answer: string, compileResult?: any) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = answer;
     setAnswers(newAnswers);
+
+    if (compileResult) {
+      setCompilationResults((prev) => ({
+        ...prev,
+        [currentQuestion]: {
+          output: compileResult.output,
+          memory: compileResult.memory,
+          cpuTime: compileResult.cpuTime,
+        },
+      }));
+    }
   };
 
   const navigateToQuestion = (index: number) => {
@@ -257,17 +277,53 @@ export default function QuizPage() {
                       >
                         {questions[currentQuestion].type}
                       </span>
+                      {questions[currentQuestion].question_type === "java" && (
+                        <span className="text-sm font-medium text-white px-2 py-1 rounded-full bg-blue-600">
+                          Java
+                        </span>
+                      )}
                     </div>
                   </div>
                   <h2 className="text-xl font-semibold mb-4 text-gray-800">
                     {questions[currentQuestion].question_txt}
                   </h2>
-                  <textarea
-                    className="w-full h-40 p-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all duration-300 resize-none text-gray-800 bg-white/50 backdrop-blur-sm"
-                    value={answers[currentQuestion]}
-                    onChange={(e) => handleAnswer(e.target.value)}
-                    placeholder="Type your answer here..."
-                  />
+
+                  {questions[currentQuestion].question_type === "java" ? (
+                    <div className="space-y-4">
+                      <JavaCompiler
+                        value={
+                          answers[currentQuestion] ||
+                          questions[currentQuestion].initial_code ||
+                          ""
+                        }
+                        onChange={(code) => handleAnswer(code)}
+                        onCompileSuccess={(result) =>
+                          handleAnswer(answers[currentQuestion], result)
+                        }
+                      />
+                      {compilationResults[currentQuestion] && (
+                        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                          <div className="text-sm text-gray-600">
+                            <p>
+                              Memory used:{" "}
+                              {compilationResults[currentQuestion].memory}
+                            </p>
+                            <p>
+                              CPU time:{" "}
+                              {compilationResults[currentQuestion].cpuTime}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <textarea
+                      className="w-full h-40 p-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all duration-300 resize-none text-gray-800 bg-white/50 backdrop-blur-sm"
+                      value={answers[currentQuestion]}
+                      onChange={(e) => handleAnswer(e.target.value)}
+                      placeholder="Type your answer here..."
+                    />
+                  )}
                 </motion.div>
               </AnimatePresence>
               <div className="flex justify-between mt-6">
