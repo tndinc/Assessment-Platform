@@ -12,8 +12,9 @@ interface CompilerResponse {
 
 interface JavaCompilerProps {
   value: string;
-  onChange: (value: string) => void;
-  onCompileSuccess?: (output: CompilerResponse) => void;
+  onChange: (code: string) => void;
+  onCompileSuccess: (result: any) => void;
+  disabled?: boolean;
 }
 
 const JavaCompiler = ({
