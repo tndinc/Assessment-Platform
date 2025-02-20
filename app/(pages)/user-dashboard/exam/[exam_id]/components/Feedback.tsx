@@ -115,7 +115,7 @@ export default function FeedbackPage({ examId, userId, answers }) {
       const metricsMax = {
         "Fundamentals of programming": 0,
         "Control Structures": 0,
-        Arrayss: 0,
+        Arrays: 0,
       };
 
       // Process each question
@@ -134,7 +134,7 @@ export default function FeedbackPage({ examId, userId, answers }) {
         if (question.metrics) {
           const metrics = Array.isArray(question.metrics)
             ? question.metrics
-            : [question.metrics];
+            : [];
 
           metrics.forEach((metric) => {
             if (metricsMax[metric] !== undefined) {
@@ -216,8 +216,8 @@ export default function FeedbackPage({ examId, userId, answers }) {
       // Prepare metrics data for visualization
       const metricsChartData = Object.keys(metricsScores).map((metric) => ({
         name: metric,
-        score: metricsScores[metric],
-        maxScore: metricsMax[metric],
+        score: metricsScores[metric] ?? 0,
+        maxScore: metricsMax[metric] ?? 0,
       }));
 
       // Store feedback in database
@@ -230,9 +230,22 @@ export default function FeedbackPage({ examId, userId, answers }) {
         metrics_data: JSON.stringify(metricsChartData),
         created_at: new Date().toISOString(),
       });
+      // ✅ Recalculate total points and max score based on categories
+      const finalTotalScore = Object.values(metricsScores).reduce(
+        (sum, val) => sum + (val ?? 0),
+        0
+      );
+      const finalMaxScore = Object.values(metricsMax).reduce(
+        (sum, val) => sum + (val ?? 0),
+        0
+      );
 
+      // ✅ Prepare metrics data
+
+      // ✅ Update final state consistently
       setFeedback(sortedFeedbackResults);
-      setTotalScore(totalPoints);
+      setTotalScore(finalTotalScore); // 🔥 Derived from category sums
+      setMaxPossibleScore(finalMaxScore); // 🔥 Matches the categories
       setMetricsData(metricsChartData);
       setLoading(false);
     } catch (error) {
@@ -605,8 +618,12 @@ FORMAT YOUR RESPONSE AS JSON:
       return (
         <div className="bg-white p-3 shadow-md rounded-md border border-gray-200">
           <p className="font-medium">{`${label}`}</p>
-          <p className="text-blue-600">{`Points Earned: ${payload[0].value}`}</p>
-          <p className="text-gray-600">{`Maximum Points: ${payload[1].value}`}</p>
+          <p className="text-blue-600">{`Points Earned: ${
+            payload[0]?.value ?? "N/A"
+          }`}</p>
+          <p className="text-gray-600">{`Maximum Points: ${
+            payload[1]?.value ?? "N/A"
+          }`}</p>
         </div>
       );
     }
@@ -653,7 +670,11 @@ FORMAT YOUR RESPONSE AS JSON:
                     {totalScore}/{maxPossibleScore}
                   </p>
                   <p className="text-gray-600 text-sm">
-                    {Math.round((totalScore / maxPossibleScore) * 100)}% Overall
+                    {maxPossibleScore > 0
+                      ? `${Math.round(
+                          (totalScore / maxPossibleScore) * 100
+                        )}% Overall`
+                      : "0% Overall"}
                   </p>
                 </div>
                 <div className="w-20 h-20 relative">
@@ -691,8 +712,7 @@ FORMAT YOUR RESPONSE AS JSON:
                   <BarChart data={metricsData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
-                    <YAxis domain={[0, "dataMax"]} />{" "}
-                    {/* Use dataMax to set scale based on maximum points */}
+                    <YAxis domain={[0, "dataMax"]} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
                     <Bar dataKey="score" fill="#3B82F6" name="Points Earned" />
@@ -726,8 +746,10 @@ FORMAT YOUR RESPONSE AS JSON:
                       {metric.score}/{metric.maxScore}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      {((metric.score / metric.maxScore) * 100).toFixed(1)}% of
-                      available points
+                      {metric.maxScore > 0
+                        ? ((metric.score / metric.maxScore) * 100).toFixed(1)
+                        : "0.0"}
+                      % of available points
                     </p>
                   </div>
                 ))}
