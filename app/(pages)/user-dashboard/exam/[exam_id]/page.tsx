@@ -36,9 +36,11 @@ interface Exam {
 }
 
 interface Answer {
+  questionId: number;
   code: string;
   explanation: string;
 }
+
 type Difficulty = "easy" | "medium" | "hard"; // Type for valid difficulty levels
 
 export default function QuizPage() {
@@ -174,7 +176,11 @@ export default function QuizPage() {
         setExam(examData);
         setQuestions(sortedQuestions);
         setAnswers(
-          Array(sortedQuestions.length).fill({ code: "", explanation: "" })
+          sortedQuestions.map((q) => ({
+            questionId: q.id,
+            code: "",
+            explanation: "",
+          }))
         );
         setTimeRemaining(examData.exam_time_limit * 60);
         setLoading(false);
@@ -226,8 +232,9 @@ export default function QuizPage() {
   ) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = {
-      code: code,
-      explanation: explanation,
+      questionId: questions[currentQuestion].id, // <-- Add this line
+      code,
+      explanation,
     };
     setAnswers(newAnswers);
 

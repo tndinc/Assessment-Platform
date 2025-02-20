@@ -121,7 +121,10 @@ export default function FeedbackPage({ examId, userId, answers }) {
       // Process each question
       for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
-        const answer = answers[i] || { code: "", explanation: "" };
+        const answer = answers.find((a) => a.questionId === question.id) || {
+          code: "",
+          explanation: "",
+        };
 
         setProcessingStatus(
           `Analyzing question ${i + 1} of ${questions.length}...`
@@ -253,7 +256,7 @@ export default function FeedbackPage({ examId, userId, answers }) {
 
       // Prepare the prompt for the OpenAI API
       const prompt = `
-You are an expert Java programming teacher grading a student's answer.
+You are an expert computer science teacher grading a student's theoretical answer.
 
 QUESTION:
 ${question.question_txt}
@@ -261,23 +264,25 @@ ${question.question_txt}
 EXPECTED ANSWER:
 ${question.question_answer || ""}
 
-STUDENT'S ANSWER:
-${answer.code || ""}
+STUDENT'S SUBMISSION:
+The student answered:
+"${answer.code || "No answer provided."}"
 
-STUDENT'S EXPLANATION:
-${answer.explanation || ""}
+Additionally, the student explained:
+"${answer.explanation || "No explanation provided."}"
 
 GRADING INSTRUCTIONS:
 1. Grade on a scale of 0 to ${question.points} points.
-2. Be fair and objective in your assessment.
-3. Consider both code correctness and explanation quality.
-4. Provide specific feedback on what was good and what needs improvement.
-5. If the student's answer is completely wrong, explain what the correct approach would be.
+2. If multiple answers or explanations exist, evaluate each separately and summarize feedback.
+3. Provide feedback pointing out specific strengths and weaknesses in reasoning, logic, and understanding.
+4. Suggest additional key points or concepts the student should mention.
+5. Provide corrections for factual inaccuracies.
+6. Feedback must be **detailed**, not generic, and should refer directly to parts of the answer.
 
 FORMAT YOUR RESPONSE AS JSON:
 {
   "points": [awarded points as a number],
-  "feedback": [detailed feedback as a string with constructive criticism and praise where deserved]
+  "feedback": [detailed feedback discussing both the main answer and explanation]
 }`;
 
       try {
