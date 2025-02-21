@@ -4,37 +4,30 @@ import { useState } from "react";
 export default function Evaluator() {
   const [studentCode, setStudentCode] = useState("");
   const [question, setQuestion] = useState("");
-  const [evaluation, setEvaluation] = useState("");
+  const [evaluation, setEvaluation] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Function to handle code evaluation
   const handleEvaluate = async () => {
     setLoading(true);
-    setEvaluation("");
+    setEvaluation(null);
     setError("");
 
     try {
-      // Sending POST request to backend API
       const response = await fetch("/api/evaluate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentCode, question }),
       });
 
-      // Handling response errors
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`API Error: ${errorData.error || response.statusText}`);
       }
 
-      // Parsing response data
       const data = await response.json();
-      setEvaluation(`
-        🤖 LLM Feedback: ${data.llmFeedback}
-        
-        📄 Syntax Analysis: ${data.syntaxAnalysis}
-      `);
+      setEvaluation(data); // Set the evaluation response data
     } catch (err: any) {
       console.error("Evaluation Error:", err);
       setError(err.message || "Failed to evaluate the code.");
@@ -45,7 +38,7 @@ export default function Evaluator() {
 
   return (
     <div className="p-6 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg">
-      <h2 className="text-xl font-bold text-center text-white">🚀 Code Evaluator</h2>
+      <h2 className="text-xl font-bold text-center text-white">🚀 Java Code Evaluator</h2>
 
       {/* Question Input */}
       <textarea
@@ -85,7 +78,31 @@ export default function Evaluator() {
       {evaluation && (
         <div className="mt-4 p-4 bg-white dark:bg-gray-800 rounded border">
           <h3 className="font-semibold text-lg text-blue-600">Evaluation Result:</h3>
-          <pre className="whitespace-pre-wrap text-sm text-gray-800 dark:text-white">{evaluation}</pre>
+
+          {/* LLM Feedback */}
+          <h4 className="mt-4 text-lg font-bold">🤖 LLM Feedback:</h4>
+          <pre className="whitespace-pre-wrap text-sm text-gray-800 dark:text-white">{evaluation.llmFeedback}</pre>
+
+          {/* Syntax Analysis */}
+          <h4 className="mt-4 text-lg font-bold">📄 Syntax Analysis:</h4>
+          <pre className="whitespace-pre-wrap text-sm text-gray-800 dark:text-white">{evaluation.syntaxAnalysis}</pre>
+
+          {/* Checkstyle Analysis */}
+          <h4 className="mt-4 text-lg font-bold">🛠️ Checkstyle Feedback:</h4>
+          <pre className="whitespace-pre-wrap text-sm text-gray-800 dark:text-white">{evaluation.checkstyleAnalysis}</pre>
+
+          {/* Rubric Scoring */}
+          <h4 className="mt-4 text-lg font-bold">📊 Rubric Scores:</h4>
+          <ul className="list-disc pl-5 text-gray-800 dark:text-white">
+            {Object.entries(evaluation.rubricScores).map(([criteria, score]) => (
+              <li key={criteria}>
+                <strong>{criteria.replace(/([A-Z])/g, " $1")}:</strong> {score} / 5
+              </li>
+            ))}
+          </ul>
+
+          {/* Total Score */}
+          <h3 className="mt-4 text-xl font-bold text-green-600">🏆 Final Score: {evaluation.totalScore}</h3>
         </div>
       )}
     </div>
