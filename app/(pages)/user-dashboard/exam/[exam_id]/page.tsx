@@ -38,7 +38,7 @@ interface Exam {
 interface Answer {
   questionId: number;
   code: string;
-  explanation: string;
+  explanation?: string; // Make explanation optional
 }
 
 type Difficulty = "easy" | "medium" | "hard"; // Type for valid difficulty levels
@@ -294,14 +294,14 @@ export default function QuizPage() {
   // Modify handleAnswer to handle both text and Java answers
   const handleAnswer = (
     code: string,
-    explanation: string,
+    explanation?: string,
     compileResult?: any
   ) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = {
-      questionId: questions[currentQuestion].id, // <-- Add this line
+      questionId: questions[currentQuestion].id,
       code,
-      explanation,
+      ...(explanation && { explanation }), // Only include explanation if provided
     };
     setAnswers(newAnswers);
 
@@ -341,12 +341,9 @@ export default function QuizPage() {
 
   const allAnswered = answers.every((answer) => {
     if (questions[answers.indexOf(answer)].question_type === "java") {
-      return (
-        answer.explanation.trim() !== "" &&
-        (questions[answers.indexOf(answer)].initial_code
-          ? true
-          : answer.code.trim() !== "")
-      );
+      return questions[answers.indexOf(answer)].initial_code
+        ? true
+        : answer.code.trim() !== "";
     }
     return answer.code.trim() !== "";
   });
@@ -374,7 +371,7 @@ export default function QuizPage() {
   }
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex flex-col justify-center items-center p-4">
-      <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+      <div class="absolute inset-0 bg-white/10"></div>
 
       {/* Conditionally render based on submission status */}
       {showFeedback ? (
@@ -537,7 +534,7 @@ export default function QuizPage() {
                           </div>
                         )}
 
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Explain your solution:
                           </label>
@@ -552,7 +549,7 @@ export default function QuizPage() {
                             }
                             placeholder="Explain your approach and solution here..."
                           />
-                        </div>
+                        </div> */}
 
                         {compilationResults[currentQuestion] &&
                           !questions[currentQuestion].initial_code && (
