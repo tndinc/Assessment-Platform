@@ -61,38 +61,84 @@ export default function QuizPage() {
   const [examScore, setExamScore] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [user, setUser] = useState<User | null | undefined>(undefined); // Initialize as `undefined` to indicate loading
+  const [copyAttemptsPerQuestion, setCopyAttemptsPerQuestion] = useState<{
+    [key: number]: number;
+  }>({});
+  const [timeAwayStart, setTimeAwayStart] = useState<number | null>(null);
+  const [timeSpentAway, setTimeSpentAway] = useState<number>(0);
+
+  // ✅ Track time away
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setTimeAwayStart(Date.now());
+      } else if (timeAwayStart) {
+        const timeAwayDuration = Math.floor(
+          (Date.now() - timeAwayStart) / 60000
+        ); // minutes
+        setTimeSpentAway((prev) => prev + timeAwayDuration);
+        setTimeAwayStart(null);
+        console.log(
+          `🕒 User returned after ${timeAwayDuration} minute(s) away`
+        );
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [timeAwayStart]);
+
+  const determineCheatRisk = (
+    copyPercentage: number,
+    timeAwayMinutes: number
+  ): string => {
+    if (copyPercentage >= 25 || timeAwayMinutes > 10) return "High";
+    if (copyPercentage >= 15 || timeAwayMinutes > 5) return "Medium";
+    return "Low";
+  };
 
   const [compilationResults, setCompilationResults] = useState<{
     [key: number]: { output: string; memory: string; cpuTime: string };
   }>({});
 
-  const calculateMetricsData = () => {
-    const metricsData = {
-      "Fundamentals of programming": { score: 0, maxScore: 0 },
-      "Control Structures": { score: 0, maxScore: 0 },
-      Arrays: { score: 0, maxScore: 0 },
-    };
-
-    questions.forEach((question) => {
-      const metric = question.metrics;
-      if (metricsData[metric]) {
-        metricsData[metric].maxScore += question.points;
-        const userAnswer = answers.find(
-          (ans) => ans.questionId === question.id
-        );
-        if (userAnswer && userAnswer.isCorrect) {
-          metricsData[metric].score += question.points;
-        }
-      }
-    });
-    return metricsData;
-  };
-
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
 
-      // 1. Record that the student has completed the exam
+      const totalQuestions = questions.length;
+      const copiedQuestions = Object.keys(copyAttemptsPerQuestion).length;
+      const copyPercentage = (copiedQuestions / totalQuestions) * 100;
+
+      // ✅ Determine risk based on copy percentage & time spent away
+      const cheatRiskLevel = determineCheatRisk(copyPercentage, timeSpentAway);
+
+      console.log("🕵️ Cheating Detection:", {
+        copiedQuestions,
+        copyPercentage: copyPercentage.toFixed(2),
+        timeSpentAway,
+        cheatRiskLevel,
+      });
+
+      // ✅ Insert cheating log with time_spent_away directly
+      if (
+        (copyPercentage > 0 || timeSpentAway > 0) &&
+        cheatRiskLevel !== "Low"
+      ) {
+        await supabase.from("cheating_logs").insert({
+          user_id: user.id,
+          exam_id: parseInt(examId),
+          copy_percentage: copyPercentage.toFixed(2),
+          time_spent_away: timeSpentAway, // ✅ Directly added here
+          cheat_risk_level: cheatRiskLevel,
+          timestamp: new Date().toISOString(),
+        });
+        console.log("🚨 Cheating log recorded with time spent away.");
+      } else {
+        console.log("✅ No suspicious activity detected.");
+      }
+
+      // ✅ Submit exam
       await supabase.from("exam_submissions").insert({
         user_id: user.id,
         exam_id: parseInt(examId),
@@ -101,11 +147,10 @@ export default function QuizPage() {
         answers: JSON.stringify(answers),
       });
 
-      // 2. Update the UI to show completion
       setExamSubmitted(true);
       setShowFeedback(true);
     } catch (error) {
-      console.error("Error submitting exam:", error);
+      console.error("❌ Error submitting exam:", error);
       alert("There was an error submitting your exam. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -449,7 +494,19 @@ export default function QuizPage() {
                         )}
                       </div>
                     </div>
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                    <h2
+                      className="text-xl font-semibold mb-4 text-gray-800 select-text"
+                      onCopy={() => {
+                        const qId = questions[currentQuestion].id;
+                        setCopyAttemptsPerQuestion((prev) => ({
+                          ...prev,
+                          [qId]: (prev[qId] || 0) + 1, // ✅ Increment copy count per question
+                        }));
+                        console.log(
+                          `⚠️ User copied question ${currentQuestion + 1}`
+                        );
+                      }}
+                    >
                       {questions[currentQuestion].question_txt}
                     </h2>
 
