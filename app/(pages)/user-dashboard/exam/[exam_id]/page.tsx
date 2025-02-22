@@ -66,6 +66,28 @@ export default function QuizPage() {
     [key: number]: { output: string; memory: string; cpuTime: string };
   }>({});
 
+  const calculateMetricsData = () => {
+    const metricsData = {
+      "Fundamentals of programming": { score: 0, maxScore: 0 },
+      "Control Structures": { score: 0, maxScore: 0 },
+      Arrays: { score: 0, maxScore: 0 },
+    };
+
+    questions.forEach((question) => {
+      const metric = question.metrics;
+      if (metricsData[metric]) {
+        metricsData[metric].maxScore += question.points;
+        const userAnswer = answers.find(
+          (ans) => ans.questionId === question.id
+        );
+        if (userAnswer && userAnswer.isCorrect) {
+          metricsData[metric].score += question.points;
+        }
+      }
+    });
+    return metricsData;
+  };
+
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);

@@ -53,11 +53,26 @@ export default function FeedbackPage({ examId, userId, answers }) {
           .eq("exam_id", examId);
 
         if (questionsError) throw questionsError;
+
         setQuestions(questionsData);
 
-        // Calculate maximum possible score
-        const maxScore = questionsData.reduce((sum, q) => sum + q.points, 0);
-        setMaxPossibleScore(maxScore);
+        // Dynamically extract metric categories from the questions
+        const initialMetrics = {};
+        questionsData.forEach((question) => {
+          if (question.metrics) {
+            const metrics = Array.isArray(question.metrics)
+              ? question.metrics
+              : [question.metrics];
+
+            metrics.forEach((metric) => {
+              if (!initialMetrics[metric]) {
+                initialMetrics[metric] = { score: 0, maxScore: 0 };
+              }
+            });
+          }
+        });
+
+        console.log("Extracted Metrics Categories:", initialMetrics);
 
         // Check if feedback already exists
         const { data: existingFeedback, error: feedbackError } = await supabase
@@ -68,18 +83,22 @@ export default function FeedbackPage({ examId, userId, answers }) {
           .single();
 
         if (!feedbackError && existingFeedback) {
-          // If feedback exists, load it and sort by difficulty
-          const parsedFeedback = JSON.parse(existingFeedback.feedback_data);
-          const sortedFeedback = sortFeedbackByDifficulty(parsedFeedback);
-          setFeedback(sortedFeedback);
+          console.log("Existing Feedback Data:", existingFeedback);
+
+          // Parse and update the state with feedback and metrics data
+          const parsedMetrics = JSON.parse(existingFeedback.metrics_data);
+          console.log("Parsed Metrics Data:", parsedMetrics);
+
+          setFeedback(JSON.parse(existingFeedback.feedback_data));
           setTotalScore(existingFeedback.total_score);
-          setMetricsData(JSON.parse(existingFeedback.metrics_data));
+          setMaxPossibleScore(existingFeedback.max_score);
+          setMetricsData(parsedMetrics);
           setLoading(false);
           return;
         }
 
-        // If no feedback exists, generate it
-        await generateFeedback(questionsData, answers);
+        // Generate new feedback if none exists
+        await generateFeedback(questionsData, answers, initialMetrics);
       } catch (error) {
         console.error("Error fetching data:", error);
         setProcessingStatus("Error analyzing answers. Please try again later.");
@@ -103,22 +122,13 @@ export default function FeedbackPage({ examId, userId, answers }) {
     });
   };
 
-  const generateFeedback = async (questions, answers) => {
+  const generateFeedback = async (questions, answers, initialMetrics) => {
     try {
       const feedbackResults = [];
-      let totalPoints = 0;
-      const metricsScores = {
-        "Fundamentals of programming": 0,
-        "Control Structures": 0,
-        Arrays: 0,
-      };
-      const metricsMax = {
-        "Fundamentals of programming": 0,
-        "Control Structures": 0,
-        Arrays: 0,
-      };
+      let totalScore = 0;
+      let maxScore = 0;
+      const metricsScores = { ...initialMetrics };
 
-      // Process each question
       for (let i = 0; i < questions.length; i++) {
         const question = questions[i];
         const answer = answers.find((a) => a.questionId === question.id) || {
@@ -130,69 +140,29 @@ export default function FeedbackPage({ examId, userId, answers }) {
           `Analyzing question ${i + 1} of ${questions.length}...`
         );
 
-        // Track metrics maximum possible points
-        if (question.metrics) {
-          const metrics = Array.isArray(question.metrics)
-            ? question.metrics
-            : [];
-
-          metrics.forEach((metric) => {
-            if (metricsMax[metric] !== undefined) {
-              metricsMax[metric] += question.points;
-            }
-          });
-        }
-
-        // Determine grading approach based on question type
         let gradingResult;
-
         if (question.question_type === "java") {
           gradingResult = await gradeJavaQuestion(question, answer);
         } else {
           gradingResult = await gradeTextQuestion(question, answer);
         }
 
-        // Update total points
-        totalPoints += gradingResult.points;
-
-        // Update metrics scores - Fixed to use actual awarded points
+        // Update metrics scores
         if (question.metrics) {
           const metrics = Array.isArray(question.metrics)
             ? question.metrics
             : [question.metrics];
 
-          // Get the grading result first
-          let gradingResult;
-          if (question.question_type === "java") {
-            gradingResult = await gradeJavaQuestion(question, answer);
-          } else {
-            gradingResult = await gradeTextQuestion(question, answer);
-          }
-
-          // Update total points
-          totalPoints += gradingResult.points;
-
           metrics.forEach((metric) => {
-            if (metricsMax[metric] !== undefined) {
-              metricsMax[metric] += question.points; // Add maximum possible points
-              metricsScores[metric] += gradingResult.points; // Add actual earned points
+            if (metricsScores[metric]) {
+              metricsScores[metric].score += gradingResult.points;
+              metricsScores[metric].maxScore += question.points;
             }
           });
         }
 
-        // Format the correct answer for display
-        let correctAnswer = question.question_answer;
-        try {
-          if (
-            typeof question.question_answer === "string" &&
-            question.question_answer.trim().startsWith("{")
-          ) {
-            const parsedAnswer = JSON.parse(question.question_answer);
-            correctAnswer = JSON.stringify(parsedAnswer, null, 2);
-          }
-        } catch (e) {
-          console.error("Error parsing question_answer:", e);
-        }
+        totalScore += gradingResult.points;
+        maxScore += question.points;
 
         feedbackResults.push({
           questionId: question.id,
@@ -204,48 +174,40 @@ export default function FeedbackPage({ examId, userId, answers }) {
           feedback: gradingResult.feedback,
           code: answer.code || "",
           explanation: answer.explanation || "",
-          correctAnswer: correctAnswer,
+          correctAnswer: question.question_answer,
           isCorrect: gradingResult.points === question.points,
           initialCode: question.initial_code || null,
         });
       }
 
-      // Sort feedback results by difficulty (easy to hard)
+      // Sort feedback results
       const sortedFeedbackResults = sortFeedbackByDifficulty(feedbackResults);
 
       // Prepare metrics data for visualization
-      const metricsChartData = Object.keys(metricsScores).map((metric) => ({
-        name: metric,
-        score: metricsScores[metric] ?? 0,
-        maxScore: metricsMax[metric] ?? 0,
-      }));
+      const metricsChartData = Object.entries(metricsScores).map(
+        ([name, data]) => ({
+          name,
+          score: data.score,
+          maxScore: data.maxScore,
+        })
+      );
+
+      console.log("Final Metrics Data for Graph:", metricsChartData);
 
       // Store feedback in database
       await supabase.from("student_feedback").upsert({
         user_id: userId,
         exam_id: examId,
-        total_score: totalPoints,
-        max_score: maxPossibleScore,
+        total_score: totalScore,
+        max_score: maxScore,
         feedback_data: JSON.stringify(sortedFeedbackResults),
         metrics_data: JSON.stringify(metricsChartData),
         created_at: new Date().toISOString(),
       });
-      // ✅ Recalculate total points and max score based on categories
-      const finalTotalScore = Object.values(metricsScores).reduce(
-        (sum, val) => sum + (val ?? 0),
-        0
-      );
-      const finalMaxScore = Object.values(metricsMax).reduce(
-        (sum, val) => sum + (val ?? 0),
-        0
-      );
 
-      // ✅ Prepare metrics data
-
-      // ✅ Update final state consistently
       setFeedback(sortedFeedbackResults);
-      setTotalScore(finalTotalScore); // 🔥 Derived from category sums
-      setMaxPossibleScore(finalMaxScore); // 🔥 Matches the categories
+      setTotalScore(totalScore);
+      setMaxPossibleScore(maxScore);
       setMetricsData(metricsChartData);
       setLoading(false);
     } catch (error) {
@@ -618,11 +580,9 @@ FORMAT YOUR RESPONSE AS JSON:
       return (
         <div className="bg-white p-3 shadow-md rounded-md border border-gray-200">
           <p className="font-medium">{`${label}`}</p>
-          <p className="text-blue-600">{`Points Earned: ${
-            payload[0]?.value ?? "N/A"
-          }`}</p>
-          <p className="text-gray-600">{`Maximum Points: ${
-            payload[1]?.value ?? "N/A"
+          <p className="text-blue-600">{`Score: ${payload[0]?.value || 0}`}</p>
+          <p className="text-gray-600">{`Maximum: ${
+            payload[1]?.value || 0
           }`}</p>
         </div>
       );
@@ -654,6 +614,7 @@ FORMAT YOUR RESPONSE AS JSON:
           transition={{ duration: 0.5 }}
         >
           <div className="p-8">
+            {/* Score Header Section */}
             <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
               <div>
                 <h1 className="text-3xl font-bold text-gray-800">
@@ -709,10 +670,16 @@ FORMAT YOUR RESPONSE AS JSON:
               </h2>
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={metricsData}>
+                  <BarChart
+                    data={
+                      metricsData.length > 0
+                        ? metricsData
+                        : [{ name: "No Data", score: 0, maxScore: 100 }]
+                    }
+                  >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
-                    <YAxis domain={[0, "dataMax"]} />
+                    <YAxis domain={[0, (dataMax) => Math.max(dataMax, 10)]} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
                     <Bar dataKey="score" fill="#3B82F6" name="Points Earned" />
