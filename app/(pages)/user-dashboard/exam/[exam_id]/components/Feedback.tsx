@@ -192,18 +192,20 @@ export default function FeedbackPage({ examId, userId, answers }) {
 
       const evaluation = await response.json();
 
-      // Calculate points based on multiple criteria
-      const syntaxScore = evaluation.syntaxAnalysis.includes("❌") ? 0 : 1;
-      const pmdScore = evaluation.pmdFeedback.includes("✅") ? 1 : 0;
-      const criteriaScore = Object.values(
-        evaluation.criterionFeedback || {}
-      ).filter((feedback) => feedback.includes("✅")).length;
+      // Calculate points based on LLM's correct/incorrect signal
+      let points = 0;
 
-      const totalCriteria =
-        2 + Object.keys(evaluation.criterionFeedback || {}).length;
-      const scoreRatio =
-        (syntaxScore + pmdScore + criteriaScore) / totalCriteria;
-      let points = Math.round(question.points * scoreRatio);
+      // Check if LLM indicates correct (now properly handling the case)
+      const isCorrect =
+        evaluation.llmFeedback.toLowerCase().includes("correct") &&
+        !evaluation.llmFeedback.toLowerCase().includes("incorrect");
+
+      // If correct, give full points. If incorrect but code exists, give partial credit
+      if (isCorrect) {
+        points = question.points;
+      } else if (answer.code && answer.code.trim().length > 0) {
+        points = Math.ceil(question.points * 0.5); // 50% for attempt
+      }
 
       return {
         points,
