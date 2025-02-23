@@ -22,8 +22,12 @@ const supabase = createClient();
 type Question = {
   id: number;
   question_txt: string;
+  question_answer: string | null;
   exam_id: number;
   type: string;
+  question_type: string;
+  initial_code: string | null;
+  metrics: string;
   points: number;
 };
 
@@ -38,7 +42,11 @@ export default function QuestionManager({ examId }: { examId: number }) {
   const [examDetails, setExamDetails] = useState<Exam | null>(null);
   const [newQuestion, setNewQuestion] = useState({
     question_txt: "",
+    question_answer: "",
     type: "easy",
+    question_type: "java",
+    initial_code: "",
+    metrics: "Fundamentals of Programming",
     points: 0,
   });
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -87,8 +95,12 @@ export default function QuestionManager({ examId }: { examId: number }) {
           .insert([
             {
               question_txt: newQuestion.question_txt,
+              question_answer: newQuestion.question_answer || null,
               exam_id: examId,
               type: newQuestion.type,
+              question_type: newQuestion.question_type,
+              initial_code: newQuestion.initial_code || null,
+              metrics: newQuestion.metrics,
               points: newQuestion.points,
             },
           ])
@@ -100,7 +112,11 @@ export default function QuestionManager({ examId }: { examId: number }) {
         setQuestions([...questions, data]);
         setNewQuestion({
           question_txt: "",
-          type: "multiple_choice",
+          question_answer: "",
+          type: "easy",
+          question_type: "java",
+          initial_code: "",
+          metrics: "Fundamentals of Programming",
           points: 0,
         });
         setIsDialogOpen(false);
@@ -143,7 +159,11 @@ export default function QuestionManager({ examId }: { examId: number }) {
     setEditingId(question.id);
     setNewQuestion({
       question_txt: question.question_txt,
+      question_answer: question.question_answer || "",
       type: question.type,
+      question_type: question.question_type,
+      initial_code: question.initial_code || "",
+      metrics: question.metrics,
       points: question.points,
     });
     setIsDialogOpen(true);
@@ -157,7 +177,11 @@ export default function QuestionManager({ examId }: { examId: number }) {
         .from("question_tbl2")
         .update({
           question_txt: newQuestion.question_txt,
+          question_answer: newQuestion.question_answer || null,
           type: newQuestion.type,
+          question_type: newQuestion.question_type,
+          initial_code: newQuestion.initial_code || null,
+          metrics: newQuestion.metrics,
           points: newQuestion.points,
         })
         .eq("id", editingId)
@@ -168,7 +192,15 @@ export default function QuestionManager({ examId }: { examId: number }) {
 
       setQuestions(questions.map((q) => (q.id === editingId ? data : q)));
       setEditingId(null);
-      setNewQuestion({ question_txt: "", type: "multiple_choice", points: 0 });
+      setNewQuestion({
+        question_txt: "",
+        question_answer: "",
+        type: "easy",
+        question_type: "java",
+        initial_code: "",
+        metrics: "Fundamentals of Programming",
+        points: 0,
+      });
       setIsDialogOpen(false);
       toast({
         title: "Question updated",
@@ -211,7 +243,11 @@ export default function QuestionManager({ examId }: { examId: number }) {
                 setEditingId(null);
                 setNewQuestion({
                   question_txt: "",
-                  type: "multiple_choice",
+                  question_answer: "",
+                  type: "easy",
+                  question_type: "java",
+                  initial_code: "",
+                  metrics: "Fundamentals of Programming",
                   points: 0,
                 });
               }}
@@ -249,6 +285,24 @@ export default function QuestionManager({ examId }: { examId: number }) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Question Format
+                </label>
+                <select
+                  value={newQuestion.question_type}
+                  onChange={(e) =>
+                    setNewQuestion({
+                      ...newQuestion,
+                      question_type: e.target.value,
+                    })
+                  }
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="text">Text-based</option>
+                  <option value="java">Java</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Points
                 </label>
                 <Input
@@ -279,6 +333,56 @@ export default function QuestionManager({ examId }: { examId: number }) {
                   className="w-full"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Question Answer
+                </label>
+                <Textarea
+                  value={newQuestion.question_answer}
+                  onChange={(e) =>
+                    setNewQuestion({
+                      ...newQuestion,
+                      question_answer: e.target.value,
+                    })
+                  }
+                  placeholder="Enter question answer"
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Initial Code
+                </label>
+                <Textarea
+                  value={newQuestion.initial_code}
+                  onChange={(e) =>
+                    setNewQuestion({
+                      ...newQuestion,
+                      initial_code: e.target.value,
+                    })
+                  }
+                  placeholder="Enter initial code (if applicable)"
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Metrics
+                </label>
+                <select
+                  value={newQuestion.metrics}
+                  onChange={(e) =>
+                    setNewQuestion({ ...newQuestion, metrics: e.target.value })
+                  }
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="Fundamentals of Programming">
+                    Fundamentals of programming
+                  </option>
+                  <option value="Control Structures">Control Structures</option>
+                  <option value="Arrays">Arrays</option>
+                </select>
+              </div>
             </div>
             <DialogFooter>
               <Button onClick={editingId ? updateQuestion : addQuestion}>
@@ -298,7 +402,9 @@ export default function QuestionManager({ examId }: { examId: number }) {
               <p className="text-gray-800">{question.question_txt}</p>
               <div className="flex gap-4 mt-1 text-sm text-gray-500">
                 <span>Type: {question.type}</span>
+                <span>Format: {question.question_type}</span>
                 <span>Points: {question.points}</span>
+                <span>Metrics: {question.metrics}</span>
               </div>
             </div>
             <div className="flex space-x-2 flex-shrink-0">
