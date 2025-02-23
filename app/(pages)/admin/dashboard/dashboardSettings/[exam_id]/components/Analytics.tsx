@@ -223,7 +223,6 @@ const Analytics = ({ examId }) => {
     }
   };
 
-  // Update the participant section to include the feedback dialog
   const renderParticipantList = () => (
     <div className="grid grid-cols-1 gap-2">
       {analyticsData.submissions.map((submission) => {
@@ -235,7 +234,7 @@ const Analytics = ({ examId }) => {
         const feedbackData = parseFeedbackData(submission.feedback_data);
         const metricsData = processMetricsData(submission.metrics_data);
 
-        // Parse answers here
+        // Parse answers
         const answers = (() => {
           try {
             const parsedAnswers =
@@ -249,35 +248,12 @@ const Analytics = ({ examId }) => {
           }
         })();
 
-        // Define the matching function here
+        // Get answer for specific question
         const getAnswerForQuestion = (questionId) => {
           const matchingAnswer = answers.find(
             (answer) => answer.questionId === questionId
           );
           return matchingAnswer ? matchingAnswer.code : "No answer submitted";
-        };
-        const updateTotalScore = async (feedback) => {
-          const { error } = await supabase
-            .from("student_feedback")
-            .update({ total_score: feedback.total_score })
-            .eq("id", feedback.id);
-
-          if (error) {
-            console.error("Error updating score:", error.message);
-            return;
-          }
-
-          // Refresh data
-          setAnalyticsData((prevData) => ({
-            ...prevData,
-            submissions: prevData.submissions.map((sub) =>
-              sub.submission_id === feedback.submission_id
-                ? { ...sub, total_score: feedback.total_score }
-                : sub
-            ),
-          }));
-
-          setSelectedFeedback(null);
         };
 
         return (
@@ -285,6 +261,7 @@ const Analytics = ({ examId }) => {
             key={submission.user_id}
             className="p-2 bg-gray-50 rounded-md flex justify-between items-center"
           >
+            {/* Student Info */}
             <div>
               <p className="text-sm">{submission.full_name}</p>
               <p className="text-xs text-gray-500">
@@ -292,195 +269,200 @@ const Analytics = ({ examId }) => {
                 <span className="font-semibold">{userAverageScore}%</span>
               </p>
             </div>
+
+            {/* Score Display */}
             <p className="text-sm font-semibold">
               {submission.total_score}/{submission.max_score}
             </p>
 
-            <AlertDialog>
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              {/* View Details Dialog */}
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={!feedbackData.length && !metricsData.length}
-                  >
+                  <Button size="sm" variant="outline">
                     View Details
                   </Button>
                 </AlertDialogTrigger>
 
-                <AlertDialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="ml-2"
-                    onClick={() => setSelectedFeedback(submission)}
-                  >
-                    Edit Grade
-                  </Button>
-                </AlertDialogTrigger>
-              </AlertDialog>
-              <AlertDialogContent className="max-w-4xl">
-                <AlertDialogHeader>
-                  <AlertDialogTitle>
-                    Details for {submission.full_name}
-                  </AlertDialogTitle>
-                </AlertDialogHeader>
+                <AlertDialogContent className="max-w-4xl">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Details for {submission.full_name}
+                    </AlertDialogTitle>
+                  </AlertDialogHeader>
 
-                <Tabs defaultValue="feedback" className="w-full">
-                  <TabsList>
-                    <TabsTrigger value="feedback">Feedback</TabsTrigger>
-                    <TabsTrigger value="metrics">Metrics</TabsTrigger>
-                  </TabsList>
+                  <Tabs defaultValue="feedback" className="w-full">
+                    <TabsList>
+                      <TabsTrigger value="feedback">Feedback</TabsTrigger>
+                      <TabsTrigger value="metrics">Metrics</TabsTrigger>
+                    </TabsList>
 
-                  <TabsContent value="feedback">
-                    <div className="whitespace-pre-wrap text-sm text-gray-800 max-h-96 overflow-y-auto space-y-6">
-                      {feedbackData.length > 0 ? (
-                        feedbackData.map((feedback, index) => (
-                          <div
-                            key={index}
-                            className="p-4 border rounded-lg bg-white"
-                          >
-                            <div className="space-y-4">
-                              <div>
-                                <h3 className="font-medium text-base">
-                                  Question {index + 1}
-                                </h3>
-                                <p className="text-gray-600">
-                                  {feedback.questionText}
-                                </p>
-                              </div>
-
-                              <div className="bg-gray-50 p-4 rounded-md">
-                                <h4 className="font-medium mb-2">
-                                  Student's Answer:
-                                </h4>
-                                <pre className="bg-black text-white p-4 rounded-md overflow-x-auto">
-                                  <code>
-                                    {getAnswerForQuestion(feedback.questionId)}
-                                  </code>
-                                </pre>
-                              </div>
-
-                              <div className="space-y-2">
-                                <div className="bg-blue-50 p-3 rounded-md">
-                                  <p className="font-medium text-blue-700">
-                                    LLM Feedback
-                                  </p>
-                                  <p className="text-blue-600">
-                                    {feedback.llmFeedback}
+                    {/* Feedback Tab */}
+                    <TabsContent value="feedback">
+                      <div className="whitespace-pre-wrap text-sm text-gray-800 max-h-96 overflow-y-auto space-y-6">
+                        {feedbackData.length > 0 ? (
+                          feedbackData.map((feedback, index) => (
+                            <div
+                              key={index}
+                              className="p-4 border rounded-lg bg-white"
+                            >
+                              <div className="space-y-4">
+                                {/* Question */}
+                                <div>
+                                  <h3 className="font-medium text-base">
+                                    Question {index + 1}
+                                  </h3>
+                                  <p className="text-gray-600">
+                                    {feedback.questionText}
                                   </p>
                                 </div>
 
-                                <div className="bg-green-50 p-3 rounded-md">
-                                  <p className="font-medium text-green-700">
-                                    Syntax Analysis
-                                  </p>
-                                  <p className="text-green-600">
-                                    {feedback.syntaxAnalysis}
-                                  </p>
+                                {/* Student Answer */}
+                                <div className="bg-gray-50 p-4 rounded-md">
+                                  <h4 className="font-medium mb-2">
+                                    Student's Answer:
+                                  </h4>
+                                  <pre className="bg-black text-white p-4 rounded-md overflow-x-auto">
+                                    <code>
+                                      {getAnswerForQuestion(
+                                        feedback.questionId
+                                      )}
+                                    </code>
+                                  </pre>
                                 </div>
 
-                                <div className="bg-purple-50 p-3 rounded-md">
-                                  <p className="font-medium text-purple-700">
-                                    PMD Feedback
-                                  </p>
-                                  <p className="text-purple-600">
-                                    {feedback.pmdFeedback}
-                                  </p>
-                                </div>
+                                {/* Feedback Sections */}
+                                <div className="space-y-2">
+                                  <div className="bg-blue-50 p-3 rounded-md">
+                                    <p className="font-medium text-blue-700">
+                                      LLM Feedback
+                                    </p>
+                                    <p className="text-blue-600">
+                                      {feedback.llmFeedback}
+                                    </p>
+                                  </div>
 
-                                <div className="bg-orange-50 p-3 rounded-md">
-                                  <p className="font-medium text-orange-700">
-                                    Overall Feedback
-                                  </p>
-                                  <p className="text-orange-600">
-                                    {feedback.overallFeedback}
-                                  </p>
+                                  <div className="bg-green-50 p-3 rounded-md">
+                                    <p className="font-medium text-green-700">
+                                      Syntax Analysis
+                                    </p>
+                                    <p className="text-green-600">
+                                      {feedback.syntaxAnalysis}
+                                    </p>
+                                  </div>
+
+                                  <div className="bg-purple-50 p-3 rounded-md">
+                                    <p className="font-medium text-purple-700">
+                                      PMD Feedback
+                                    </p>
+                                    <p className="text-purple-600">
+                                      {feedback.pmdFeedback}
+                                    </p>
+                                  </div>
+
+                                  <div className="bg-orange-50 p-3 rounded-md">
+                                    <p className="font-medium text-orange-700">
+                                      Overall Feedback
+                                    </p>
+                                    <p className="text-orange-600">
+                                      {feedback.overallFeedback}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
+                              {index < feedbackData.length - 1 && (
+                                <hr className="my-4" />
+                              )}
                             </div>
-                            {index < feedbackData.length - 1 && (
-                              <hr className="my-4" />
-                            )}
-                          </div>
-                        ))
-                      ) : (
-                        <p>No feedback available for this submission.</p>
-                      )}
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="metrics">
-                    {metricsData.length > 0 ? (
-                      <div className="space-y-4">
-                        <div className="h-64">
-                          <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={metricsData}>
-                              <CartesianGrid strokeDasharray="3 3" />
-                              <XAxis dataKey="concept" />
-                              <YAxis />
-                              <Tooltip />
-                              <Legend />
-                              <Bar
-                                name="Score"
-                                dataKey="score"
-                                fill="#8884d8"
-                              />
-                              <Bar
-                                name="Max Score"
-                                dataKey="maxScore"
-                                fill="#82ca9d"
-                              />
-                            </BarChart>
-                          </ResponsiveContainer>
-                        </div>
-
-                        <div className="mt-4">
-                          <table className="w-full text-sm">
-                            <thead>
-                              <tr className="bg-gray-50">
-                                <th className="text-left p-2">Concept</th>
-                                <th className="text-right p-2">Score</th>
-                                <th className="text-right p-2">Max Score</th>
-                                <th className="text-right p-2">Percentage</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {metricsData.map((metric, index) => (
-                                <tr key={index} className="border-t">
-                                  <td className="p-2">{metric.concept}</td>
-                                  <td className="text-right p-2">
-                                    {metric.score}
-                                  </td>
-                                  <td className="text-right p-2">
-                                    {metric.maxScore}
-                                  </td>
-                                  <td className="text-right p-2">
-                                    {metric.percentage}%
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
+                          ))
+                        ) : (
+                          <p>No feedback available for this submission.</p>
+                        )}
                       </div>
-                    ) : (
-                      <p>No metrics data available for this submission.</p>
-                    )}
-                  </TabsContent>
-                </Tabs>
+                    </TabsContent>
 
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Close</AlertDialogCancel>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+                    {/* Metrics Tab */}
+                    <TabsContent value="metrics">
+                      {metricsData.length > 0 ? (
+                        <div className="space-y-4">
+                          <div className="h-64">
+                            <ResponsiveContainer width="100%" height="100%">
+                              <BarChart data={metricsData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="concept" />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Bar
+                                  name="Score"
+                                  dataKey="score"
+                                  fill="#8884d8"
+                                />
+                                <Bar
+                                  name="Max Score"
+                                  dataKey="maxScore"
+                                  fill="#82ca9d"
+                                />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+
+                          <div className="mt-4">
+                            <table className="w-full text-sm">
+                              <thead>
+                                <tr className="bg-gray-50">
+                                  <th className="text-left p-2">Concept</th>
+                                  <th className="text-right p-2">Score</th>
+                                  <th className="text-right p-2">Max Score</th>
+                                  <th className="text-right p-2">Percentage</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {metricsData.map((metric, index) => (
+                                  <tr key={index} className="border-t">
+                                    <td className="p-2">{metric.concept}</td>
+                                    <td className="text-right p-2">
+                                      {metric.score}
+                                    </td>
+                                    <td className="text-right p-2">
+                                      {metric.maxScore}
+                                    </td>
+                                    <td className="text-right p-2">
+                                      {metric.percentage}%
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ) : (
+                        <p>No metrics data available for this submission.</p>
+                      )}
+                    </TabsContent>
+                  </Tabs>
+
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Close</AlertDialogCancel>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              {/* Edit Grade Button */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setSelectedFeedback(submission)}
+              >
+                Edit Grade
+              </Button>
+            </div>
           </div>
         );
       })}
     </div>
   );
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
