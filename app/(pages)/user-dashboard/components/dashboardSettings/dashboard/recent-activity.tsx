@@ -14,6 +14,17 @@ import {
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 const supabase = createClient();
 
@@ -34,9 +45,11 @@ interface ExamSubmission {
   submission_date: string;
   time_spent: number;
   status: string;
+  answers: string;
   exam_tbl: ExamTable;
   student_feedback?: {
     feedback_data: any;
+    metrics_data: any;
     total_score: number;
     max_score: number;
   };
@@ -52,6 +65,8 @@ interface Activity {
   status: string;
   submissionDate: string;
   feedbackData: any;
+  metricsData: any;
+  answers: any;
   totalScore: number;
   maxScore: number;
 }
@@ -101,6 +116,7 @@ export function RecentActivity() {
             submission_date,
             time_spent,
             status,
+            answers,
             exam_tbl!exam_submissions_exam_id_fkey (
               exam_id,
               exam_title,
@@ -142,6 +158,8 @@ export function RecentActivity() {
           submissionDate: new Date(submission.submission_date).toLocaleString(),
           feedbackData:
             feedbackLookup[submission.exam_id]?.feedback_data || null,
+          metricsData: feedbackLookup[submission.exam_id]?.metrics_data || null,
+          answers: submission.answers,
           totalScore: feedbackLookup[submission.exam_id]?.total_score || 0,
           maxScore: feedbackLookup[submission.exam_id]?.max_score || 0,
         }));
@@ -201,12 +219,7 @@ export function RecentActivity() {
               <span className="font-medium text-xs text-muted-foreground whitespace-nowrap">
                 {activity.submissionDate}
               </span>
-              <ViewFeedbackButton
-                feedbackData={activity.feedbackData}
-                examTitle={activity.examTitle}
-                examId={activity.id}
-                userId={user?.id || ""}
-              />
+              <ViewFeedbackButton activity={activity} userId={user?.id || ""} />
             </div>
           </div>
         ))
@@ -216,14 +229,10 @@ export function RecentActivity() {
 }
 
 const ViewFeedbackButton = ({
-  feedbackData,
-  examTitle,
-  examId,
+  activity,
   userId,
 }: {
-  feedbackData: any;
-  examTitle: string;
-  examId: string;
+  activity: Activity;
   userId: string;
 }) => {
   const parseFeedbackData = (data: any) => {
@@ -237,44 +246,183 @@ const ViewFeedbackButton = ({
     }
   };
 
-  const feedback = parseFeedbackData(feedbackData);
+  const processMetricsData = (metricsData: any) => {
+    if (!metricsData) return [];
+    try {
+      const parsed =
+        typeof metricsData === "string" ? JSON.parse(metricsData) : metricsData;
+      return Object.entries(parsed).map(([concept, scores]: [string, any]) => ({
+        concept,
+        score: scores.score,
+        maxScore: scores.maxScore,
+        percentage: ((scores.score / scores.maxScore) * 100).toFixed(1),
+      }));
+    } catch (error) {
+      console.error("Error parsing metrics data:", error);
+      return [];
+    }
+  };
+
+  const parseAnswers = (answers: string) => {
+    try {
+      return typeof answers === "string" ? JSON.parse(answers) : answers;
+    } catch (error) {
+      console.error("Error parsing answers:", error);
+      return [];
+    }
+  };
+
+  const getAnswerForQuestion = (questionId: string) => {
+    const answers = parseAnswers(activity.answers);
+    const matchingAnswer = answers.find(
+      (answer: any) => answer.questionId === questionId
+    );
+    return matchingAnswer ? matchingAnswer.code : "No answer submitted";
+  };
+
+  const feedback = parseFeedbackData(activity.feedbackData);
+  const metricsData = processMetricsData(activity.metricsData);
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button size="sm" variant="outline" disabled={!feedback.length}>
-          View Feedback
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={!feedback.length && !metricsData.length}
+        >
+          View Details
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="max-w-4xl">
         <AlertDialogHeader>
-          <AlertDialogTitle>Feedback for {examTitle}</AlertDialogTitle>
+          <AlertDialogTitle>Details for {activity.examTitle}</AlertDialogTitle>
         </AlertDialogHeader>
-        <AlertDialogDescription className="whitespace-pre-wrap text-sm text-gray-800 max-h-64 overflow-y-auto">
-          {feedback.length > 0 ? (
-            feedback.map((item, index) => (
-              <div key={index} className="mb-4 p-2 border-b">
-                <p>
-                  <strong>Question:</strong> {item.questionText}
-                </p>
-                <p>
-                  <strong>LLM Feedback:</strong> {item.llmFeedback}
-                </p>
-                <p>
-                  <strong>Syntax Analysis:</strong> {item.syntaxAnalysis}
-                </p>
-                <p>
-                  <strong>PMD Feedback:</strong> {item.pmdFeedback}
-                </p>
-                <p>
-                  <strong>Overall Feedback:</strong> {item.overallFeedback}
-                </p>
+
+        <Tabs defaultValue="feedback" className="w-full">
+          <TabsList>
+            <TabsTrigger value="feedback">Feedback</TabsTrigger>
+            <TabsTrigger value="metrics">Metrics</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="feedback">
+            <div className="whitespace-pre-wrap text-sm text-gray-800 max-h-96 overflow-y-auto space-y-6">
+              {feedback.length > 0 ? (
+                feedback.map((feedbackItem: any, index: number) => (
+                  <div key={index} className="p-4 border rounded-lg bg-white">
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-medium text-base">
+                          Question {index + 1}
+                        </h3>
+                        <p className="text-gray-600">
+                          {feedbackItem.questionText}
+                        </p>
+                      </div>
+
+                      <div className="bg-gray-50 p-4 rounded-md">
+                        <h4 className="font-medium mb-2">Your Answer:</h4>
+                        <pre className="bg-black text-white p-4 rounded-md overflow-x-auto">
+                          <code>
+                            {getAnswerForQuestion(feedbackItem.questionId)}
+                          </code>
+                        </pre>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="bg-blue-50 p-3 rounded-md">
+                          <p className="font-medium text-blue-700">
+                            LLM Feedback
+                          </p>
+                          <p className="text-blue-600">
+                            {feedbackItem.llmFeedback}
+                          </p>
+                        </div>
+
+                        <div className="bg-green-50 p-3 rounded-md">
+                          <p className="font-medium text-green-700">
+                            Syntax Analysis
+                          </p>
+                          <p className="text-green-600">
+                            {feedbackItem.syntaxAnalysis}
+                          </p>
+                        </div>
+
+                        <div className="bg-purple-50 p-3 rounded-md">
+                          <p className="font-medium text-purple-700">
+                            PMD Feedback
+                          </p>
+                          <p className="text-purple-600">
+                            {feedbackItem.pmdFeedback}
+                          </p>
+                        </div>
+
+                        <div className="bg-orange-50 p-3 rounded-md">
+                          <p className="font-medium text-orange-700">
+                            Overall Feedback
+                          </p>
+                          <p className="text-orange-600">
+                            {feedbackItem.overallFeedback}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No feedback available for this submission.</p>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="metrics">
+            {metricsData.length > 0 ? (
+              <div className="space-y-4">
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={metricsData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="concept" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Bar name="Score" dataKey="score" fill="#8884d8" />
+                      <Bar name="Max Score" dataKey="maxScore" fill="#82ca9d" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="mt-4">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-gray-50">
+                        <th className="text-left p-2">Concept</th>
+                        <th className="text-right p-2">Score</th>
+                        <th className="text-right p-2">Max Score</th>
+                        <th className="text-right p-2">Percentage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {metricsData.map((metric: any, index: number) => (
+                        <tr key={index} className="border-t">
+                          <td className="p-2">{metric.concept}</td>
+                          <td className="text-right p-2">{metric.score}</td>
+                          <td className="text-right p-2">{metric.maxScore}</td>
+                          <td className="text-right p-2">
+                            {metric.percentage}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            ))
-          ) : (
-            <p>No feedback available for this submission.</p>
-          )}
-        </AlertDialogDescription>
+            ) : (
+              <p>No metrics data available for this submission.</p>
+            )}
+          </TabsContent>
+        </Tabs>
+
         <AlertDialogFooter>
           <AlertDialogCancel>Close</AlertDialogCancel>
         </AlertDialogFooter>
