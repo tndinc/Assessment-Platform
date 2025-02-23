@@ -178,7 +178,36 @@ const Analytics = ({ examId }) => {
 
     fetchAnalytics();
   }, [examId, supabase]);
+  const updateTotalScore = async (feedback) => {
+    if (!feedback?.submission_id) {
+      console.error("Error: feedback submission_id is missing", feedback);
+      return;
+    }
 
+    console.log("Updating feedback:", feedback);
+
+    const { error } = await supabase
+      .from("student_feedback")
+      .update({ total_score: feedback.total_score })
+      .eq("submission_id", feedback.submission_id); // Use submission_id instead of id
+
+    if (error) {
+      console.error("Error updating score:", error.message);
+      return;
+    }
+
+    // Update the state to reflect the new score
+    setAnalyticsData((prevData) => ({
+      ...prevData,
+      submissions: prevData.submissions.map((sub) =>
+        sub.submission_id === feedback.submission_id
+          ? { ...sub, total_score: feedback.total_score }
+          : sub
+      ),
+    }));
+
+    setSelectedFeedback(null);
+  };
   // Function to parse and validate feedback data
   const parseFeedbackData = (feedbackData) => {
     if (!feedbackData) return [];
@@ -227,6 +256,29 @@ const Analytics = ({ examId }) => {
           );
           return matchingAnswer ? matchingAnswer.code : "No answer submitted";
         };
+        const updateTotalScore = async (feedback) => {
+          const { error } = await supabase
+            .from("student_feedback")
+            .update({ total_score: feedback.total_score })
+            .eq("id", feedback.id);
+
+          if (error) {
+            console.error("Error updating score:", error.message);
+            return;
+          }
+
+          // Refresh data
+          setAnalyticsData((prevData) => ({
+            ...prevData,
+            submissions: prevData.submissions.map((sub) =>
+              sub.submission_id === feedback.submission_id
+                ? { ...sub, total_score: feedback.total_score }
+                : sub
+            ),
+          }));
+
+          setSelectedFeedback(null);
+        };
 
         return (
           <div
@@ -245,15 +297,28 @@ const Analytics = ({ examId }) => {
             </p>
 
             <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  disabled={!feedbackData.length && !metricsData.length}
-                >
-                  View Details
-                </Button>
-              </AlertDialogTrigger>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!feedbackData.length && !metricsData.length}
+                  >
+                    View Details
+                  </Button>
+                </AlertDialogTrigger>
+
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="ml-2"
+                    onClick={() => setSelectedFeedback(submission)}
+                  >
+                    Edit Grade
+                  </Button>
+                </AlertDialogTrigger>
+              </AlertDialog>
               <AlertDialogContent className="max-w-4xl">
                 <AlertDialogHeader>
                   <AlertDialogTitle>
@@ -539,6 +604,44 @@ const Analytics = ({ examId }) => {
             </div>
           </Card>
         </TabsContent>
+        {selectedFeedback && (
+          <AlertDialog
+            open={true}
+            onOpenChange={() => setSelectedFeedback(null)}
+          >
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Edit Grade for {selectedFeedback.user_id}
+                </AlertDialogTitle>
+              </AlertDialogHeader>
+
+              <div className="space-y-4">
+                <label className="block">
+                  <span className="text-sm font-medium">Total Score</span>
+                  <input
+                    type="number"
+                    value={selectedFeedback.total_score}
+                    onChange={(e) =>
+                      setSelectedFeedback({
+                        ...selectedFeedback,
+                        total_score: Number(e.target.value),
+                      })
+                    }
+                    className="w-full p-2 border rounded-md"
+                  />
+                </label>
+              </div>
+
+              <AlertDialogFooter>
+                <Button onClick={() => updateTotalScore(selectedFeedback)}>
+                  Save
+                </Button>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
 
         <TabsContent value="performance" className="space-y-4">
           <Card className="p-4">
