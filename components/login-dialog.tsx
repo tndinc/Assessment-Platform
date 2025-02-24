@@ -28,7 +28,9 @@ export function LoginDialog() {
       let { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: "http://localhost:3000/user-dashboard",
+          redirectTo:
+            process.env.NEXT_PUBLIC_SITE_URL ||
+            "http://localhost:3000/user-dashboard",
         },
       });
       if (error) throw error;
@@ -48,30 +50,40 @@ export function LoginDialog() {
           Login
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] rounded-3xl shadow-2xl border-0
+      <DialogContent
+        className="sm:max-w-[425px] rounded-3xl shadow-2xl border-0
             bg-gradient-to-br from-[#E5E1DA] to-[#948979]/30
-            dark:from-[#27374D] dark:to-[#526D82]/30 ">
+            dark:from-[#27374D] dark:to-[#526D82]/30 "
+      >
         <DialogHeader>
-          <DialogTitle className="text-4xl font-bold font-mono text-center 
+          <DialogTitle
+            className="text-4xl font-bold font-mono text-center 
                 text-[#74512D]
-                dark:text-[#67C6E3]">
+                dark:text-[#67C6E3]"
+          >
             Code Your Future
           </DialogTitle>
-          <DialogDescription className="text-center text-lg mt-2 font-light
+          <DialogDescription
+            className="text-center text-lg mt-2 font-light
                 text-[#74512D]/80
-                dark:text-[#67C6E3]/60">
+                dark:text-[#67C6E3]/60"
+          >
             Where innovation meets education
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center justify-center p-6 space-y-6">
-          <div className="w-40 h-40 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform duration-300
+          <div
+            className="w-40 h-40 rounded-full flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform duration-300
               bg-gradient-to-r from-[#948979] to-[#74512D]/20
-              dark:from-[#526D82] dark:to-[#67C6E3]/20">
+              dark:from-[#526D82] dark:to-[#67C6E3]/20"
+          >
             <Code className="w-24 h-24 text-white" />
           </div>
-          <p className="text-center text-lg font-mono
+          <p
+            className="text-center text-lg font-mono
               text-[#74512D]
-              dark:text-[#67C6E3]">
+              dark:text-[#67C6E3]"
+          >
             {"<div class='future'>You</div>"}
           </p>
           <Button
@@ -79,8 +91,8 @@ export function LoginDialog() {
             className={`w-full bg-gradient-to-r border-none shadow-md hover:shadow-lg transition-all duration-300 text-lg font-semibold py-3 px-4 rounded-xl flex items-center justify-center space-x-3
                     from-[#948979]/60 to-[#E5E1DA]/80 hover:from-[#948979] hover:to-[#E5E1DA] text-[#74512D]/70 hover:text-[#74512D]
                     dark:from-[#526D82]/60 dark:to-[#092635]/60 dark:hover:from-[#526D82] dark:hover:to-[#092635] dark:text-[#67C6E3] dark:hover:text-[#67C6E3]/70 ${
-              mounted ? "animate-fade-in-up" : "opacity-0"
-            }`}
+                      mounted ? "animate-fade-in-up" : "opacity-0"
+                    }`}
             onClick={login}
           >
             <LogIn className="w-6 h-6" />
