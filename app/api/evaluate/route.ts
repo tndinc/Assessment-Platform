@@ -106,23 +106,23 @@ async function generateLLMFeedback(
       return fineTunedResponse.choices[0].message.content;
     }
 
-    // Fallback to GPT-4
-    const gpt4Response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "You are a Java programming expert. Evaluate the code for correctness, efficiency, and provide specific improvement suggestions."
-        },
-        {
-          role: "user",
-          content: `Question: ${question}\nStudent Code:\n${code}`
-        }
-      ],
-      max_tokens: 300
-    });
+    // // Fallback to GPT-4
+    // const gpt4Response = await openai.chat.completions.create({
+    //   model: "gpt-4o-mini",
+    //   messages: [
+    //     {
+    //       role: "system",
+    //       content: "You are a Java programming expert. Evaluate the code for correctness, efficiency, and provide specific improvement suggestions."
+    //     },
+    //     {
+    //       role: "user",
+    //       content: `Question: ${question}\nStudent Code:\n${code}`
+    //     }
+    //   ],
+    //   max_tokens: 300
+    // });
 
-    return gpt4Response.choices[0]?.message?.content || "Unable to generate feedback.";
+    // return gpt4Response.choices[0]?.message?.content || "Unable to generate feedback.";
   } catch (error) {
     console.error("LLM Feedback Error:", error);
     return "Error generating AI feedback. Please try again.";
