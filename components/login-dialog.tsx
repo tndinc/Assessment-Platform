@@ -28,9 +28,7 @@ export function LoginDialog() {
       let { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo:
-            process.env.NEXT_PUBLIC_SITE_URL ||
-            "http://localhost:3000/user-dashboard",
+          redirectTo: process.env.NEXT_PUBLIC_SITE_URL,
         },
       });
       if (error) throw error;
