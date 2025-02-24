@@ -108,11 +108,11 @@ export function DashboardContent() {
 
   const stats = [
     {
-      title: "Total Courses",
+      title: "Total Exam/s",
       value: totalCourses.toString(),
       change: "Updated dynamically",
       icon: BookOpen,
-      description: `You're enrolled in ${totalCourses} courses.`,
+      description: `You have a total of ${totalCourses} exams.`,
     },
     {
       title: "Average Grade",

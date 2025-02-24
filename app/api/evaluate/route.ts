@@ -206,7 +206,7 @@ export async function POST(req: NextRequest) {
             Structure your response with:
             - Overall Summary: Brief assessment of code quality
             - Strengths: What the student did well
-            - Suggestions for Improvement: Specific, actionable advice
+            - Weaknesses & Suggestions for Improvement: What the Student Struggled With. Specific, actionable advice
             - Final Thoughts: Encouraging closing message`
           },
           {

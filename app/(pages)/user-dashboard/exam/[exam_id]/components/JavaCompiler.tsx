@@ -71,7 +71,9 @@ const JavaCompiler = ({
         <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full h-64 p-4 font-mono text-sm border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring focus:ring-blue-200 transition-all duration-300 resize-none bg-white/50 backdrop-blur-sm"
+          className="w-full h-40 p-4 border-2 rounded-lg transition-all duration-300 resize-none
+    border-gray-300 bg-white/50 text-gray-800 placeholder-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-200 
+    dark:border-gray-600 dark:bg-black/50 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-600"
           placeholder="Write your Java code here..."
         />
       </div>

@@ -142,7 +142,9 @@ export default function Evaluator() {
                   </li>
                 );
               }
-              if (feedback.includes("Suggestions for Improvement:")) {
+              if (
+                feedback.includes("Weaknesses & Suggestions for Improvement:")
+              ) {
                 return (
                   <li
                     key={index}
@@ -150,9 +152,12 @@ export default function Evaluator() {
                   >
                     ⚠️{" "}
                     <span>
-                      <strong>Suggestions for Improvement:</strong>{" "}
+                      <strong>Weakness & Suggestions for Improvement:</strong>{" "}
                       {feedback
-                        .replace("Suggestions for Improvement:", "")
+                        .replace(
+                          "Weaknesses & Suggestions for Improvement:",
+                          ""
+                        )
                         .trim()}
                     </span>
                   </li>

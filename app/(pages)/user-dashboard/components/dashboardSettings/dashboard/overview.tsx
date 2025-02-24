@@ -103,6 +103,7 @@ export function Overview() {
           return {
             subject: feedback.exam_tbl.subject,
             examTitle: feedback.exam_tbl.exam_title,
+            xAxisLabel: `${feedback.exam_tbl.subject} (${feedback.exam_tbl.exam_title})`,
             totalScore: Number(
               ((feedback.total_score / feedback.max_score) * 100).toFixed(2)
             ),
@@ -161,7 +162,7 @@ export function Overview() {
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
             >
               <XAxis
-                dataKey="subject"
+                dataKey="xAxisLabel"
                 stroke="#888888"
                 fontSize={12}
                 tickLine={false}

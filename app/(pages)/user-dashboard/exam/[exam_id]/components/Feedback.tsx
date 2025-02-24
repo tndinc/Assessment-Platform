@@ -470,7 +470,7 @@ export default function FeedbackPage({ examId, userId, answers }) {
                                 }
                                 if (
                                   feedback.includes(
-                                    "Suggestions for Improvement:"
+                                    "Weaknesses & Suggestions for Improvement:"
                                   )
                                 ) {
                                   return (
@@ -481,11 +481,12 @@ export default function FeedbackPage({ examId, userId, answers }) {
                                       ⚠️{" "}
                                       <span>
                                         <strong>
-                                          Suggestions for Improvement:
+                                          Weakness & Suggestions for
+                                          Improvement:
                                         </strong>{" "}
                                         {feedback
                                           .replace(
-                                            "Suggestions for Improvement:",
+                                            "Weaknesses & Suggestions for Improvement:",
                                             ""
                                           )
                                           .trim()}

@@ -9,6 +9,7 @@ export function UpcomingExams() {
   type Exam = {
     id: number;
     subject: string;
+    title: string;
     date: string;
     time: string;
   };
@@ -44,7 +45,7 @@ export function UpcomingExams() {
         // Fetch upcoming exams that the user has NOT taken
         const { data, error } = await supabase
           .from("exam_tbl")
-          .select("exam_id, subject, deadline")
+          .select("exam_id, subject, exam_title, deadline")
           .eq("status", "open")
           .not("exam_id", "in", `(${takenExamIds.join(",") || "0"})`)
           .order("deadline", { ascending: true });
@@ -57,6 +58,7 @@ export function UpcomingExams() {
           return {
             id: exam.exam_id,
             subject: exam.subject,
+            title: exam.exam_title,
             date: deadline.toLocaleDateString(),
             time: deadline.toLocaleTimeString([], {
               hour: "2-digit",
@@ -83,7 +85,9 @@ export function UpcomingExams() {
             <AvatarFallback>{exam.subject[0]}</AvatarFallback>
           </Avatar>
           <div className="ml-4 space-y-1 flex-grow">
-            <p className="text-sm font-medium leading-none">{exam.subject}</p>
+            <p className="text-sm font-medium leading-none">
+              {exam.subject} ({exam.title})
+            </p>
             <p className="text-xs text-muted-foreground">
               {exam.date} at {exam.time}
             </p>

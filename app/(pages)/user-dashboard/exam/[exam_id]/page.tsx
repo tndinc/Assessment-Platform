@@ -334,11 +334,12 @@ export default function QuizPage() {
   };
 
   const progress =
-    (answers.filter((a) => a.code.trim() !== "" || a.explanation.trim() !== "")
-      .length /
+    (answers.filter(
+      (a) =>
+        (a?.code?.trim() ?? "") !== "" || (a?.explanation?.trim() ?? "") !== ""
+    ).length /
       questions.length) *
     100;
-
   const allAnswered = answers.every((answer) => {
     if (questions[answers.indexOf(answer)].question_type === "java") {
       return questions[answers.indexOf(answer)].initial_code
@@ -587,15 +588,17 @@ export default function QuizPage() {
                   >
                     <ChevronLeft size={20} className="mr-1" /> Previous
                   </motion.button>
-                  <motion.button
-                    className="px-4 py-2 bg-blue-500 rounded-full text-white font-semibold flex items-center hover:bg-blue-600 transition-colors"
-                    onClick={nextQuestion}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    disabled={currentQuestion === questions.length - 1}
-                  >
-                    Next <ChevronRight size={20} className="ml-1" />
-                  </motion.button>
+
+                  {currentQuestion < questions.length - 1 && (
+                    <motion.button
+                      className="px-4 py-2 bg-blue-500 rounded-full text-white font-semibold flex items-center hover:bg-blue-600 transition-colors"
+                      onClick={nextQuestion}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Next <ChevronRight size={20} className="ml-1" />
+                    </motion.button>
+                  )}
                 </div>
               </div>
               <motion.div
