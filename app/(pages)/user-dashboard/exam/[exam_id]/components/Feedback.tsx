@@ -31,7 +31,12 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default function FeedbackPage({ examId, userId, answers }) {
+export default function FeedbackPage({
+  examId,
+  userId,
+  answers,
+  submissionId,
+}) {
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState([]);
   const [feedback, setFeedback] = useState([]);
@@ -41,13 +46,13 @@ export default function FeedbackPage({ examId, userId, answers }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!examId || !userId || !answers) {
+    if (!examId || !userId || !answers || !submissionId) {
       setError("Missing required data");
       setLoading(false);
       return;
     }
     fetchQuestionsAndGrade();
-  }, [examId, userId, answers]);
+  }, [examId, userId, answers, submissionId]);
 
   async function fetchQuestionsAndGrade() {
     try {
@@ -164,6 +169,7 @@ export default function FeedbackPage({ examId, userId, answers }) {
         await supabase.from("student_feedback").upsert({
           user_id: userId,
           exam_id: examId,
+          submission_id: submissionId,
           total_score: totalScore,
           max_score: maxScore,
           feedback_data: JSON.stringify(feedbackResults),

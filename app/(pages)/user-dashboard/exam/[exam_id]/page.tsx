@@ -67,6 +67,7 @@ export default function QuizPage() {
   const [timeAwayStart, setTimeAwayStart] = useState<number | null>(null);
   const [timeSpentAway, setTimeSpentAway] = useState<number>(0);
 
+  const [submissionId, setSubmissionId] = useState(null);
   // ✅ Track time away
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -139,16 +140,29 @@ export default function QuizPage() {
       }
 
       // ✅ Submit exam
-      await supabase.from("exam_submissions").insert({
-        user_id: user.id,
-        exam_id: parseInt(examId),
-        submission_date: new Date().toISOString(),
-        time_spent: exam.exam_time_limit * 60 - timeRemaining,
-        answers: JSON.stringify(answers),
-      });
+      const { data: submissionData, error: submissionError } = await supabase
+        .from("exam_submissions")
+        .insert({
+          user_id: user.id,
+          exam_id: parseInt(examId),
+          submission_date: new Date().toISOString(),
+          time_spent: exam.exam_time_limit * 60 - timeRemaining,
+          answers: JSON.stringify(answers),
+        })
+
+        .select("submission_id")
+        .single();
+
+      if (submissionError) throw submissionError;
+
+      const submissionId = submissionData.submission_id;
+      console.log("✅ Exam submitted with ID:", submissionId);
 
       setExamSubmitted(true);
       setShowFeedback(true);
+
+      // Pass submission_id to the feedback component
+      setSubmissionId(submissionId);
     } catch (error) {
       console.error("❌ Error submitting exam:", error);
       alert("There was an error submitting your exam. Please try again.");
@@ -380,6 +394,7 @@ export default function QuizPage() {
           examId={parseInt(examId)}
           userId={user.id}
           answers={answers}
+          submissionId={submissionId}
         />
       ) : (
         <motion.div
