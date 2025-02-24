@@ -20,9 +20,6 @@ import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
 import { Book, Pencil, GraduationCap } from "lucide-react";
 
-export const description =
-  "An artistic login form for teachers with username and password inside a card. There is also a link to reset the password.";
-
 const Login = () => {
   const [adminUser, setAdminUser] = useState("");
   const [adminPsw, setAdminPsw] = useState("");

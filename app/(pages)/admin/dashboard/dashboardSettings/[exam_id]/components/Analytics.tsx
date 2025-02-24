@@ -28,9 +28,55 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { Button } from "@/components/ui/button";
+// First, define interfaces for your data structures
+interface Submission {
+  submission_id: string;
+  user_id: string;
+  exam_id: string;
+  submission_date: string;
+  time_spent: number;
+  answers: any; // You can make this more specific based on your data structure
+  status: string;
+  profiles?: {
+    full_name: string;
+    email: string;
+    avatar_url: string;
+  };
+  total_score: number;
+  max_score: number;
+  feedback_data: any;
+  metrics_data: any;
+  full_name: string;
+}
 
-const Analytics = ({ examId }) => {
-  const [analyticsData, setAnalyticsData] = useState({
+interface CheatingLog {
+  id: string;
+  user_id: string;
+  exam_id: string;
+  timestamp: string;
+  copy_percentage: number;
+  time_spent_away: number;
+  cheat_risk_level: string;
+  profiles?: {
+    full_name: string;
+  };
+  full_name: string;
+}
+
+interface AnalyticsData {
+  submissions: Submission[];
+  cheatingStats: CheatingLog[];
+  feedback: Record<string, any>;
+  riskLevels: { level: string; count: number }[];
+  metricsData: any[]; // You can make this more specific if needed
+}
+
+// Define the props interface
+interface AnalyticsProps {
+  examId: string;
+}
+const Analytics = ({ examId }: AnalyticsProps) => {
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
     submissions: [],
     cheatingStats: [],
     feedback: {}, // Changed to object for easier lookup
