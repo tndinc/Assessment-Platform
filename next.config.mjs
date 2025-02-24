@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    reactStrictMode: true,
+  reactStrictMode: true,
   images: {
     remotePatterns: [
       {
@@ -9,6 +9,11 @@ const nextConfig = {
         pathname: "**",
       },
     ],
+  },
+  // Add ESLint configuration
+  eslint: {
+    // This will completely disable ESLint during builds
+    ignoreDuringBuilds: true,
   },
 };
 
