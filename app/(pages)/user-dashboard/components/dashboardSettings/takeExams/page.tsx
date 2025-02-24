@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation"; // For navigation in App Router
