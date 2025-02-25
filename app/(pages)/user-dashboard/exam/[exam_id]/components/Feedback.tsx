@@ -70,11 +70,26 @@ export default function FeedbackPage({
         throw new Error("No questions found for this exam");
       }
 
-      setQuestions(questionsData);
+      // IMPORTANT FIX: Sort questions by difficulty to match QuizPage sort order
+      const sortedQuestions = questionsData.sort((a, b) => {
+        const difficultyOrder = { easy: 1, medium: 2, hard: 3 };
+        const aDifficulty = a.type.toLowerCase();
+        const bDifficulty = b.type.toLowerCase();
+        return difficultyOrder[aDifficulty] - difficultyOrder[bDifficulty];
+      });
+
+      setQuestions(sortedQuestions);
+
+      // Log the order for troubleshooting
+      console.log(
+        "Questions order:",
+        sortedQuestions.map((q) => `ID: ${q.id}, Difficulty: ${q.type}`)
+      );
+      console.log("Answers:", answers);
 
       // Initialize metrics
       const initialMetrics = {};
-      questionsData.forEach((question) => {
+      sortedQuestions.forEach((question) => {
         if (question.metrics) {
           const metrics = Array.isArray(question.metrics)
             ? question.metrics
@@ -87,7 +102,7 @@ export default function FeedbackPage({
         }
       });
 
-      await generateFeedback(questionsData, answers, initialMetrics);
+      await generateFeedback(sortedQuestions, answers, initialMetrics);
     } catch (error) {
       console.error("Error fetching data:", error);
       setError(error.message);
@@ -104,9 +119,17 @@ export default function FeedbackPage({
 
       // Process each question sequentially
       for (const question of questions) {
-        const answer = answers.find((a) => a.questionId === question.id) || {
-          code: "",
-        };
+        // Find the matching answer by questionId
+        const answer = answers.find((a) => a.questionId === question.id);
+
+        // Debug log for troubleshooting
+        console.log(
+          `Processing Q${question.id}:`,
+          answer ? `Found matching answer` : `No matching answer found!`
+        );
+
+        // If no matching answer found, create a default empty one
+        const processedAnswer = answer || { code: "", explanation: "" };
 
         // Generate default feedback structure
         const defaultFeedback = {
@@ -124,8 +147,8 @@ export default function FeedbackPage({
         };
 
         // Only grade if there's actual code to evaluate
-        let gradingResult = answer.code
-          ? await gradeJavaQuestion(question, answer)
+        let gradingResult = processedAnswer.code
+          ? await gradeJavaQuestion(question, processedAnswer)
           : defaultFeedback;
 
         // Ensure we have all feedback fields
@@ -158,7 +181,7 @@ export default function FeedbackPage({
           questionType: question.question_type,
           difficulty: question.type,
           maxPoints: question.points,
-          code: answer.code || "",
+          code: processedAnswer.code || "",
           correctAnswer: question.question_answer,
           isCorrect: gradingResult.points === question.points,
         });
