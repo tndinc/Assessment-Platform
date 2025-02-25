@@ -400,17 +400,18 @@ export default function FeedbackPage({
                 Question Feedback
               </h2>
               <Tabs defaultValue="1" className="w-full">
-                <TabsList className="grid grid-cols-3 lg:grid-cols-5 gap-2 mb-4">
+                <TabsList className="flex flex-wrap justify-center gap-2 mb-4 rounded-lg bg-transparent">
                   {feedback.map((_, index) => (
                     <TabsTrigger
                       key={index}
                       value={`${index + 1}`}
-                      className="text-sm"
+                      className="text-sm px-4 py-2 rounded-md border border-gray-300 bg-white shadow-sm hover:bg-gray-200 transition"
                     >
                       Q{index + 1}
                     </TabsTrigger>
                   ))}
                 </TabsList>
+
                 {feedback.map((item, index) => (
                   <TabsContent key={index} value={`${index + 1}`}>
                     <div className="space-y-6">
