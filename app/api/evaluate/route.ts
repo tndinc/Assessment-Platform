@@ -2,106 +2,249 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { execSync } from "child_process";
 import fs from "fs";
+import path from "path";
 
-// Function to extract public class name from Java code
+// Extract class name from Java code
 function extractClassName(javaCode: string): string {
-    const match = javaCode.match(/public\s+class\s+(\w+)/);
-    return match ? match[1] : "StudentCode"; // Default filename if no public class is found
+  const match = javaCode.match(/public\s+class\s+(\w+)/);
+  return match ? match[1] : "StudentCode";
 }
 
-// Function to determine if the question requires code evaluation
-function isCodingQuestion(question: string): boolean {
-    const codingKeywords = ["code", "function", "method", "class", "array", "loop", "algorithm", "syntax", "compile"];
-    return codingKeywords.some(keyword => question.toLowerCase().includes(keyword));
+// Clean directory paths from error messages
+function cleanErrorMessage(message: string): string {
+  return message.replace(/(\w:)?[\\/][^:\n]+:/g, "");
 }
 
-// Function to check if student input looks like code
-function isCodeInput(answer: string): boolean {
-    const codeIndicators = ["public class", "{", "}", "return", ";", "System.out.println", "int ", "String "];
-    return codeIndicators.some(indicator => answer.includes(indicator));
+// Check if code requires logic evaluation
+function requiresLogicEvaluation(question: string, code: string): boolean {
+  const logicKeywords = [
+    "loop", "condition", "if", "else", "switch", 
+    "algorithm", "logic", "find", "compare", "search", 
+    "largest", "smallest", "sort", "calculate"
+  ];
+  
+  const codeLogicPatterns = [
+    "if", "else", "for", "while", "switch", 
+    "case", "do", "break", "continue"
+  ];
+
+  const questionRequiresLogic = logicKeywords.some(keyword => 
+    question.toLowerCase().includes(keyword)
+  );
+  const codeContainsLogic = codeLogicPatterns.some(pattern => 
+    new RegExp(`\\b${pattern}\\b`).test(code)
+  );
+
+  return questionRequiresLogic || codeContainsLogic;
 }
 
-export async function POST(req: NextRequest) {
-    try {
-        console.log("🔄 API request received...");
+// Run PMD analysis
+function runPMD(filePath: string): string {
+  try {
+    const pmdCommand = `"C:/Program Files/pmd/pmd-bin-7.10.0/bin/pmd.bat" check -d "${filePath}" -R "C:/Program Files/pmd/pmd-bin-7.10.0/bin/rule_set.xml" -f text`;
+    const output = execSync(pmdCommand, { encoding: "utf-8" });
+    return output.trim().length > 0 
+      ? `❌ PMD Violations:\n${cleanErrorMessage(output)}`
+      : "✅ No PMD violations detected.";
+  } catch (error: any) {
+    const errorMessage = error.stdout || error.message;
+    return `❌ PMD Violations:\n${cleanErrorMessage(errorMessage)}`;
+  }
+}
 
-        // ✅ Verify OpenAI API Key
-        const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-        if (!OPENAI_API_KEY) {
-            console.error("❌ OpenAI API Key is missing!");
-            return NextResponse.json({ error: "Server Error: Missing API Key." }, { status: 500 });
+// Evaluate code against criteria
+function evaluateCriteria(
+  syntaxFeedback: string, 
+  pmdFeedback: string, 
+  requiresLogic: boolean
+): Record<string, string> {
+  return {
+    "Code Structure": pmdFeedback.includes("✅")
+      ? "✅ Well-structured and follows Java conventions"
+      : "❌ Code structure needs improvement",
+      
+    "Functionality": syntaxFeedback.includes("✅")
+      ? "✅ Code compiles and functions as expected"
+      : "❌ Code has compilation issues",
+      
+    "Best Practices": pmdFeedback.includes("✅")
+      ? "✅ Follows Java best practices"
+      : "❌ Some best practices violations detected",
+      
+    "Logic Implementation": requiresLogic
+      ? (syntaxFeedback.includes("✅") 
+          ? "✅ Logic implementation appears correct"
+          : "❌ Logic implementation needs review")
+      : "⚠️ Logic evaluation not applicable"
+  };
+}
+
+// Generate LLM feedback with fallback
+async function generateLLMFeedback(
+  openai: OpenAI,
+  code: string,
+  question: string
+): Promise<string> {
+  try {
+    // Try fine-tuned model first
+    const fineTunedResponse = await openai.chat.completions.create({
+      model: "ft:gpt-4o-mini-2024-07-18:personal::B3Rjviyf",
+      messages: [
+        {
+          role: "system",
+          content: "Evaluate the Java code considering correctness, efficiency, and suggest improvements."
+        },
+        {
+          role: "user",
+          content: `Question: ${question}\nStudent Code:\n${code}`
         }
+      ],
+      max_tokens: 300
+    });
 
-        // ✅ Parse Request Body
-        let body;
-        try {
-            body = await req.json();
-        } catch (err) {
-            console.error("❌ Invalid JSON format:", err);
-            return NextResponse.json({ error: "Invalid JSON format." }, { status: 400 });
-        }
-
-        const { studentCode, question } = body;
-
-        if (!studentCode || !question) {
-            console.error("❌ Missing parameters:", { studentCode, question });
-            return NextResponse.json({
-                error: "Bad Request: Missing studentCode or question."
-            }, { status: 400 });
-        }
-
-        // ✅ 1️⃣ LLM Evaluation for All Questions
-        console.log("✅ Sending request to OpenAI...");
-        const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
-
-        const response = await openai.chat.completions.create({
-            model: "ft:gpt-4o-mini-2024-07-18:personal::B3208MXR",
-            messages: [
-                { role: "system", content: "Evaluate the answer for correctness, logic, and suggest improvements." },
-                { role: "user", content: `Question: ${question}` },
-                { role: "user", content: `Student Answer:\n\`\`\`${studentCode}\n\`\`\`` }
-            ],
-            max_tokens: 300,
-        });
-
-        if (!response || !response.choices || response.choices.length === 0) {
-            console.error("❌ Empty response from OpenAI.");
-            return NextResponse.json({ error: "Empty response from OpenAI." }, { status: 500 });
-        }
-
-        const llmFeedback = response.choices[0].message.content;
-        console.log("✅ LLM Feedback Received:", llmFeedback);
-
-        // ✅ 2️⃣ Check if Question and Answer Require Code Compilation
-        let syntaxFeedback = "✅ No syntax check required (essay-type question or non-code answer).";
-
-        if (isCodingQuestion(question) && isCodeInput(studentCode)) {
-            // Run javac only for coding questions with valid-looking code input
-            const className = extractClassName(studentCode);
-            const filename = `${className}.java`;
-            fs.writeFileSync(filename, studentCode);
-
-            try {
-                execSync(`javac ${filename}`, { stdio: "pipe" });
-                syntaxFeedback = "✅ No syntax errors detected.";
-            } catch (error: any) {
-                syntaxFeedback = `❌ Syntax Error:\n${error.stderr.toString()}`;
-            }
-
-            // Cleanup compiled Java files
-            const classFile = filename.replace(".java", ".class");
-            if (fs.existsSync(classFile)) fs.unlinkSync(classFile);
-            fs.unlinkSync(filename);
-        }
-
-        // ✅ 3️⃣ Return the Final Combined Result
-        return NextResponse.json({
-            llmFeedback,
-            syntaxAnalysis: syntaxFeedback
-        });
-
-    } catch (error: any) {
-        console.error("🔥 API Error:", error);
-        return NextResponse.json({ error: "Server Error: Failed to process request.", details: error.message }, { status: 500 });
+    if (fineTunedResponse.choices[0]?.message?.content) {
+      return fineTunedResponse.choices[0].message.content;
     }
+
+    // Fallback to GPT-4
+    const gpt4Response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are a Java programming expert. Evaluate the code for correctness, efficiency, and provide specific improvement suggestions."
+        },
+        {
+          role: "user",
+          content: `Question: ${question}\nStudent Code:\n${code}`
+        }
+      ],
+      max_tokens: 300
+    });
+
+    return gpt4Response.choices[0]?.message?.content || "Unable to generate feedback.";
+  } catch (error) {
+    console.error("LLM Feedback Error:", error);
+    return "Error generating AI feedback. Please try again.";
+  }
+}
+
+// Main API route handler
+export async function POST(req: NextRequest) {
+  let tempFilePath: string | null = null;
+
+  try {
+    const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+    if (!OPENAI_API_KEY) {
+      throw new Error("Missing OpenAI API Key");
+    }
+
+    const body = await req.json();
+    const { studentCode, question, expectedAnswer } = body;
+
+    if (!studentCode || !question) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    // Initialize feedback variables
+    let syntaxFeedback = "✅ No syntax errors detected.";
+    let pmdFeedback = "✅ No PMD violations detected.";
+    let llmFeedback = "";
+    let overallFeedback = "";
+    
+    const requiresLogic = requiresLogicEvaluation(question, studentCode);
+
+    // Process student code
+    if (studentCode.trim()) {
+      const className = extractClassName(studentCode);
+      const filename = `${className}.java`;
+      tempFilePath = path.join(process.cwd(), filename);
+
+      // Save code to file
+      fs.writeFileSync(tempFilePath, studentCode);
+
+      // Check syntax
+      try {
+        execSync(`javac "${tempFilePath}"`, { stdio: "pipe" });
+      } catch (error: any) {
+        syntaxFeedback = `❌ Syntax Error:\n${cleanErrorMessage(error.stderr.toString())}`;
+      }
+
+      // Run PMD
+      pmdFeedback = runPMD(tempFilePath);
+
+      // Generate feedback
+      const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+      
+      // Get LLM feedback
+      llmFeedback = await generateLLMFeedback(openai, studentCode, question);
+
+      // Generate criterion feedback
+      const criterionFeedback = evaluateCriteria(
+        syntaxFeedback,
+        pmdFeedback,
+        requiresLogic
+      );
+
+      // Generate overall feedback
+      const evaluationSummary = `
+        Syntax Analysis: ${syntaxFeedback}
+        PMD Analysis: ${pmdFeedback}
+        Criterion Feedback: ${JSON.stringify(criterionFeedback, null, 2)}
+        LLM Feedback: ${llmFeedback}
+      `;
+
+      const overallResponse = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: `You are a supportive computer science professor providing feedback on Java code.
+            Structure your response with:
+            - Overall Summary: Brief assessment of code quality
+            - Strengths: What the student did well
+            - Suggestions for Improvement: Specific, actionable advice
+            - Final Thoughts: Encouraging closing message`
+          },
+          {
+            role: "user",
+            content: `Evaluation Results:\n${evaluationSummary}`
+          }
+        ],
+        max_tokens: 400
+      });
+
+      overallFeedback = overallResponse.choices[0]?.message?.content || 
+        "Unable to generate overall feedback.";
+    }
+
+    return NextResponse.json({
+      llmFeedback,
+      syntaxAnalysis: syntaxFeedback,
+      pmdFeedback,
+      criterionFeedback: evaluateCriteria(syntaxFeedback, pmdFeedback, requiresLogic),
+      overallFeedback
+    });
+
+  } catch (error: any) {
+    console.error("API Error:", error);
+    return NextResponse.json(
+      { 
+        error: "Server Error", 
+        details: cleanErrorMessage(error.message) 
+      }, 
+      { status: 500 }
+    );
+
+  } finally {
+    // Cleanup temporary files
+    if (tempFilePath) {
+      const classFile = tempFilePath.replace(".java", ".class");
+      if (fs.existsSync(classFile)) fs.unlinkSync(classFile);
+      if (fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
+    }
+  }
 }

@@ -76,6 +76,7 @@
 <<<<<<< HEAD
 }
 
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 }
@@ -84,3 +85,16 @@
 }
 >>>>>>> cheska
 >>>>>>> 410ee37e2ec0bc45afbd9faf34a00d5d7d4ad228
+=======
+
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+>>>>>>> ian2

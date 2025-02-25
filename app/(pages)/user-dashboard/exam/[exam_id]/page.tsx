@@ -36,9 +36,11 @@ interface Exam {
 }
 
 interface Answer {
+  questionId: number;
   code: string;
-  explanation: string;
+  explanation?: string; // Make explanation optional
 }
+
 type Difficulty = "easy" | "medium" | "hard"; // Type for valid difficulty levels
 
 export default function QuizPage() {
@@ -59,6 +61,42 @@ export default function QuizPage() {
   const [examScore, setExamScore] = useState(null);
   const [showFeedback, setShowFeedback] = useState(false);
   const [user, setUser] = useState<User | null | undefined>(undefined); // Initialize as `undefined` to indicate loading
+  const [copyAttemptsPerQuestion, setCopyAttemptsPerQuestion] = useState<{
+    [key: number]: number;
+  }>({});
+  const [timeAwayStart, setTimeAwayStart] = useState<number | null>(null);
+  const [timeSpentAway, setTimeSpentAway] = useState<number>(0);
+
+  // ✅ Track time away
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setTimeAwayStart(Date.now());
+      } else if (timeAwayStart) {
+        const timeAwayDuration = Math.floor(
+          (Date.now() - timeAwayStart) / 60000
+        ); // minutes
+        setTimeSpentAway((prev) => prev + timeAwayDuration);
+        setTimeAwayStart(null);
+        console.log(
+          `🕒 User returned after ${timeAwayDuration} minute(s) away`
+        );
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [timeAwayStart]);
+
+  const determineCheatRisk = (
+    copyPercentage: number,
+    timeAwayMinutes: number
+  ): string => {
+    if (copyPercentage >= 25 || timeAwayMinutes > 10) return "High";
+    if (copyPercentage >= 15 || timeAwayMinutes > 5) return "Medium";
+    return "Low";
+  };
 
   const [compilationResults, setCompilationResults] = useState<{
     [key: number]: { output: string; memory: string; cpuTime: string };
@@ -68,7 +106,39 @@ export default function QuizPage() {
     try {
       setIsSubmitting(true);
 
-      // 1. Record that the student has completed the exam
+      const totalQuestions = questions.length;
+      const copiedQuestions = Object.keys(copyAttemptsPerQuestion).length;
+      const copyPercentage = (copiedQuestions / totalQuestions) * 100;
+
+      // ✅ Determine risk based on copy percentage & time spent away
+      const cheatRiskLevel = determineCheatRisk(copyPercentage, timeSpentAway);
+
+      console.log("🕵️ Cheating Detection:", {
+        copiedQuestions,
+        copyPercentage: copyPercentage.toFixed(2),
+        timeSpentAway,
+        cheatRiskLevel,
+      });
+
+      // ✅ Insert cheating log with time_spent_away directly
+      if (
+        (copyPercentage > 0 || timeSpentAway > 0) &&
+        cheatRiskLevel !== "Low"
+      ) {
+        await supabase.from("cheating_logs").insert({
+          user_id: user.id,
+          exam_id: parseInt(examId),
+          copy_percentage: copyPercentage.toFixed(2),
+          time_spent_away: timeSpentAway, // ✅ Directly added here
+          cheat_risk_level: cheatRiskLevel,
+          timestamp: new Date().toISOString(),
+        });
+        console.log("🚨 Cheating log recorded with time spent away.");
+      } else {
+        console.log("✅ No suspicious activity detected.");
+      }
+
+      // ✅ Submit exam
       await supabase.from("exam_submissions").insert({
         user_id: user.id,
         exam_id: parseInt(examId),
@@ -77,11 +147,10 @@ export default function QuizPage() {
         answers: JSON.stringify(answers),
       });
 
-      // 2. Update the UI to show completion
       setExamSubmitted(true);
       setShowFeedback(true);
     } catch (error) {
-      console.error("Error submitting exam:", error);
+      console.error("❌ Error submitting exam:", error);
       alert("There was an error submitting your exam. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -174,7 +243,11 @@ export default function QuizPage() {
         setExam(examData);
         setQuestions(sortedQuestions);
         setAnswers(
-          Array(sortedQuestions.length).fill({ code: "", explanation: "" })
+          sortedQuestions.map((q) => ({
+            questionId: q.id,
+            code: "",
+            explanation: "",
+          }))
         );
         setTimeRemaining(examData.exam_time_limit * 60);
         setLoading(false);
@@ -221,13 +294,14 @@ export default function QuizPage() {
   // Modify handleAnswer to handle both text and Java answers
   const handleAnswer = (
     code: string,
-    explanation: string,
+    explanation?: string,
     compileResult?: any
   ) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = {
-      code: code,
-      explanation: explanation,
+      questionId: questions[currentQuestion].id,
+      code,
+      ...(explanation && { explanation }), // Only include explanation if provided
     };
     setAnswers(newAnswers);
 
@@ -267,12 +341,9 @@ export default function QuizPage() {
 
   const allAnswered = answers.every((answer) => {
     if (questions[answers.indexOf(answer)].question_type === "java") {
-      return (
-        answer.explanation.trim() !== "" &&
-        (questions[answers.indexOf(answer)].initial_code
-          ? true
-          : answer.code.trim() !== "")
-      );
+      return questions[answers.indexOf(answer)].initial_code
+        ? true
+        : answer.code.trim() !== "";
     }
     return answer.code.trim() !== "";
   });
@@ -300,7 +371,7 @@ export default function QuizPage() {
   }
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex flex-col justify-center items-center p-4">
-      <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
+      <div class="absolute inset-0 bg-white/10"></div>
 
       {/* Conditionally render based on submission status */}
       {showFeedback ? (
@@ -420,7 +491,19 @@ export default function QuizPage() {
                         )}
                       </div>
                     </div>
-                    <h2 className="text-xl font-semibold mb-4 text-gray-800">
+                    <h2
+                      className="text-xl font-semibold mb-4 text-gray-800 select-text"
+                      onCopy={() => {
+                        const qId = questions[currentQuestion].id;
+                        setCopyAttemptsPerQuestion((prev) => ({
+                          ...prev,
+                          [qId]: (prev[qId] || 0) + 1, // ✅ Increment copy count per question
+                        }));
+                        console.log(
+                          `⚠️ User copied question ${currentQuestion + 1}`
+                        );
+                      }}
+                    >
                       {questions[currentQuestion].question_txt}
                     </h2>
 
@@ -451,7 +534,7 @@ export default function QuizPage() {
                           </div>
                         )}
 
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Explain your solution:
                           </label>
@@ -466,7 +549,7 @@ export default function QuizPage() {
                             }
                             placeholder="Explain your approach and solution here..."
                           />
-                        </div>
+                        </div> */}
 
                         {compilationResults[currentQuestion] &&
                           !questions[currentQuestion].initial_code && (

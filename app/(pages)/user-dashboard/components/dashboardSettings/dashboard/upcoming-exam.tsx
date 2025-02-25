@@ -6,7 +6,6 @@ import { createClient } from "@/utils/supabase/client";
 const supabase = createClient();
 
 export function UpcomingExams() {
-  // Define the type for exam entries
   type Exam = {
     id: number;
     subject: string;
@@ -14,14 +13,40 @@ export function UpcomingExams() {
     time: string;
   };
 
-  const [exams, setExams] = useState<Exam[]>([]); // State type is now an array of Exam objects
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchUser = async () => {
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data.user) return;
+      setUserId(data.user.id);
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+
     const fetchExams = async () => {
       try {
+        // Get the list of exam IDs the user has already taken
+        const { data: takenExams, error: takenExamsError } = await supabase
+          .from("exam_submissions")
+          .select("exam_id")
+          .eq("user_id", userId);
+
+        if (takenExamsError) throw takenExamsError;
+
+        const takenExamIds = takenExams?.map((exam) => exam.exam_id) || [];
+
+        // Fetch upcoming exams that the user has NOT taken
         const { data, error } = await supabase
           .from("exam_tbl")
           .select("exam_id, subject, deadline")
+          .eq("status", "open")
+          .not("exam_id", "in", `(${takenExamIds.join(",") || "0"})`)
           .order("deadline", { ascending: true });
 
         if (error) throw error;
@@ -47,7 +72,7 @@ export function UpcomingExams() {
     };
 
     fetchExams();
-  }, []);
+  }, [userId]);
 
   return (
     <div className="space-y-8">
