@@ -314,8 +314,8 @@ export default function QuizPage() {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = {
       questionId: questions[currentQuestion].id,
-      code,
-      ...(explanation && { explanation }), // Only include explanation if provided
+      code: code || "", // Ensure code is never undefined
+      explanation: explanation || "", // Ensure explanation is never undefined
     };
     setAnswers(newAnswers);
 
@@ -463,8 +463,8 @@ export default function QuizPage() {
                         ${
                           currentQuestion === index
                             ? "bg-blue-500 text-white"
-                            : answers[index].code.trim() !== "" ||
-                              answers[index].explanation.trim() !== ""
+                            : (answers[index]?.code?.trim() || "") !== "" ||
+                              (answers[index]?.explanation?.trim() || "") !== ""
                             ? "bg-teal-500 text-white"
                             : "bg-gray-200 text-gray-600"
                         }`}
