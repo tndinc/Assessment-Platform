@@ -240,16 +240,39 @@ export default function FeedbackPage({
       // Calculate points based on LLM's correct/incorrect signal
       let points = 0;
 
-      // Check if LLM indicates correct (now properly handling the case)
-      const isCorrect =
-        evaluation.llmFeedback.toLowerCase().includes("correct") &&
-        !evaluation.llmFeedback.toLowerCase().includes("incorrect");
+      // Check if the submission contains Java code
+      const hasJavaCode =
+        answer.code &&
+        (answer.code.includes("class") ||
+          answer.code.includes("public") ||
+          answer.code.includes("private") ||
+          answer.code.includes("void") ||
+          answer.code.includes("int") ||
+          answer.code.includes("String") ||
+          answer.code.includes("boolean"));
 
-      // If correct, give full points. If incorrect but code exists, give partial credit
-      if (isCorrect) {
+      // If no Java code submitted, give 0 points
+      if (!hasJavaCode) {
+        points = 0;
+      }
+      // If correct Java implementation, give full points
+      else if (
+        evaluation.llmFeedback.toLowerCase().includes("correct") &&
+        !evaluation.llmFeedback.toLowerCase().includes("incorrect")
+      ) {
         points = question.points;
-      } else if (answer.code && answer.code.trim().length > 0) {
-        points = Math.ceil(question.points * 0.5); // 50% for attempt
+      }
+      // If close implementation (similar logic/approach but with minor issues)
+      else if (
+        evaluation.llmFeedback.toLowerCase().includes("close") ||
+        evaluation.llmFeedback.toLowerCase().includes("almost correct") ||
+        evaluation.llmFeedback.toLowerCase().includes("partially correct")
+      ) {
+        points = Math.round(question.points * 0.7); // 70% of full points
+      }
+      // If submission is Java code but not close to correct implementation
+      else {
+        points = Math.round(question.points * 0.4); // 40% of full points for an attempt
       }
 
       return {
