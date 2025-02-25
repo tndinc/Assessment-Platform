@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import JavaCompiler from "./components/JavaCompiler";
 import FeedbackPage from "./components/Feedback";
 import { User } from "@supabase/supabase-js";
+import DashboardButton from "./components/DashboardButton";
 
 const supabase = createClient();
 
@@ -68,6 +69,10 @@ export default function QuizPage() {
   const [timeSpentAway, setTimeSpentAway] = useState<number>(0);
 
   const [submissionId, setSubmissionId] = useState(null);
+
+  const navigateToDashboard = () => {
+    router.push("/user-dashboard");
+  };
   // ✅ Track time away
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -387,6 +392,7 @@ export default function QuizPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex flex-col justify-center items-center p-4">
       <div class="absolute inset-0 bg-white/10"></div>
+      <DashboardButton onClick={navigateToDashboard} />
 
       {/* Conditionally render based on submission status */}
       {showFeedback ? (
