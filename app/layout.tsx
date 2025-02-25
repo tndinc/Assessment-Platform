@@ -30,5 +30,15 @@ export default function RootLayout({
         </ThemeProvider>
       </body>
     </html>
+<<<<<<< HEAD
   );
 }
+=======
+  )
+<<<<<<< HEAD
+}
+
+=======
+}
+>>>>>>> cheska
+>>>>>>> 410ee37e2ec0bc45afbd9faf34a00d5d7d4ad228

@@ -7,6 +7,7 @@ import { Footer } from "./landingpage/components/footer";
 
 export default function Home() {
   return (
+<<<<<<< HEAD
     <>
       <main className="min-h-screen bg-background">
         <Header />
@@ -19,3 +20,19 @@ export default function Home() {
     </>
   );
 }
+=======
+    <main className="min-h-screen">
+      <Header />
+      <HeroSection />
+      <FeaturesSection />
+      <TestimonialsSection />
+      <CTASection />
+    </main>
+  )
+<<<<<<< HEAD
+}
+
+=======
+}
+>>>>>>> cheska
+>>>>>>> 410ee37e2ec0bc45afbd9faf34a00d5d7d4ad228
