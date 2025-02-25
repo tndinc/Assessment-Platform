@@ -483,21 +483,16 @@ export default function FeedbackPage({
                       </div>
 
                       {item.overallFeedback && (
-                        <div className="p-4 bg-gray-50 dark:bg-[#395B64] rounded-lg">
-                          <h4 className="text-lg font-bold">
-                            📊 Overall Feedback:
-                          </h4>
-                          <ul className="mt-2 space-y-2 ">
-                            {item.overallFeedback
-                              .split("\n")
-                              .map((feedback, idx) => {
-                                if (feedback.includes("Overall Summary:")) {
-                                  return (
-                                    <li
-                                      key={idx}
-                                      className="flex items-start gap-2 text-green-600"
-                                    >
-                                      ✅{" "}
+                      <div className="p-4 bg-gray-50 dark:bg-[#395B64] rounded-lg">
+                        <h4 className="mt-4 text-lg font-bold">📊 Overall Feedback:</h4>
+                        <ul className="list-none pl-0 text-gray-800 dark:text-white space-y-2">
+                          {item.overallFeedback &&
+                            typeof item.overallFeedback === "string" &&
+                            item.overallFeedback.split("\n").map((feedback, idx) => {
+                              if (feedback.includes("Overall Summary:")) {
+                                return (
+                                  <li key={idx} className="flex items-start gap-2 text-green-600">
+                                    ✅{" "}
                                       <span>
                                         <strong>Overall Summary:</strong>{" "}
                                         {feedback

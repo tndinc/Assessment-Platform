@@ -11,6 +11,11 @@ function extractClassName(javaCode: string): string {
   return match ? match[1] : "StudentCode";
 }
 
+function isValidJavaCode(code: string) {
+  const javaKeywords = ["class", "public", "static", "void", "int", "boolean", "System.out.println", "{", "}"];
+  return javaKeywords.some(keyword => code.includes(keyword));
+}
+
 // Clean directory paths from error messages
 function cleanErrorMessage(message: string): string {
   return message.replace(/(\w:)?[\\/][^:\n]+:/g, "");
@@ -124,6 +129,13 @@ export async function POST(req: NextRequest) {
         ],
         max_tokens: 400
       });
+
+      if (!isValidJavaCode(studentCode)) {
+        return NextResponse.json({
+          error: "Invalid Java Code Submission",
+          message: "Your submission does not appear to be valid Java code. Please submit a Java program for evaluation.",
+        });
+      }
 
       overallFeedback = overallResponse.choices[0]?.message?.content || "Unable to generate overall feedback.";
 
