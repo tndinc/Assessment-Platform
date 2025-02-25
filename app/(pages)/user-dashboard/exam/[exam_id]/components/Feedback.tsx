@@ -137,10 +137,11 @@ export default function FeedbackPage({
           llmFeedback: "No submission provided",
           syntaxAnalysis: "No code to analyze",
           pmdFeedback: "No code to analyze",
-          criterionFeedback: {
-            "Code Structure": "Not evaluated",
-            Functionality: "Not evaluated",
-            "Best Practices": "Not evaluated",
+          criteriaScores: {
+            "Code Correctness": 0,
+            "Input Handling": 0,
+            "Code Structure": 0,
+            "Logic Functionality": 0
           },
           overallFeedback:
             "No submission to evaluate\nSuggestions for Improvement: Please submit your code for evaluation.",
@@ -314,33 +315,33 @@ export default function FeedbackPage({
     return (
       <div className="p-6 max-w-4xl mx-auto">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 dark:border-gray-200"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden mb-8">
-        <div className="p-8">
+    <div className="container mx-auto bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen dark:bg-[#344C64]">
+      <div className="bg-white/80 dark:bg-[#344C64] backdrop-blur-md rounded-2xl shadow-2xl">
+        <div className="p-8 border-4">
           {/* Score Header Section */}
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-[#67C6E3]">
                 Exam Feedback
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-1 dark:text-gray-300">
                 Your performance analysis and personalized feedback
               </p>
             </div>
-            <div className="mt-4 md:mt-0 bg-gray-100 p-4 rounded-xl flex items-center">
+            <div className="mt-4 md:mt-0 bg-gray-100 dark:bg-[#27374D] p-4 rounded-xl flex items-center">
               <div className="mr-4">
-                <p className="text-gray-600 text-sm">Your Score</p>
-                <p className="text-3xl font-bold text-blue-600">
+                <p className="text-gray-600 dark:text-gray-200 text-sm">Your Score</p>
+                <p className="text-3xl font-bold text-blue-600 dark:text-[#37B7C3]">
                   {totalScore}/{maxPossibleScore}
                 </p>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 dark:text-gray-200 text-sm">
                   {((totalScore / maxPossibleScore) * 100).toFixed(1)}% Overall
                 </p>
               </div>
@@ -349,13 +350,13 @@ export default function FeedbackPage({
                   <path
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
-                    stroke="#E5E7EB"
+                    stroke="#088395"
                     strokeWidth="3"
                   />
                   <path
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
-                    stroke="#3B82F6"
+                    stroke="#37B7C3"
                     strokeWidth="3"
                     strokeDasharray={`${
                       (totalScore / maxPossibleScore) * 100
@@ -363,15 +364,15 @@ export default function FeedbackPage({
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Award className="text-blue-600" size={24} />
+                  <Award className="text-blue-600 dark:text-[#37B7C3]" size={24} />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Metrics Chart */}
-          <div className="mb-8 p-6 bg-gray-50 rounded-xl">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
+          <div className="mb-8 p-6 bg-gray-50 dark:bg-[#27374D] rounded-xl">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
               Score Distribution
             </h2>
             <div className="h-64">
@@ -382,10 +383,10 @@ export default function FeedbackPage({
                   <YAxis />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                  <Bar dataKey="score" fill="#3B82F6" name="Points Earned" />
+                  <Bar dataKey="score" fill="#87CBB9" name="Points Earned" />
                   <Bar
                     dataKey="maxScore"
-                    fill="#E5E7EB"
+                    fill="#0E8388"
                     name="Maximum Points"
                   />
                 </BarChart>
@@ -394,9 +395,9 @@ export default function FeedbackPage({
           </div>
 
           {/* Detailed Feedback Section */}
-          <Card className="shadow-lg">
+          <Card className="shadow-lg dark:bg-[#27374D]">
             <CardContent className="p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4 dark:text-gray-200">
                 Question Feedback
               </h2>
               <Tabs defaultValue="1" className="w-full">
@@ -405,7 +406,7 @@ export default function FeedbackPage({
                     <TabsTrigger
                       key={index}
                       value={`${index + 1}`}
-                      className="text-sm px-4 py-2 rounded-md border border-gray-300 bg-white shadow-sm hover:bg-gray-200 transition"
+                      className="text-sm px-4 py-2 rounded-md border border-gray-300 bg-white dark:bg-[#344C64] shadow-sm hover:bg-gray-200 transition"
                     >
                       Q{index + 1}
                     </TabsTrigger>
@@ -415,19 +416,19 @@ export default function FeedbackPage({
                 {feedback.map((item, index) => (
                   <TabsContent key={index} value={`${index + 1}`}>
                     <div className="space-y-6">
-                      <div className="p-4 bg-blue-50 rounded-lg">
+                      <div className="p-4 bg-blue-50 rounded-lg dark:bg-[#344C64]">
                         <h4 className="font-semibold">Question:</h4>
                         <p>{item.questionText}</p>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-gray-50 rounded-lg">
+                      <div className="grid md:grid-cols-2 gap-4 ">
+                        <div className="p-4 bg-gray-50 rounded-lg dark:bg-[#344C64]">
                           <h4 className="font-semibold">Your Answer:</h4>
                           <pre className="mt-2 whitespace-pre-wrap">
                             {item.code}
                           </pre>
                         </div>
-                        <div className="p-4 bg-gray-50 rounded-lg">
+                        <div className="p-4 bg-gray-50 rounded-lg dark:bg-[#344C64]">
                           <h4 className="font-semibold">Expected Answer:</h4>
                           <pre className="mt-2 whitespace-pre-wrap">
                             {item.correctAnswer}
@@ -435,8 +436,8 @@ export default function FeedbackPage({
                         </div>
                       </div>
 
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <h4 className="text-lg font-bold text-blue-800">
+                      <div className="p-4 bg-blue-50 dark:bg-[#4C6793] rounded-lg">
+                        <h4 className="text-lg font-bold text-blue-400">
                           🤖 LLM Feedback:
                         </h4>
                         <pre className="mt-2 whitespace-pre-wrap">
@@ -444,8 +445,8 @@ export default function FeedbackPage({
                         </pre>
                       </div>
 
-                      <div className="p-4 bg-green-50 rounded-lg">
-                        <h4 className="text-lg font-bold text-green-800">
+                      <div className="p-4 bg-green-50 dark:bg-[#697565] rounded-lg">
+                        <h4 className="text-lg font-bold text-green-400">
                           📄 Syntax Analysis:
                         </h4>
                         <pre className="mt-2 whitespace-pre-wrap">
@@ -453,8 +454,8 @@ export default function FeedbackPage({
                         </pre>
                       </div>
 
-                      <div className="p-4 bg-yellow-50 rounded-lg">
-                        <h4 className="text-lg font-bold text-yellow-800">
+                      <div className="p-4 bg-yellow-50 dark:bg-[#957777] rounded-lg">
+                        <h4 className="text-lg font-bold text-yellow-400">
                           🛠️ PMD Feedback:
                         </h4>
                         <pre className="mt-2 whitespace-pre-wrap">
@@ -462,18 +463,19 @@ export default function FeedbackPage({
                         </pre>
                       </div>
 
-                      <div className="p-4 bg-purple-50 rounded-lg">
-                        <h4 className="text-lg font-bold text-purple-800">
-                          ✅ Criterion-Based Feedback:
+                      <div className="p-4 bg-purple-50 dark:bg-[#6D5D6E] rounded-lg">
+                        <h4 className="text-lg font-bold text-purple-400">
+                          🎓 Graded Criteria:
                         </h4>
                         <ul className="mt-2 list-disc pl-5">
-                          {Object.entries(item.criterionFeedback || {}).map(
-                            ([criteria, feedback]) => (
+                          {Object.entries(item.criteriaScores || {}).map(
+                            ([criteria, score]) => (
                               <li key={criteria}>
                                 <strong>
                                   {criteria.replace(/([A-Z])/g, " $1")}:
                                 </strong>{" "}
-                                {feedback}
+                                {score}/5 {" "}
+                                {score >= 4 ? "✅" : "⚠️"}
                               </li>
                             )
                           )}
@@ -481,11 +483,11 @@ export default function FeedbackPage({
                       </div>
 
                       {item.overallFeedback && (
-                        <div className="p-4 bg-gray-50 rounded-lg">
+                        <div className="p-4 bg-gray-50 dark:bg-[#395B64] rounded-lg">
                           <h4 className="text-lg font-bold">
                             📊 Overall Feedback:
                           </h4>
-                          <ul className="mt-2 space-y-2">
+                          <ul className="mt-2 space-y-2 ">
                             {item.overallFeedback
                               .split("\n")
                               .map((feedback, idx) => {
@@ -501,6 +503,7 @@ export default function FeedbackPage({
                                         {feedback
                                           .replace("Overall Summary:", "")
                                           .trim()}
+
                                       </span>
                                     </li>
                                   );
@@ -551,7 +554,7 @@ export default function FeedbackPage({
                                   return (
                                     <li
                                       key={idx}
-                                      className="flex items-start gap-2 text-blue-600"
+                                      className="flex items-start gap-2 text-blue-500"
                                     >
                                       🎓{" "}
                                       <span>
@@ -564,7 +567,7 @@ export default function FeedbackPage({
                                   );
                                 }
                                 return (
-                                  <li key={idx} className="text-gray-700">
+                                  <li key={idx} className="text-gray-700 dark:text-gray-200">
                                     {feedback}
                                   </li>
                                 );

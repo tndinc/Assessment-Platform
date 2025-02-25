@@ -371,7 +371,9 @@ export default function QuizPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex justify-center items-center">
+      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 
+      dark:bg-gradient-to-br dark:from-[#27374D] dark:to-[#526D82]/30
+      flex justify-center items-center">
         <div className="text-white text-xl">Loading exam...</div>
       </div>
     );
@@ -379,15 +381,17 @@ export default function QuizPage() {
 
   if (!exam || questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex justify-center items-center">
+      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 
+      dark:bg-[#27374D] 
+      flex justify-center items-center">
         <div className="text-white text-xl">Exam not found</div>
       </div>
     );
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex flex-col justify-center items-center p-4">
-      <div class="absolute inset-0 bg-white/10"></div>
-
+    <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex flex-col justify-center items-center p-4
+    dark:bg-gradient-to-t dark:from-[#27374D] dark:to-[#526D82]/30">
+      <div className="fixed dark:bg-[#27374D] bg-white/10 "></div>
       {/* Conditionally render based on submission status */}
       {showFeedback ? (
         <FeedbackPage
@@ -398,17 +402,17 @@ export default function QuizPage() {
         />
       ) : (
         <motion.div
-          className="w-full max-w-2xl bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden relative z-10"
+          className="w-full max-w-2xl bg-white/80 dark:bg-[#27374D] backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden relative z-10"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           {showInstructions ? (
             <div className="p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              <h2 className="text-2xl font-bold dark:text-gray-200 text-gray-800 mb-4">
                 Exam Instructions
               </h2>
-              <div className="text-gray-700 space-y-2 mb-6">
+              <div className="dark:text-gray-200 text-gray-700 space-y-2 mb-6">
                 <div dangerouslySetInnerHTML={{ __html: exam.exam_desc }} />
                 <ul className="list-disc list-inside mt-4">
                   <li>Time limit: {exam.exam_time_limit} minutes</li>
@@ -425,7 +429,7 @@ export default function QuizPage() {
             </div>
           ) : (
             <>
-              <div className="p-8">
+              <div className="p-8 dark:bg-[#344C64]">
                 <div className="flex justify-between items-center mb-6">
                   <motion.h1
                     className="text-3xl font-bold text-gray-800"
@@ -435,7 +439,7 @@ export default function QuizPage() {
                   >
                     {exam.exam_title}
                   </motion.h1>
-                  <div className="flex items-center space-x-2 text-gray-600">
+                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-200">
                     <Clock size={20} />
                     <span className="font-semibold">
                       {formatTime(timeRemaining)}
@@ -485,7 +489,7 @@ export default function QuizPage() {
                     transition={{ duration: 0.3 }}
                   >
                     <div className="flex justify-between items-center mb-4">
-                      <span className="text-sm font-medium text-gray-600">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-200">
                         Question {currentQuestion + 1} of {questions.length}
                       </span>
                       <div className="flex items-center space-x-2">
@@ -508,7 +512,7 @@ export default function QuizPage() {
                       </div>
                     </div>
                     <h2
-                      className="text-xl font-semibold mb-4 text-gray-800 select-text"
+                      className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 select-text"
                       onCopy={() => {
                         const qId = questions[currentQuestion].id;
                         setCopyAttemptsPerQuestion((prev) => ({
@@ -617,13 +621,13 @@ export default function QuizPage() {
                 </div>
               </div>
               <motion.div
-                className="bg-gray-100/80 backdrop-blur-sm p-4 flex justify-between items-center"
+                className="bg-gray-100/80 dark:bg-[#344C64] backdrop-blur-sm p-4 flex justify-between items-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
                 <button
-                  className="text-gray-600 hover:text-gray-800 transition-colors flex items-center"
+                  className="text-gray-600 hover:text-gray-800 dark:text-gray-200 transition-colors flex items-center"
                   onClick={() => setShowInstructions(true)}
                 >
                   <Info size={20} className="mr-1" /> Instructions
