@@ -273,7 +273,7 @@ export default function FeedbackPage({
       }
       // If submission is Java code but not close to correct implementation
       else {
-        points = Math.round(question.points * 0.4); // 40% of full points for an attempt
+        points = Math.round(question.points * 0.2); // 40% of full points for an attempt
       }
 
       return {
@@ -322,7 +322,7 @@ export default function FeedbackPage({
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div className="container mx-auto px-4 py-14 ">
       <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden mb-8">
         <div className="p-8">
           {/* Score Header Section */}
@@ -420,7 +420,26 @@ export default function FeedbackPage({
                       <div className="p-4 bg-blue-100 rounded-lg">
                         <div className="flex justify-between items-center mb-2">
                           <h4 className="font-semibold text-blue-800">
-                            Question {index + 1}
+                            Question {index + 1} -{" "}
+                            {item.metrics &&
+                              (Array.isArray(item.metrics)
+                                ? item.metrics
+                                : [item.metrics]
+                              ).map((metric, idx) => (
+                                <span
+                                  key={idx}
+                                  className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm"
+                                >
+                                  {metric}
+                                </span>
+                              ))}
+                            {(!item.metrics ||
+                              (Array.isArray(item.metrics) &&
+                                item.metrics.length === 0)) && (
+                              <span className="text-sm text-gray-500 italic">
+                                No metrics assigned
+                              </span>
+                            )}
                           </h4>
                           <div className="text-center px-3 py-1 bg-white rounded-lg shadow">
                             <span className="block text-xl font-bold text-blue-600">
@@ -436,27 +455,6 @@ export default function FeedbackPage({
                         </div>
 
                         {/* Display metrics as badges */}
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {item.metrics &&
-                            (Array.isArray(item.metrics)
-                              ? item.metrics
-                              : [item.metrics]
-                            ).map((metric, idx) => (
-                              <span
-                                key={idx}
-                                className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm"
-                              >
-                                {metric}
-                              </span>
-                            ))}
-                          {(!item.metrics ||
-                            (Array.isArray(item.metrics) &&
-                              item.metrics.length === 0)) && (
-                            <span className="text-sm text-gray-500 italic">
-                              No metrics assigned
-                            </span>
-                          )}
-                        </div>
                       </div>
 
                       <div className="p-4 bg-blue-50 rounded-lg">
