@@ -185,6 +185,7 @@ export default function FeedbackPage({
           code: processedAnswer.code || "",
           correctAnswer: question.question_answer,
           isCorrect: gradingResult.points === question.points,
+          metrics: question.metrics, // Make sure metrics are included in feedback
         });
       }
 
@@ -415,8 +416,51 @@ export default function FeedbackPage({
 
                 {feedback.map((item, index) => (
                   <TabsContent key={index} value={`${index + 1}`}>
-                    <div className="space-y-6">
                       <div className="p-4 bg-blue-50 rounded-lg dark:bg-[#344C64]">
+                      {/* Question Score Card - Updated to show metrics */}
+                      <div className="p-4 bg-blue-100 rounded-lg">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-semibold text-blue-800">
+                            Question {index + 1}
+                          </h4>
+                          <div className="text-center px-3 py-1 bg-white rounded-lg shadow">
+                            <span className="block text-xl font-bold text-blue-600">
+                              {item.points}/{item.maxPoints}
+                            </span>
+                            <span className="text-xs text-gray-600">
+                              {((item.points / item.maxPoints) * 100).toFixed(
+                                0
+                              )}
+                              %
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Display metrics as badges */}
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {item.metrics &&
+                            (Array.isArray(item.metrics)
+                              ? item.metrics
+                              : [item.metrics]
+                            ).map((metric, idx) => (
+                              <span
+                                key={idx}
+                                className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm"
+                              >
+                                {metric}
+                              </span>
+                            ))}
+                          {(!item.metrics ||
+                            (Array.isArray(item.metrics) &&
+                              item.metrics.length === 0)) && (
+                            <span className="text-sm text-gray-500 italic">
+                              No metrics assigned
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-blue-50 rounded-lg">
                         <h4 className="font-semibold">Question:</h4>
                         <p>{item.questionText}</p>
                       </div>
