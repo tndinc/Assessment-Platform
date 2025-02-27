@@ -17,7 +17,7 @@ export default function Evaluator() {
     setError("");
 
     try {
-      const response = await fetch("/api/evaluate", {
+      const response = await fetch("/api/evaluate2", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentCode, question: fixedQuestion }),
@@ -100,94 +100,94 @@ export default function Evaluator() {
             ✅ Criterion-Based Feedback:
           </h4>
           <ul className="list-disc pl-5 text-gray-800 dark:text-white">
-            {Object.entries(evaluation.criterionFeedback).map(
-              ([criteria, feedback]) => (
-                <li key={criteria}>
-                  <strong>{criteria.replace(/([A-Z])/g, " $1")}:</strong>{" "}
-                  {feedback}
-                </li>
-              )
-            )}
+          {evaluation.criteriaScores &&
+            Object.entries(evaluation.criteriaScores).map(([criteria, score]) => (
+              <li key={criteria}>
+                <strong>{criteria.replace(/([A-Z])/g, " $1")}:</strong> {score}/5
+              </li>
+            ))}
           </ul>
 
           <h4 className="mt-4 text-lg font-bold">📊 Overall Feedback:</h4>
           <ul className="list-none pl-0 text-gray-800 dark:text-white space-y-2">
-            {evaluation.overallFeedback.split("\n").map((feedback, index) => {
-              // Add checkmarks and bold styling for labeled feedback points
-              if (feedback.includes("Overall Summary:")) {
-                return (
-                  <li
-                    key={index}
-                    className="flex items-start gap-2 text-green-600"
-                  >
-                    ✅{" "}
-                    <span>
-                      <strong>Overall Summary:</strong>{" "}
-                      {feedback.replace("Overall Summary:", "").trim()}
-                    </span>
-                  </li>
-                );
-              }
-              if (feedback.includes("Strengths:")) {
-                return (
-                  <li
-                    key={index}
-                    className="flex items-start gap-2 text-green-600"
-                  >
-                    ✅{" "}
-                    <span>
-                      <strong>Strengths:</strong>{" "}
-                      {feedback.replace("Strengths:", "").trim()}
-                    </span>
-                  </li>
-                );
-              }
-              if (
-                feedback.includes("Weaknesses & Suggestions for Improvement:")
-              ) {
-                return (
-                  <li
-                    key={index}
-                    className="flex items-start gap-2 text-yellow-600"
-                  >
-                    ⚠️{" "}
-                    <span>
-                      <strong>Weakness & Suggestions for Improvement:</strong>{" "}
-                      {feedback
-                        .replace(
-                          "Weaknesses & Suggestions for Improvement:",
-                          ""
-                        )
-                        .trim()}
-                    </span>
-                  </li>
-                );
-              }
-              if (feedback.includes("Final Thoughts:")) {
-                return (
-                  <li
-                    key={index}
-                    className="flex items-start gap-2 text-blue-600"
-                  >
-                    🎓{" "}
-                    <span>
-                      <strong>Final Thoughts:</strong>{" "}
-                      {feedback.replace("Final Thoughts:", "").trim()}
-                    </span>
-                  </li>
-                );
-              }
-              // Default formatting for any additional feedback
-              return (
-                <li
-                  key={index}
-                  className="flex items-start gap-2 text-gray-800 dark:text-white"
-                >
-                  <span>{feedback}</span>
+              {evaluation.overallFeedback && typeof evaluation.overallFeedback === 'string' ? (
+                evaluation.overallFeedback.split("\n").map((feedback, index) => {
+                  // Add checkmarks and bold styling for labeled feedback points
+                  if (feedback.includes("Overall Summary:")) {
+                    return (
+                      <li
+                        key={index}
+                        className="flex items-start gap-2 text-green-600"
+                      >
+                        ✅{" "}
+                        <span>
+                          <strong>Overall Summary:</strong>{" "}
+                          {feedback.replace("Overall Summary:", "").trim()}
+                        </span>
+                      </li>
+                    );
+                  }
+                  if (feedback.includes("Strengths:")) {
+                    return (
+                      <li
+                        key={index}
+                        className="flex items-start gap-2 text-green-600"
+                      >
+                        ✅{" "}
+                        <span>
+                          <strong>Strengths:</strong>{" "}
+                          {feedback.replace("Strengths:", "").trim()}
+                        </span>
+                      </li>
+                    );
+                  }
+                  if (feedback.includes("Weaknesses & Suggestions for Improvement:")) {
+                    return (
+                      <li
+                        key={index}
+                        className="flex items-start gap-2 text-yellow-600"
+                      >
+                        ⚠️{" "}
+                        <span>
+                          <strong>Weakness & Suggestions for Improvement:</strong>{" "}
+                          {feedback
+                            .replace("Weaknesses & Suggestions for Improvement:", "")
+                            .trim()}
+                        </span>
+                      </li>
+                    );
+                  }
+                  if (feedback.includes("Final Thoughts:")) {
+                    return (
+                      <li
+                        key={index}
+                        className="flex items-start gap-2 text-blue-600"
+                      >
+                        🎓{" "}
+                        <span>
+                          <strong>Final Thoughts:</strong>{" "}
+                          {feedback.replace("Final Thoughts:", "").trim()}
+                        </span>
+                      </li>
+                    );
+                  }
+                  // Default formatting for any additional feedback
+                  return (
+                    <li
+                      key={index}
+                      className="flex items-start gap-2 text-gray-800 dark:text-white"
+                    >
+                      <span>{feedback}</span>
+                    </li>
+                  );
+                })
+              ) : (
+                <li className="flex items-start gap-2 text-red-600">
+                  ⚠️ No valid feedback available.
                 </li>
-              );
-            })}
-          </ul>
+              )}
+            </ul>
+
         </div>
       )}
     </div>

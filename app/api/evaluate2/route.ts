@@ -11,6 +11,15 @@ function extractClassName(javaCode: string): string {
   return match ? match[1] : "StudentCode";
 }
 
+// Function to validate if the code is Java based on common Java patterns
+function isJavaCode(code: string): boolean {
+    const hasClassDeclaration = /public\s+class\s+\w+/.test(code);
+    const hasMainMethod = /public\s+static\s+void\s+main\s*\(\s*String\s*\[\]\s*\w*\)/.test(code);
+  
+    return hasClassDeclaration && hasMainMethod;
+  }
+  
+
 function isValidJavaCode(code: string) {
   const javaKeywords = ["class", "public", "static", "void", "int", "boolean", "System.out.println", "{", "}"];
   return javaKeywords.some(keyword => code.includes(keyword));
@@ -32,13 +41,7 @@ function requiresLogicEvaluation(question: string, code: string): boolean {
   return questionRequiresLogic || codeContainsLogic;
 }
 
-// // Function to validate if the code is Java based on common Java patterns
-// function isJavaCode(code: string): boolean {
-//   const hasClassDeclaration = /public\s+class\s+\w+/.test(code);
-//   const hasMainMethod = /public\s+static\s+void\s+main\s*\(\s*String\s*\[\]\s*\w*\)/.test(code);
-
-//   return hasClassDeclaration && hasMainMethod;
-// }
+// Function to validate if the code is Java based on common Java pattern
 
 // Run PMD analysis
 function runPMD(filePath: string): string {
@@ -68,7 +71,7 @@ async function generateLLMFeedback(openai: OpenAI, code: string, question: strin
     const response = await openai.chat.completions.create({
       model: "ft:gpt-4o-mini-2024-07-18:personal::B4r8Uh7Y",
       messages: [
-        { role: "system", content: "Evaluate the Java code considering correctness." },
+        { role: "system", content: "Evaluate the Java code considering correctness" },
         { role: "user", content: `Question: ${question}\nStudent Code:\n${code}` }
       ],
       max_tokens: 300
@@ -97,16 +100,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // if (!isJavaCode(studentCode)) {
-    //   return NextResponse.json({ error: "Only Java code is accepted." }, { status: 400 });
-    // }
+    if (!isJavaCode(studentCode)) {
+      return NextResponse.json({ error: "Only Java code is accepted." }, { status: 400 });
+    }
 
-    // if (!isValidJavaCode(studentCode)) {
-    //   return NextResponse.json({
-    //     error: "Invalid Java Code Submission",
-    //     message: "Your submission does not appear to be valid Java code. Please submit a Java program for evaluation.",
-    //   });
-    // }
+    if (!isValidJavaCode(studentCode)) {
+      return NextResponse.json({
+        error: "Invalid Java Code Submission",
+        message: "Your submission does not appear to be valid Java code. Please submit a Java program for evaluation.",
+      });
+    }
 
     let syntaxFeedback = "✅ No syntax errors detected.";
     let pmdFeedback = "✅ No PMD violations detected.";
