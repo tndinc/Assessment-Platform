@@ -108,6 +108,18 @@ export default function QuizPage() {
     [key: number]: { output: string; memory: string; cpuTime: string };
   }>({});
 
+  const isValidJavaCode = (code: string): boolean => {
+    const javaClassPattern = /public\s+class\s+\w+\s*{/; // `public class ClassName {`
+    const javaMainPattern =
+      /public\s+static\s+void\s+main\s*\(\s*String\[\]\s+\w+\s*\)/; // `public static void main(String[] args)`
+
+    return javaClassPattern.test(code) && javaMainPattern.test(code);
+  };
+
+  const [invalidAnswers, setInvalidAnswers] = useState<{
+    [key: number]: boolean;
+  }>({});
+
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
@@ -144,7 +156,22 @@ export default function QuizPage() {
         console.log("✅ No suspicious activity detected.");
       }
 
-      // ✅ Submit exam
+      // ✅ Validate Java code before submission
+      const invalidAnswers = answers.filter(
+        (answer) =>
+          questions.find((q) => q.id === answer.questionId)?.question_type ===
+            "java" && !isValidJavaCode(answer.code) // Check only Java questions
+      );
+
+      if (invalidAnswers.length > 0) {
+        alert(
+          "❌ Some Java answers are not correctly formatted! Please check and fix them."
+        );
+        setIsSubmitting(false);
+        return; // Stop submission if any Java code is invalid
+      }
+
+      // ✅ Continue with normal submission
       const { data: submissionData, error: submissionError } = await supabase
         .from("exam_submissions")
         .insert({
@@ -154,7 +181,6 @@ export default function QuizPage() {
           time_spent: exam.exam_time_limit * 60 - timeRemaining,
           answers: JSON.stringify(answers),
         })
-
         .select("submission_id")
         .single();
 
@@ -165,8 +191,6 @@ export default function QuizPage() {
 
       setExamSubmitted(true);
       setShowFeedback(true);
-
-      // Pass submission_id to the feedback component
       setSubmissionId(submissionId);
     } catch (error) {
       console.error("❌ Error submitting exam:", error);
@@ -319,10 +343,18 @@ export default function QuizPage() {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = {
       questionId: questions[currentQuestion].id,
-      code: code || "", // Ensure code is never undefined
-      explanation: explanation || "", // Ensure explanation is never undefined
+      code: code || "",
+      explanation: explanation || "",
     };
     setAnswers(newAnswers);
+
+    // ✅ Track if the current Java answer is invalid
+    if (questions[currentQuestion].question_type === "java") {
+      setInvalidAnswers((prev) => ({
+        ...prev,
+        [currentQuestion]: !isValidJavaCode(code),
+      }));
+    }
 
     if (compileResult) {
       setCompilationResults((prev) => ({
@@ -588,6 +620,13 @@ export default function QuizPage() {
                               </div>
                             </div>
                           )}
+                        {invalidAnswers[currentQuestion] && (
+                          <div className="flex justify-center mt-2">
+                            <button className="bg-red-500 text-white px-4 py-2 rounded-full font-semibold">
+                              ❌ Fix Your Java Code Before Submitting
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <textarea

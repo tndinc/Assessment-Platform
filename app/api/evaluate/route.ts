@@ -88,7 +88,7 @@ async function generateLLMFeedback(
   try {
     // Try fine-tuned model first
     const fineTunedResponse = await openai.chat.completions.create({
-      model: "ft:gpt-4o-mini-2024-07-18:personal::B3Rjviyf",
+      model: "ft:gpt-4o-mini-2024-07-18:personal::B4r8Uh7Y",
       messages: [
         {
           role: "system",
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { studentCode, question, expectedAnswer } = body;
+    const { studentCode, question } = body;
 
     if (!studentCode || !question) {
       return NextResponse.json(

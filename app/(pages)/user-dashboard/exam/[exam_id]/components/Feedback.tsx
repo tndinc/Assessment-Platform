@@ -51,8 +51,81 @@ export default function FeedbackPage({
       setLoading(false);
       return;
     }
-    fetchQuestionsAndGrade();
-  }, [examId, userId, answers, submissionId]);
+
+    fetchExistingFeedback();
+
+    // Set up realtime subscription for updates to this specific feedback
+    const subscription = supabase
+      .channel("student_feedback_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "student_feedback",
+          filter: `user_id=eq.${userId} AND exam_id=eq.${examId} AND submission_id=eq.${submissionId}`,
+        },
+        (payload) => {
+          console.log("Realtime update received:", payload);
+          // If we get an update, refresh the feedback data
+          fetchExistingFeedback();
+        }
+      )
+      .subscribe();
+
+    // Cleanup function to remove subscription when component unmounts
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [examId, userId, submissionId]);
+
+  async function fetchExistingFeedback() {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Check if feedback already exists in the database
+      const { data: existingFeedback, error: feedbackError } = await supabase
+        .from("student_feedback")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("exam_id", examId)
+        .eq("submission_id", submissionId)
+        .single();
+
+      if (feedbackError && feedbackError.code !== "PGRST116") {
+        // PGRST116 is "no rows returned" - not an error for our purpose
+        console.error("Error fetching existing feedback:", feedbackError);
+        throw feedbackError;
+      }
+
+      // If feedback exists, use it
+      if (existingFeedback) {
+        console.log("Found existing feedback, using stored data");
+
+        // Parse the stored JSON data
+        const feedbackData = JSON.parse(existingFeedback.feedback_data || "[]");
+        const metricsData = JSON.parse(existingFeedback.metrics_data || "{}");
+
+        // Update state with the stored data
+        setFeedback(feedbackData);
+        setTotalScore(existingFeedback.total_score || 0);
+        setMaxPossibleScore(existingFeedback.max_score || 0);
+        setMetricsData(
+          Object.entries(metricsData).map(([name, data]) => ({ name, ...data }))
+        );
+        setLoading(false);
+      } else {
+        console.log("No existing feedback found, generating new feedback");
+        // No existing feedback, proceed with generating new feedback
+        fetchQuestionsAndGrade();
+      }
+    } catch (error) {
+      console.error("Error in fetchExistingFeedback:", error);
+      setError(error.message);
+      setLoading(false);
+    }
+  }
 
   async function fetchQuestionsAndGrade() {
     try {
@@ -117,10 +190,20 @@ export default function FeedbackPage({
       let maxScore = 0;
       const metricsScores = { ...initialMetrics };
 
+      // Create a map of questionId to answer for more efficient lookup
+      const answerMap = {};
+      answers.forEach((answer) => {
+        answerMap[answer.questionId] = answer;
+      });
+
+      // Log for debugging
+      console.log("Total questions to process:", questions.length);
+      console.log("Total answers available:", answers.length);
+
       // Process each question sequentially
       for (const question of questions) {
-        // Find the matching answer by questionId
-        const answer = answers.find((a) => a.questionId === question.id);
+        // Find the matching answer using our map instead of .find()
+        const answer = answerMap[question.id];
 
         // Debug log for troubleshooting
         console.log(
@@ -147,9 +230,14 @@ export default function FeedbackPage({
         };
 
         // Only grade if there's actual code to evaluate
-        let gradingResult = processedAnswer.code
-          ? await gradeJavaQuestion(question, processedAnswer)
-          : defaultFeedback;
+        let gradingResult;
+        if (processedAnswer.code && processedAnswer.code.trim()) {
+          gradingResult = await gradeJavaQuestion(question, processedAnswer);
+          console.log(`Completed grading for Q${question.id}`);
+        } else {
+          gradingResult = defaultFeedback;
+          console.log(`Skipped grading for Q${question.id} (no code)`);
+        }
 
         // Ensure we have all feedback fields
         gradingResult = {
@@ -188,9 +276,11 @@ export default function FeedbackPage({
         });
       }
 
+      console.log("All questions processed, saving feedback");
+
       // Save feedback to database
       try {
-        await supabase.from("student_feedback").upsert({
+        const { data, error } = await supabase.from("student_feedback").upsert({
           user_id: userId,
           exam_id: examId,
           submission_id: submissionId,
@@ -200,6 +290,10 @@ export default function FeedbackPage({
           metrics_data: JSON.stringify(metricsScores),
           created_at: new Date().toISOString(),
         });
+
+        if (error) throw error;
+
+        console.log("Feedback successfully saved to database");
       } catch (dbError) {
         console.error("Error saving feedback to database:", dbError);
         // Continue execution even if database save fails
@@ -226,9 +320,8 @@ export default function FeedbackPage({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          studentCode: answer.code,
           question: question.question_txt,
-          expectedAnswer: question.question_answer,
+          studentCode: answer.code,
         }),
       });
 
@@ -263,17 +356,9 @@ export default function FeedbackPage({
       ) {
         points = question.points;
       }
-      // If close implementation (similar logic/approach but with minor issues)
-      else if (
-        evaluation.llmFeedback.toLowerCase().includes("close") ||
-        evaluation.llmFeedback.toLowerCase().includes("almost correct") ||
-        evaluation.llmFeedback.toLowerCase().includes("partially correct")
-      ) {
-        points = Math.round(question.points * 0.7); // 70% of full points
-      }
       // If submission is Java code but not close to correct implementation
       else {
-        points = Math.round(question.points * 0.2); // 40% of full points for an attempt
+        points = 0; // No points for uncertain feedback
       }
 
       return {
@@ -428,7 +513,7 @@ export default function FeedbackPage({
                               ).map((metric, idx) => (
                                 <span
                                   key={idx}
-                                  className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm"
+                                  className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm ml-1"
                                 >
                                   {metric}
                                 </span>
@@ -453,8 +538,6 @@ export default function FeedbackPage({
                             </span>
                           </div>
                         </div>
-
-                        {/* Display metrics as badges */}
                       </div>
 
                       <div className="p-4 bg-blue-50 rounded-lg">
