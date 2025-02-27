@@ -47,20 +47,107 @@ function runPMD(filePath: string): string {
 // Generate criterion-based feedback
 function evaluateCriteria(syntaxFeedback: string, pmdFeedback: string, requiresLogic: boolean): any {
   return {
-    codeCorrectness: syntaxFeedback.includes("No syntax errors detected")
-      ? "✅ Code is correct."
-      : `❌ Code has syntax errors: ${syntaxFeedback}`,
-    inputHandling: syntaxFeedback.includes("No syntax errors detected")
-      ? "✅ Code handles input correctly."
-      : `❌ Input handling issue: ${syntaxFeedback}`,
-    codeStructureReadability: pmdFeedback.includes("No PMD violations detected")
-      ? "✅ Code structure follows best practices."
-      : `❌ Code readability issues detected: ${pmdFeedback}`,
-    logicFunctionality: requiresLogic
-      ? "✅ Logic is functional and correct."
-      : "⚠️ Logic evaluation not required or not detected based on student's code."
+    "Code Structure": pmdFeedback.includes("✅")
+      ? "✅ Well-structured and follows Java conventions"
+      : "❌ Code structure needs improvement",
+      
+    "Functionality": syntaxFeedback.includes("✅")
+      ? "✅ Code compiles and functions as expected"
+      : "❌ Code has compilation issues",
+      
+    "Best Practices": pmdFeedback.includes("✅")
+      ? "✅ Follows Java best practices"
+      : "❌ Some best practices violations detected",
+      
+    "Logic Implementation": requiresLogic
+      ? (syntaxFeedback.includes("✅") 
+          ? "✅ Logic implementation appears correct"
+          : "❌ Logic implementation needs review")
+      : "⚠️ Logic evaluation not applicable"
   };
 }
+
+async function generateLLMFeedback(
+  openai: OpenAI,
+  code: string,
+  question: string
+): Promise<string> {
+  let feedback = "";
+
+  try {
+    // ✅ Step 1: Get Feedback from Fine-Tuned Model
+    const fineTunedResponse = await openai.chat.completions.create({
+      model: "ft:gpt-4o-mini-2024-07-18:personal::B4r8Uh7Y",
+      messages: [
+        { role: "system", content: "Evaluate the Java code. Start the response with 'Correct' or 'Incorrect', then provide an explanation." },
+        { role: "user", content: `Question: ${question}\nStudent Code:\n${code}` }
+      ],
+      max_tokens: 300
+    });
+
+    feedback = fineTunedResponse.choices[0]?.message?.content || "Unable to generate feedback.";
+    console.log("✅ Fine-Tuned Model Output:", feedback);
+
+    // ✅ Step 2: Ask GPT-4o-mini to Verify the Response
+    const verificationResponse = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "Check if the following feedback is correct. Respond with 'VALID' if it's correct, otherwise respond with 'INVALID'." },
+        { role: "user", content: `Feedback: ${feedback}\nQuestion: ${question}\nStudent Code:\n${code}` }
+      ],
+      max_tokens: 10
+    });
+
+    const verificationResult = verificationResponse.choices[0]?.message?.content || "INVALID";
+    console.log("🔍 GPT-4o Verification Result:", verificationResult);
+
+    // ✅ Step 3: If Fine-Tuned Model is Wrong, Generate New Feedback
+    if (verificationResult.trim().toUpperCase() !== "VALID") {
+      console.warn("⚠️ Fine-Tuned Model Gave Incorrect Feedback. Using GPT-4o-mini Instead.");
+      const gpt4Response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: "Evaluate the Java code. Start the response with 'Correct' or 'Incorrect', then provide an explanation." },
+          { role: "user", content: `Question: ${question}\nStudent Code:\n${code}` }
+        ],
+        max_tokens: 300
+      });
+
+      feedback = gpt4Response.choices[0]?.message?.content || "Unable to generate feedback.";
+      console.log("✅ GPT-4o-mini Final Feedback:", feedback);
+    }
+  } catch (error) {
+    console.error("❌ Error in Feedback Generation:", error);
+    return "⚠️ Unable to generate AI feedback. Please try again.";
+  }
+
+  // ✅ Step 4: Ensure Feedback Starts with "Correct" or "Incorrect"
+  return formatFeedback(feedback);
+}
+
+function formatFeedback(feedback: string): string {
+  const lowercaseFeedback = feedback.toLowerCase();
+
+  if (lowercaseFeedback.startsWith("correct") || lowercaseFeedback.startsWith("incorrect")) {
+    return feedback; // ✅ Already correctly formatted
+  }
+
+  // ✅ If feedback mentions correctness, extract and format properly
+  if (lowercaseFeedback.includes("correct") && !lowercaseFeedback.includes("incorrect")) {
+    return "Correct. " + capitalizeFirstLetter(feedback);
+  }
+  if (lowercaseFeedback.includes("incorrect") && !lowercaseFeedback.includes("correct")) {
+    return "Incorrect. " + capitalizeFirstLetter(feedback);
+  }
+
+  // ✅ Default to "Incorrect" but keep original feedback
+  return "Incorrect. " + capitalizeFirstLetter(feedback);
+}
+
+function capitalizeFirstLetter(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 
 // API Route Handler
 export async function POST(req: NextRequest) {

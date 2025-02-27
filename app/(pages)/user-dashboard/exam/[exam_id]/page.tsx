@@ -9,6 +9,7 @@ import { useParams } from "next/navigation";
 import JavaCompiler from "./components/JavaCompiler";
 import FeedbackPage from "./components/Feedback";
 import { User } from "@supabase/supabase-js";
+import DashboardButton from "./components/DashboardButton";
 
 const supabase = createClient();
 
@@ -68,6 +69,10 @@ export default function QuizPage() {
   const [timeSpentAway, setTimeSpentAway] = useState<number>(0);
 
   const [submissionId, setSubmissionId] = useState(null);
+
+  const navigateToDashboard = () => {
+    router.push("/user-dashboard");
+  };
   // ✅ Track time away
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -101,6 +106,18 @@ export default function QuizPage() {
 
   const [compilationResults, setCompilationResults] = useState<{
     [key: number]: { output: string; memory: string; cpuTime: string };
+  }>({});
+
+  const isValidJavaCode = (code: string): boolean => {
+    const javaClassPattern = /public\s+class\s+\w+\s*{/; // `public class ClassName {`
+    const javaMainPattern =
+      /public\s+static\s+void\s+main\s*\(\s*String\[\]\s+\w+\s*\)/; // `public static void main(String[] args)`
+
+    return javaClassPattern.test(code) && javaMainPattern.test(code);
+  };
+
+  const [invalidAnswers, setInvalidAnswers] = useState<{
+    [key: number]: boolean;
   }>({});
 
   const handleSubmit = async () => {
@@ -139,7 +156,22 @@ export default function QuizPage() {
         console.log("✅ No suspicious activity detected.");
       }
 
-      // ✅ Submit exam
+      // ✅ Validate Java code before submission
+      const invalidAnswers = answers.filter(
+        (answer) =>
+          questions.find((q) => q.id === answer.questionId)?.question_type ===
+            "java" && !isValidJavaCode(answer.code) // Check only Java questions
+      );
+
+      if (invalidAnswers.length > 0) {
+        alert(
+          "❌ Some Java answers are not correctly formatted! Please check and fix them."
+        );
+        setIsSubmitting(false);
+        return; // Stop submission if any Java code is invalid
+      }
+
+      // ✅ Continue with normal submission
       const { data: submissionData, error: submissionError } = await supabase
         .from("exam_submissions")
         .insert({
@@ -149,7 +181,6 @@ export default function QuizPage() {
           time_spent: exam.exam_time_limit * 60 - timeRemaining,
           answers: JSON.stringify(answers),
         })
-
         .select("submission_id")
         .single();
 
@@ -160,8 +191,6 @@ export default function QuizPage() {
 
       setExamSubmitted(true);
       setShowFeedback(true);
-
-      // Pass submission_id to the feedback component
       setSubmissionId(submissionId);
     } catch (error) {
       console.error("❌ Error submitting exam:", error);
@@ -314,10 +343,18 @@ export default function QuizPage() {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = {
       questionId: questions[currentQuestion].id,
-      code: code || "", // Ensure code is never undefined
-      explanation: explanation || "", // Ensure explanation is never undefined
+      code: code || "",
+      explanation: explanation || "",
     };
     setAnswers(newAnswers);
+
+    // ✅ Track if the current Java answer is invalid
+    if (questions[currentQuestion].question_type === "java") {
+      setInvalidAnswers((prev) => ({
+        ...prev,
+        [currentQuestion]: !isValidJavaCode(code),
+      }));
+    }
 
     if (compileResult) {
       setCompilationResults((prev) => ({
@@ -371,7 +408,11 @@ export default function QuizPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex justify-center items-center">
+      <div
+        className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 
+      dark:bg-gradient-to-br dark:from-[#27374D] dark:to-[#526D82]/30
+      flex justify-center items-center"
+      >
         <div className="text-white text-xl">Loading exam...</div>
       </div>
     );
@@ -379,7 +420,11 @@ export default function QuizPage() {
 
   if (!exam || questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex justify-center items-center">
+      <div
+        className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 
+      dark:bg-[#27374D] 
+      flex justify-center items-center"
+      >
         <div className="text-white text-xl">Exam not found</div>
       </div>
     );
@@ -387,6 +432,7 @@ export default function QuizPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex flex-col justify-center items-center p-4">
       <div class="absolute inset-0 bg-white/10"></div>
+      <DashboardButton onClick={navigateToDashboard} />
 
       {/* Conditionally render based on submission status */}
       {showFeedback ? (
@@ -398,17 +444,17 @@ export default function QuizPage() {
         />
       ) : (
         <motion.div
-          className="w-full max-w-2xl bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden relative z-10"
+          className="w-full max-w-2xl bg-white/80 dark:bg-[#27374D] backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden relative z-10"
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           {showInstructions ? (
             <div className="p-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              <h2 className="text-2xl font-bold dark:text-gray-200 text-gray-800 mb-4">
                 Exam Instructions
               </h2>
-              <div className="text-gray-700 space-y-2 mb-6">
+              <div className="dark:text-gray-200 text-gray-700 space-y-2 mb-6">
                 <div dangerouslySetInnerHTML={{ __html: exam.exam_desc }} />
                 <ul className="list-disc list-inside mt-4">
                   <li>Time limit: {exam.exam_time_limit} minutes</li>
@@ -425,7 +471,7 @@ export default function QuizPage() {
             </div>
           ) : (
             <>
-              <div className="p-8">
+              <div className="p-8 dark:bg-[#344C64]">
                 <div className="flex justify-between items-center mb-6">
                   <motion.h1
                     className="text-3xl font-bold text-gray-800"
@@ -435,7 +481,7 @@ export default function QuizPage() {
                   >
                     {exam.exam_title}
                   </motion.h1>
-                  <div className="flex items-center space-x-2 text-gray-600">
+                  <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-200">
                     <Clock size={20} />
                     <span className="font-semibold">
                       {formatTime(timeRemaining)}
@@ -485,7 +531,7 @@ export default function QuizPage() {
                     transition={{ duration: 0.3 }}
                   >
                     <div className="flex justify-between items-center mb-4">
-                      <span className="text-sm font-medium text-gray-600">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-200">
                         Question {currentQuestion + 1} of {questions.length}
                       </span>
                       <div className="flex items-center space-x-2">
@@ -508,7 +554,7 @@ export default function QuizPage() {
                       </div>
                     </div>
                     <h2
-                      className="text-xl font-semibold mb-4 text-gray-800 select-text"
+                      className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200 select-text"
                       onCopy={() => {
                         const qId = questions[currentQuestion].id;
                         setCopyAttemptsPerQuestion((prev) => ({
@@ -582,6 +628,13 @@ export default function QuizPage() {
                               </div>
                             </div>
                           )}
+                        {invalidAnswers[currentQuestion] && (
+                          <div className="flex justify-center mt-2">
+                            <button className="bg-red-500 text-white px-4 py-2 rounded-full font-semibold">
+                              ❌ Fix Your Java Code Before Submitting
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <textarea
@@ -617,13 +670,13 @@ export default function QuizPage() {
                 </div>
               </div>
               <motion.div
-                className="bg-gray-100/80 backdrop-blur-sm p-4 flex justify-between items-center"
+                className="bg-gray-100/80 dark:bg-[#344C64] backdrop-blur-sm p-4 flex justify-between items-center"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
               >
                 <button
-                  className="text-gray-600 hover:text-gray-800 transition-colors flex items-center"
+                  className="text-gray-600 hover:text-gray-800 dark:text-gray-200 transition-colors flex items-center"
                   onClick={() => setShowInstructions(true)}
                 >
                   <Info size={20} className="mr-1" /> Instructions

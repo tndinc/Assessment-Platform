@@ -51,8 +51,81 @@ export default function FeedbackPage({
       setLoading(false);
       return;
     }
-    fetchQuestionsAndGrade();
-  }, [examId, userId, answers, submissionId]);
+
+    fetchExistingFeedback();
+
+    // Set up realtime subscription for updates to this specific feedback
+    const subscription = supabase
+      .channel("student_feedback_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "student_feedback",
+          filter: `user_id=eq.${userId} AND exam_id=eq.${examId} AND submission_id=eq.${submissionId}`,
+        },
+        (payload) => {
+          console.log("Realtime update received:", payload);
+          // If we get an update, refresh the feedback data
+          fetchExistingFeedback();
+        }
+      )
+      .subscribe();
+
+    // Cleanup function to remove subscription when component unmounts
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [examId, userId, submissionId]);
+
+  async function fetchExistingFeedback() {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Check if feedback already exists in the database
+      const { data: existingFeedback, error: feedbackError } = await supabase
+        .from("student_feedback")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("exam_id", examId)
+        .eq("submission_id", submissionId)
+        .single();
+
+      if (feedbackError && feedbackError.code !== "PGRST116") {
+        // PGRST116 is "no rows returned" - not an error for our purpose
+        console.error("Error fetching existing feedback:", feedbackError);
+        throw feedbackError;
+      }
+
+      // If feedback exists, use it
+      if (existingFeedback) {
+        console.log("Found existing feedback, using stored data");
+
+        // Parse the stored JSON data
+        const feedbackData = JSON.parse(existingFeedback.feedback_data || "[]");
+        const metricsData = JSON.parse(existingFeedback.metrics_data || "{}");
+
+        // Update state with the stored data
+        setFeedback(feedbackData);
+        setTotalScore(existingFeedback.total_score || 0);
+        setMaxPossibleScore(existingFeedback.max_score || 0);
+        setMetricsData(
+          Object.entries(metricsData).map(([name, data]) => ({ name, ...data }))
+        );
+        setLoading(false);
+      } else {
+        console.log("No existing feedback found, generating new feedback");
+        // No existing feedback, proceed with generating new feedback
+        fetchQuestionsAndGrade();
+      }
+    } catch (error) {
+      console.error("Error in fetchExistingFeedback:", error);
+      setError(error.message);
+      setLoading(false);
+    }
+  }
 
   async function fetchQuestionsAndGrade() {
     try {
@@ -117,10 +190,20 @@ export default function FeedbackPage({
       let maxScore = 0;
       const metricsScores = { ...initialMetrics };
 
+      // Create a map of questionId to answer for more efficient lookup
+      const answerMap = {};
+      answers.forEach((answer) => {
+        answerMap[answer.questionId] = answer;
+      });
+
+      // Log for debugging
+      console.log("Total questions to process:", questions.length);
+      console.log("Total answers available:", answers.length);
+
       // Process each question sequentially
       for (const question of questions) {
-        // Find the matching answer by questionId
-        const answer = answers.find((a) => a.questionId === question.id);
+        // Find the matching answer using our map instead of .find()
+        const answer = answerMap[question.id];
 
         // Debug log for troubleshooting
         console.log(
@@ -147,9 +230,14 @@ export default function FeedbackPage({
         };
 
         // Only grade if there's actual code to evaluate
-        let gradingResult = processedAnswer.code
-          ? await gradeJavaQuestion(question, processedAnswer)
-          : defaultFeedback;
+        let gradingResult;
+        if (processedAnswer.code && processedAnswer.code.trim()) {
+          gradingResult = await gradeJavaQuestion(question, processedAnswer);
+          console.log(`Completed grading for Q${question.id}`);
+        } else {
+          gradingResult = defaultFeedback;
+          console.log(`Skipped grading for Q${question.id} (no code)`);
+        }
 
         // Ensure we have all feedback fields
         gradingResult = {
@@ -184,12 +272,15 @@ export default function FeedbackPage({
           code: processedAnswer.code || "",
           correctAnswer: question.question_answer,
           isCorrect: gradingResult.points === question.points,
+          metrics: question.metrics, // Make sure metrics are included in feedback
         });
       }
 
+      console.log("All questions processed, saving feedback");
+
       // Save feedback to database
       try {
-        await supabase.from("student_feedback").upsert({
+        const { data, error } = await supabase.from("student_feedback").upsert({
           user_id: userId,
           exam_id: examId,
           submission_id: submissionId,
@@ -199,6 +290,10 @@ export default function FeedbackPage({
           metrics_data: JSON.stringify(metricsScores),
           created_at: new Date().toISOString(),
         });
+
+        if (error) throw error;
+
+        console.log("Feedback successfully saved to database");
       } catch (dbError) {
         console.error("Error saving feedback to database:", dbError);
         // Continue execution even if database save fails
@@ -225,9 +320,8 @@ export default function FeedbackPage({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          studentCode: answer.code,
           question: question.question_txt,
-          expectedAnswer: question.question_answer,
+          studentCode: answer.code,
         }),
       });
 
@@ -262,17 +356,9 @@ export default function FeedbackPage({
       ) {
         points = question.points;
       }
-      // If close implementation (similar logic/approach but with minor issues)
-      else if (
-        evaluation.llmFeedback.toLowerCase().includes("close") ||
-        evaluation.llmFeedback.toLowerCase().includes("almost correct") ||
-        evaluation.llmFeedback.toLowerCase().includes("partially correct")
-      ) {
-        points = Math.round(question.points * 0.7); // 70% of full points
-      }
       // If submission is Java code but not close to correct implementation
       else {
-        points = Math.round(question.points * 0.4); // 40% of full points for an attempt
+        points = 0; // No points for uncertain feedback
       }
 
       return {
@@ -314,33 +400,35 @@ export default function FeedbackPage({
     return (
       <div className="p-6 max-w-4xl mx-auto">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 dark:border-gray-200"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div className="container mx-auto px-4 py-14 ">
       <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden mb-8">
         <div className="p-8">
           {/* Score Header Section */}
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-[#67C6E3]">
                 Exam Feedback
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-1 dark:text-gray-300">
                 Your performance analysis and personalized feedback
               </p>
             </div>
-            <div className="mt-4 md:mt-0 bg-gray-100 p-4 rounded-xl flex items-center">
+            <div className="mt-4 md:mt-0 bg-gray-100   dark:bg-[#27374D] p-4 rounded-xl flex items-center">
               <div className="mr-4">
-                <p className="text-gray-600 text-sm">Your Score</p>
-                <p className="text-3xl font-bold text-blue-600">
+                <p className="text-gray-600  dark:text-gray-200 text-sm">
+                  Your Score
+                </p>
+                <p className="text-3xl font-bold text-blue-600 dark:text-[#37B7C3]">
                   {totalScore}/{maxPossibleScore}
                 </p>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 dark:text-gray-200 text-sm">
                   {((totalScore / maxPossibleScore) * 100).toFixed(1)}% Overall
                 </p>
               </div>
@@ -349,13 +437,13 @@ export default function FeedbackPage({
                   <path
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
-                    stroke="#E5E7EB"
+                    stroke="#088395"
                     strokeWidth="3"
                   />
                   <path
                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     fill="none"
-                    stroke="#3B82F6"
+                    stroke="#37B7C3"
                     strokeWidth="3"
                     strokeDasharray={`${
                       (totalScore / maxPossibleScore) * 100
@@ -363,15 +451,18 @@ export default function FeedbackPage({
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Award className="text-blue-600" size={24} />
+                  <Award
+                    className="text-blue-600 dark:text-[#37B7C3]"
+                    size={24}
+                  />
                 </div>
               </div>
             </div>
           </div>
 
           {/* Metrics Chart */}
-          <div className="mb-8 p-6 bg-gray-50 rounded-xl">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
+          <div className="mb-8 p-6 bg-gray-50 dark:bg-[#27374D] rounded-xl">
+            <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
               Score Distribution
             </h2>
             <div className="h-64">
@@ -382,10 +473,10 @@ export default function FeedbackPage({
                   <YAxis />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                  <Bar dataKey="score" fill="#3B82F6" name="Points Earned" />
+                  <Bar dataKey="score" fill="#87CBB9" name="Points Earned" />
                   <Bar
                     dataKey="maxScore"
-                    fill="#E5E7EB"
+                    fill="#0E8388"
                     name="Maximum Points"
                   />
                 </BarChart>
@@ -394,39 +485,79 @@ export default function FeedbackPage({
           </div>
 
           {/* Detailed Feedback Section */}
-          <Card className="shadow-lg">
+          <Card className="shadow-lg dark:bg-[#27374D]">
             <CardContent className="p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4 dark:text-gray-200">
                 Question Feedback
               </h2>
               <Tabs defaultValue="1" className="w-full">
-                <TabsList className="grid grid-cols-3 lg:grid-cols-5 gap-2 mb-4">
+                <TabsList className="flex flex-wrap justify-center gap-2 mb-4 rounded-lg bg-transparent">
                   {feedback.map((_, index) => (
                     <TabsTrigger
                       key={index}
                       value={`${index + 1}`}
-                      className="text-sm"
+                      className="text-sm px-4 py-2 rounded-md border border-gray-300 bg-white dark:bg-[#344C64] shadow-sm hover:bg-gray-200 transition"
                     >
                       Q{index + 1}
                     </TabsTrigger>
                   ))}
                 </TabsList>
+
                 {feedback.map((item, index) => (
                   <TabsContent key={index} value={`${index + 1}`}>
                     <div className="space-y-6">
+                      {/* Question Score Card - Updated to show metrics */}
+                      <div className="p-4 bg-blue-100 rounded-lg">
+                        <div className="flex justify-between items-center mb-2">
+                          <h4 className="font-semibold text-blue-800">
+                            Question {index + 1} -{" "}
+                            {item.metrics &&
+                              (Array.isArray(item.metrics)
+                                ? item.metrics
+                                : [item.metrics]
+                              ).map((metric, idx) => (
+                                <span
+                                  key={idx}
+                                  className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm ml-1"
+                                >
+                                  {metric}
+                                </span>
+                              ))}
+                            {(!item.metrics ||
+                              (Array.isArray(item.metrics) &&
+                                item.metrics.length === 0)) && (
+                              <span className="text-sm text-gray-500 italic">
+                                No metrics assigned
+                              </span>
+                            )}
+                          </h4>
+                          <div className="text-center px-3 py-1 bg-white rounded-lg shadow">
+                            <span className="block text-xl font-bold text-blue-600">
+                              {item.points}/{item.maxPoints}
+                            </span>
+                            <span className="text-xs text-gray-600">
+                              {((item.points / item.maxPoints) * 100).toFixed(
+                                0
+                              )}
+                              %
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
                       <div className="p-4 bg-blue-50 rounded-lg">
                         <h4 className="font-semibold">Question:</h4>
                         <p>{item.questionText}</p>
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-gray-50 rounded-lg">
+                      <div className="grid md:grid-cols-2 gap-4 ">
+                        <div className="p-4 bg-gray-50 rounded-lg dark:bg-[#344C64]">
                           <h4 className="font-semibold">Your Answer:</h4>
                           <pre className="mt-2 whitespace-pre-wrap">
                             {item.code}
                           </pre>
                         </div>
-                        <div className="p-4 bg-gray-50 rounded-lg">
+                        <div className="p-4 bg-gray-50 rounded-lg dark:bg-[#344C64]">
                           <h4 className="font-semibold">Expected Answer:</h4>
                           <pre className="mt-2 whitespace-pre-wrap">
                             {item.correctAnswer}
@@ -434,8 +565,8 @@ export default function FeedbackPage({
                         </div>
                       </div>
 
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <h4 className="text-lg font-bold text-blue-800">
+                      <div className="p-4 bg-blue-50 dark:bg-[#4C6793] rounded-lg">
+                        <h4 className="text-lg font-bold text-blue-400">
                           🤖 LLM Feedback:
                         </h4>
                         <pre className="mt-2 whitespace-pre-wrap">
@@ -443,8 +574,8 @@ export default function FeedbackPage({
                         </pre>
                       </div>
 
-                      <div className="p-4 bg-green-50 rounded-lg">
-                        <h4 className="text-lg font-bold text-green-800">
+                      <div className="p-4 bg-green-50 dark:bg-[#697565] rounded-lg">
+                        <h4 className="text-lg font-bold text-green-400">
                           📄 Syntax Analysis:
                         </h4>
                         <pre className="mt-2 whitespace-pre-wrap">
@@ -452,8 +583,8 @@ export default function FeedbackPage({
                         </pre>
                       </div>
 
-                      <div className="p-4 bg-yellow-50 rounded-lg">
-                        <h4 className="text-lg font-bold text-yellow-800">
+                      <div className="p-4 bg-yellow-50 dark:bg-[#957777] rounded-lg">
+                        <h4 className="text-lg font-bold text-yellow-400">
                           🛠️ PMD Feedback:
                         </h4>
                         <pre className="mt-2 whitespace-pre-wrap">
@@ -461,8 +592,8 @@ export default function FeedbackPage({
                         </pre>
                       </div>
 
-                      <div className="p-4 bg-purple-50 rounded-lg">
-                        <h4 className="text-lg font-bold text-purple-800">
+                      <div className="p-4 bg-purple-50 dark:bg-[#6D5D6E] rounded-lg">
+                        <h4 className="text-lg font-bold text-purple-400">
                           ✅ Criterion-Based Feedback:
                         </h4>
                         <ul className="mt-2 list-disc pl-5">
@@ -480,11 +611,11 @@ export default function FeedbackPage({
                       </div>
 
                       {item.overallFeedback && (
-                        <div className="p-4 bg-gray-50 rounded-lg">
-                          <h4 className="text-lg font-bold">
+                        <div className="p-4 bg-gray-50 dark:bg-[#395B64] rounded-lg">
+                          <h4 className="mt-4 text-lg font-bold">
                             📊 Overall Feedback:
                           </h4>
-                          <ul className="mt-2 space-y-2">
+                          <ul className="list-none pl-0 text-gray-800 dark:text-white space-y-2">
                             {item.overallFeedback
                               .split("\n")
                               .map((feedback, idx) => {
@@ -550,7 +681,7 @@ export default function FeedbackPage({
                                   return (
                                     <li
                                       key={idx}
-                                      className="flex items-start gap-2 text-blue-600"
+                                      className="flex items-start gap-2 text-blue-500"
                                     >
                                       🎓{" "}
                                       <span>
@@ -563,7 +694,10 @@ export default function FeedbackPage({
                                   );
                                 }
                                 return (
-                                  <li key={idx} className="text-gray-700">
+                                  <li
+                                    key={idx}
+                                    className="text-gray-700 dark:text-gray-200"
+                                  >
                                     {feedback}
                                   </li>
                                 );
