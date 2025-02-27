@@ -11,10 +11,10 @@ function extractClassName(javaCode: string): string {
   return match ? match[1] : "StudentCode";
 }
 
-function isValidJavaCode(code: string) {
-  const javaKeywords = ["class", "public", "static", "void", "int", "boolean", "System.out.println", "{", "}"];
-  return javaKeywords.some(keyword => code.includes(keyword));
-}
+// function isValidJavaCode(code: string) {
+//   const javaKeywords = ["class", "public", "static", "void", "int", "boolean", "System.out.println", "{", "}"];
+//   return javaKeywords.some(keyword => code.includes(keyword));
+// }
 
 // Clean directory paths from error messages
 function cleanErrorMessage(message: string): string {
