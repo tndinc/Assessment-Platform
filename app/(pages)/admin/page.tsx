@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { AdminDashboard } from "./dashboard/page";
+import { AdminDashboard } from "./dashboard/components/AdminDashboard";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import LoadingPage from "../../../components/Loading";
@@ -14,7 +14,7 @@ const AdminPages = () => {
     const loggedInUser = sessionStorage.getItem("admin_user");
     if (!loggedInUser) {
       // Redirect to login if no admin_user in sessionStorage
-      router.push("/login");
+      router.push("/");
     } else {
       // Set the adminUser from sessionStorage
       console.log(loggedInUser);

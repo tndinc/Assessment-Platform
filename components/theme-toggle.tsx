@@ -3,22 +3,50 @@
 import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-
-import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   return (
-    <Button
-      variant="outline"
-      size="icon"
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="bg-white dark:bg-gray-800 w-8 h-8 md:w-10 md:h-10"
+    <motion.button
+      onClick={toggleTheme}
+      className="relative w-14 h-8 rounded-full bg-[#948979]/50 dark:bg-[#526D82]/50 p-1 shadow-lg transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#D5E5EC] dark:focus:ring-[#3A5567] hover:bg-[#948979] dark:hover:bg-[#526D82]"
+      whileTap={{ scale: 0.95 }}
+      aria-label="Toggle theme"
     >
-      <Sun className="h-[1rem] w-[1rem] md:h-[1.2rem] md:w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1rem] w-[1rem] md:h-[1.2rem] md:w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <motion.div
+        className="w-6 h-6 rounded-full bg-[#F8FAFC] dark:bg-[#EDF2F7] shadow-md flex items-center justify-center"
+        layout
+        transition={{
+          type: "spring",
+          stiffness: 700,
+          damping: 30,
+        }}
+        style={{
+          x: theme === "dark" ? 24 : 0,
+        }}
+      >
+        {theme === "dark" ? (
+          <Moon className="w-4 h-4 text-[#4A6C84]" />
+        ) : (
+          <Sun className="w-4 h-4 text-[#FFB156]" />
+        )}
+      </motion.div>
       <span className="sr-only">Toggle theme</span>
-    </Button>
+    </motion.button>
   );
 }
