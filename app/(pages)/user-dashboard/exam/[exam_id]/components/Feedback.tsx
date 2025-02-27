@@ -220,11 +220,10 @@ export default function FeedbackPage({
           llmFeedback: "No submission provided",
           syntaxAnalysis: "No code to analyze",
           pmdFeedback: "No code to analyze",
-          criteriaScores: {
-            "Code Correctness": 0,
-            "Input Handling": 0,
-            "Code Structure": 0,
-            "Logic Functionality": 0,
+          criterionFeedback: {
+            "Code Structure": "Not evaluated",
+            Functionality: "Not evaluated",
+            "Best Practices": "Not evaluated",
           },
           overallFeedback:
             "No submission to evaluate\nSuggestions for Improvement: Please submit your code for evaluation.",
@@ -421,9 +420,9 @@ export default function FeedbackPage({
                 Your performance analysis and personalized feedback
               </p>
             </div>
-            <div className="mt-4 md:mt-0 bg-gray-100 dark:bg-[#27374D] p-4 rounded-xl flex items-center">
+            <div className="mt-4 md:mt-0 bg-gray-100   dark:bg-[#27374D] p-4 rounded-xl flex items-center">
               <div className="mr-4">
-                <p className="text-gray-600 dark:text-gray-200 text-sm">
+                <p className="text-gray-600  dark:text-gray-200 text-sm">
                   Your Score
                 </p>
                 <p className="text-3xl font-bold text-blue-600 dark:text-[#37B7C3]">
@@ -595,16 +594,16 @@ export default function FeedbackPage({
 
                       <div className="p-4 bg-purple-50 dark:bg-[#6D5D6E] rounded-lg">
                         <h4 className="text-lg font-bold text-purple-400">
-                          🎓 Graded Criteria:
+                          ✅ Criterion-Based Feedback:
                         </h4>
                         <ul className="mt-2 list-disc pl-5">
-                          {Object.entries(item.criteriaScores || {}).map(
-                            ([criteria, score]) => (
+                          {Object.entries(item.criterionFeedback || {}).map(
+                            ([criteria, feedback]) => (
                               <li key={criteria}>
                                 <strong>
                                   {criteria.replace(/([A-Z])/g, " $1")}:
                                 </strong>{" "}
-                                {score}/5 {score >= 4 ? "✅" : "⚠️"}
+                                {feedback}
                               </li>
                             )
                           )}
@@ -617,94 +616,92 @@ export default function FeedbackPage({
                             📊 Overall Feedback:
                           </h4>
                           <ul className="list-none pl-0 text-gray-800 dark:text-white space-y-2">
-                            {item.overallFeedback &&
-                              typeof item.overallFeedback === "string" &&
-                              item.overallFeedback
-                                .split("\n")
-                                .map((feedback, idx) => {
-                                  if (feedback.includes("Overall Summary:")) {
-                                    return (
-                                      <li
-                                        key={idx}
-                                        className="flex items-start gap-2 text-green-600"
-                                      >
-                                        ✅{" "}
-                                        <span>
-                                          <strong>Overall Summary:</strong>{" "}
-                                          {feedback
-                                            .replace("Overall Summary:", "")
-                                            .trim()}
-                                        </span>
-                                      </li>
-                                    );
-                                  }
-                                  if (feedback.includes("Strengths:")) {
-                                    return (
-                                      <li
-                                        key={idx}
-                                        className="flex items-start gap-2 text-green-600"
-                                      >
-                                        ✅{" "}
-                                        <span>
-                                          <strong>Strengths:</strong>{" "}
-                                          {feedback
-                                            .replace("Strengths:", "")
-                                            .trim()}
-                                        </span>
-                                      </li>
-                                    );
-                                  }
-                                  if (
-                                    feedback.includes(
-                                      "Weaknesses & Suggestions for Improvement:"
-                                    )
-                                  ) {
-                                    return (
-                                      <li
-                                        key={idx}
-                                        className="flex items-start gap-2 text-yellow-600"
-                                      >
-                                        ⚠️{" "}
-                                        <span>
-                                          <strong>
-                                            Weakness & Suggestions for
-                                            Improvement:
-                                          </strong>{" "}
-                                          {feedback
-                                            .replace(
-                                              "Weaknesses & Suggestions for Improvement:",
-                                              ""
-                                            )
-                                            .trim()}
-                                        </span>
-                                      </li>
-                                    );
-                                  }
-                                  if (feedback.includes("Final Thoughts:")) {
-                                    return (
-                                      <li
-                                        key={idx}
-                                        className="flex items-start gap-2 text-blue-500"
-                                      >
-                                        🎓{" "}
-                                        <span>
-                                          <strong>Final Thoughts:</strong>{" "}
-                                          {feedback
-                                            .replace("Final Thoughts:", "")
-                                            .trim()}
-                                        </span>
-                                      </li>
-                                    );
-                                  }
+                            {item.overallFeedback
+                              .split("\n")
+                              .map((feedback, idx) => {
+                                if (feedback.includes("Overall Summary:")) {
                                   return (
                                     <li
                                       key={idx}
-                                      className="text-gray-700 dark:text-gray-200"
+                                      className="flex items-start gap-2 text-green-600"
                                     >
-                                      {feedback}
+                                      ✅{" "}
+                                      <span>
+                                        <strong>Overall Summary:</strong>{" "}
+                                        {feedback
+                                          .replace("Overall Summary:", "")
+                                          .trim()}
+                                      </span>
                                     </li>
                                   );
-                                })}
+                                }
+                                if (feedback.includes("Strengths:")) {
+                                  return (
+                                    <li
+                                      key={idx}
+                                      className="flex items-start gap-2 text-green-600"
+                                    >
+                                      ✅{" "}
+                                      <span>
+                                        <strong>Strengths:</strong>{" "}
+                                        {feedback
+                                          .replace("Strengths:", "")
+                                          .trim()}
+                                      </span>
+                                    </li>
+                                  );
+                                }
+                                if (
+                                  feedback.includes(
+                                    "Weaknesses & Suggestions for Improvement:"
+                                  )
+                                ) {
+                                  return (
+                                    <li
+                                      key={idx}
+                                      className="flex items-start gap-2 text-yellow-600"
+                                    >
+                                      ⚠️{" "}
+                                      <span>
+                                        <strong>
+                                          Weakness & Suggestions for
+                                          Improvement:
+                                        </strong>{" "}
+                                        {feedback
+                                          .replace(
+                                            "Weaknesses & Suggestions for Improvement:",
+                                            ""
+                                          )
+                                          .trim()}
+                                      </span>
+                                    </li>
+                                  );
+                                }
+                                if (feedback.includes("Final Thoughts:")) {
+                                  return (
+                                    <li
+                                      key={idx}
+                                      className="flex items-start gap-2 text-blue-500"
+                                    >
+                                      🎓{" "}
+                                      <span>
+                                        <strong>Final Thoughts:</strong>{" "}
+                                        {feedback
+                                          .replace("Final Thoughts:", "")
+                                          .trim()}
+                                      </span>
+                                    </li>
+                                  );
+                                }
+                                return (
+                                  <li
+                                    key={idx}
+                                    className="text-gray-700 dark:text-gray-200"
+                                  >
+                                    {feedback}
+                                  </li>
+                                );
+                              })}
                           </ul>
                         </div>
                       )}
