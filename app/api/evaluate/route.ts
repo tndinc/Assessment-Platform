@@ -62,23 +62,74 @@ function evaluateCriteria(  syntaxFeedback: string, pmdFeedback: string, llmFeed
   };
 }
 
-// Generate LLM feedback with fallback
-async function generateLLMFeedback(openai: OpenAI, code: string, question: string){
+async function generateLLMFeedback(
+  openai: OpenAI,
+  code: string,
+  question: string
+): Promise<string> {
   try {
-    const response = await openai.chat.completions.create({
+    // ✅ Try Fine-Tuned Model First
+    const fineTunedResponse = await openai.chat.completions.create({
       model: "ft:gpt-4o-mini-2024-07-18:personal::B4r8Uh7Y",
       messages: [
-        { role: "system", content: "Evaluate the Java code considering correctness." },
+        { role: "system", content: "Evaluate the Java code considering correctness, efficiency, and suggest improvements." },
         { role: "user", content: `Question: ${question}\nStudent Code:\n${code}` }
       ],
       max_tokens: 300
     });
-    return response.choices[0]?.message?.content || "Unable to generate feedback.";
-  } catch (error: any) {
-    console.error("LLM Feedback Error:", error);
-    return "Error generating AI feedback. Please try again.";
+
+    if (fineTunedResponse.choices[0]?.message?.content) {
+      console.log("✅ Fine-Tuned Model Used");
+      return fineTunedResponse.choices[0].message.content;
+    }
+  } catch (error) {
+    console.error("❌ Fine-Tuned Model Failed. Falling back to GPT-4o-mini:", error);
   }
+
+  // ✅ Fallback to GPT-4o-mini
+  try {
+    const gpt4Response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "You are a Java programming expert. Evaluate the code and start your response with 'Correct' or 'Incorrect'." },
+        { role: "user", content: `Question: ${question}\nStudent Code:\n${code}` }
+      ],
+      max_tokens: 300
+    });
+
+    let feedback = gpt4Response.choices[0]?.message?.content || "Unable to generate feedback.";
+
+    // ✅ Ensure feedback starts with "Correct" or "Incorrect"
+    feedback = formatFeedback(feedback);
+    console.log("✅ Used GPT-4o-mini as fallback:", feedback);
+
+    return feedback;
+  } catch (fallbackError) {
+    console.error("❌ GPT-4o-mini Failed as Well:", fallbackError);
+  }
+
+  return "⚠️ Unable to generate AI feedback. Please try again.";
 }
+function formatFeedback(feedback: string): string {
+  const lowercaseFeedback = feedback.toLowerCase();
+
+  if (lowercaseFeedback.startsWith("correct") || lowercaseFeedback.startsWith("incorrect")) {
+    return feedback; // ✅ If already correct, return as-is
+  }
+
+  // ✅ If feedback mentions correctness, extract the correct response
+  if (lowercaseFeedback.includes("correct") && !lowercaseFeedback.includes("incorrect")) {
+    return "Correct. " + feedback;
+  }
+  if (lowercaseFeedback.includes("incorrect") && !lowercaseFeedback.includes("correct")) {
+    return "Incorrect. " + feedback;
+  }
+
+  // ✅ Default to "Incorrect" if the response is unclear
+  return "Incorrect. " + feedback;
+}
+
+
 
 // Main API route handler
 export async function POST(req: NextRequest) {
@@ -90,6 +141,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { studentCode, question } = body;
+
     if (!studentCode || !question) {
       return NextResponse.json(
         { error: "Missing required fields" },
