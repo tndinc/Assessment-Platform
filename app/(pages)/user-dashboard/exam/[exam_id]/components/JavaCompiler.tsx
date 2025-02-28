@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Check, Loader2 } from "lucide-react";
 import CodeMirror from "@uiw/react-codemirror";
 import { java } from "@codemirror/lang-java";
 import { dracula } from "@uiw/codemirror-theme-dracula";
+import { autocompletion } from "@codemirror/autocomplete";
 
 interface CompilerResponse {
   output: string;
@@ -29,7 +30,10 @@ const JavaCompiler = ({
   const [isCompiling, setIsCompiling] = useState(false);
   const [error, setError] = useState<string>("");
 
-  const compileCode = async () => {
+  // Memoized function for better performance
+  const compileCode = useCallback(async () => {
+    if (!value.trim()) return;
+
     setIsCompiling(true);
     setError("");
 
@@ -44,17 +48,13 @@ const JavaCompiler = ({
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Compilation failed");
-      }
+      if (!response.ok) throw new Error(data.error || "Compilation failed");
 
       if (data.statusCode === 200) {
         setOutput(data.output);
         onCompileSuccess?.(data);
       } else {
-        setError(
-          `Compilation Error: ${data.output || "Unknown error occurred"}`
-        );
+        setError(`Compilation Error: ${data.output || "Unknown error"}`);
       }
     } catch (err) {
       setError(
@@ -66,32 +66,32 @@ const JavaCompiler = ({
     } finally {
       setIsCompiling(false);
     }
-  };
+  }, [value, onCompileSuccess]);
 
   return (
-    <div className="space-y-4">
-      <div className="relative">
+    <div className="space-y-4 w-full max-w-4xl mx-auto">
+      {/* Code Editor */}
+      <div className="relative border rounded-lg overflow-hidden shadow-md">
         <CodeMirror
           value={value}
           onChange={(code) => onChange(code)}
-          className="w-full h-40 p-4 border-2 rounded-lg transition-all duration-300 resize-none
-    border-gray-300 bg-white/50 text-gray-800 placeholder-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-200 
-    dark:border-gray-600 dark:bg-black/50 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-600"
+          className="w-full text-sm"
           placeholder="Write your Java code here..."
-          extensions={[java()]}
+          extensions={[java(), autocompletion()]}
           theme={dracula}
         />
       </div>
 
+      {/* Compile Button */}
       <div className="flex justify-between items-center">
         <button
           onClick={compileCode}
           disabled={isCompiling || !value.trim()}
-          className={`px-4 py-2 rounded-full font-semibold flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-lg flex items-center gap-2 font-semibold transition ${
             isCompiling || !value.trim()
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-500 hover:bg-blue-600"
-          } text-white transition-colors`}
+          } text-white`}
         >
           {isCompiling ? (
             <>
@@ -107,19 +107,21 @@ const JavaCompiler = ({
         </button>
       </div>
 
+      {/* Error Message */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600 font-medium">Error:</p>
-          <pre className="text-red-500 mt-2 whitespace-pre-wrap text-sm">
-            {error}
-          </pre>
+        <div className="p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
+          <p className="font-semibold">Error:</p>
+          <pre className="text-sm whitespace-pre-wrap mt-2">{error}</pre>
         </div>
       )}
 
+      {/* Output Display */}
       {output && !error && (
-        <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+        <div className="p-4 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg shadow">
           <h3 className="font-semibold mb-2">Output:</h3>
-          <pre className="font-mono text-sm whitespace-pre-wrap">{output}</pre>
+          <pre className="text-sm whitespace-pre-wrap overflow-auto max-h-40">
+            {output}
+          </pre>
         </div>
       )}
     </div>
