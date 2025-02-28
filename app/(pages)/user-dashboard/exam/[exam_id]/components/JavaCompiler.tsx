@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Check, Loader2 } from "lucide-react";
+import CodeMirror from "@uiw/react-codemirror";
+import { java } from "@codemirror/lang-java";
+import { dracula } from "@uiw/codemirror-theme-dracula";
 
 interface CompilerResponse {
   output: string;
@@ -68,13 +71,15 @@ const JavaCompiler = ({
   return (
     <div className="space-y-4">
       <div className="relative">
-        <textarea
+        <CodeMirror
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(code) => onChange(code)}
           className="w-full h-40 p-4 border-2 rounded-lg transition-all duration-300 resize-none
     border-gray-300 bg-white/50 text-gray-800 placeholder-gray-600 focus:border-blue-500 focus:ring focus:ring-blue-200 
     dark:border-gray-600 dark:bg-black/50 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-600"
           placeholder="Write your Java code here..."
+          extensions={[java()]}
+          theme={dracula}
         />
       </div>
 
