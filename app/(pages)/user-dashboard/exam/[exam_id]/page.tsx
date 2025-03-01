@@ -55,6 +55,7 @@ export default function QuizPage() {
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [showInstructions, setShowInstructions] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [hasExistingSubmission, setHasExistingSubmission] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -171,32 +172,94 @@ export default function QuizPage() {
         return; // Stop submission if any Java code is invalid
       }
 
-      // ✅ Continue with normal submission
-      const { data: submissionData, error: submissionError } = await supabase
-        .from("exam_submissions")
-        .insert({
-          user_id: user.id,
-          exam_id: parseInt(examId),
-          submission_date: new Date().toISOString(),
-          time_spent: exam.exam_time_limit * 60 - timeRemaining,
-          answers: JSON.stringify(answers),
-        })
-        .select("submission_id")
-        .single();
+      // ✅ Check if we're updating an existing submission or creating a new one
+      if (hasExistingSubmission && submissionId) {
+        // Update existing submission
+        const { error: updateError } = await supabase
+          .from("exam_submissions")
+          .update({
+            submission_date: new Date().toISOString(),
+            time_spent: exam.exam_time_limit * 60 - timeRemaining,
+            answers: JSON.stringify(answers),
+          })
+          .eq("submission_id", submissionId);
 
-      if (submissionError) throw submissionError;
+        if (updateError) throw updateError;
+        console.log("✅ Existing submission updated with ID:", submissionId);
+      } else {
+        // Create new submission
+        const { data: submissionData, error: submissionError } = await supabase
+          .from("exam_submissions")
+          .insert({
+            user_id: user.id,
+            exam_id: parseInt(examId),
+            submission_date: new Date().toISOString(),
+            time_spent: exam.exam_time_limit * 60 - timeRemaining,
+            answers: JSON.stringify(answers),
+          })
+          .select("submission_id")
+          .single();
 
-      const submissionId = submissionData.submission_id;
-      console.log("✅ Exam submitted with ID:", submissionId);
+        if (submissionError) throw submissionError;
+        setSubmissionId(submissionData.submission_id);
+        console.log(
+          "✅ New exam submitted with ID:",
+          submissionData.submission_id
+        );
+      }
 
       setExamSubmitted(true);
       setShowFeedback(true);
-      setSubmissionId(submissionId);
     } catch (error) {
       console.error("❌ Error submitting exam:", error);
       alert("There was an error submitting your exam. Please try again.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // New function to check for existing submissions and load answers
+  const checkForExistingSubmission = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("exam_submissions")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("exam_id", parseInt(examId))
+        .order("submission_date", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) {
+        if (error.code === "PGRST116") {
+          // No submissions found (not an error)
+          console.log("No existing submissions found");
+          return false;
+        }
+        throw error;
+      }
+
+      if (data) {
+        console.log("✅ Found existing submission:", data);
+        setSubmissionId(data.submission_id);
+
+        // Parse the answers JSONB data
+        try {
+          const parsedAnswers = JSON.parse(data.answers);
+          setAnswers(parsedAnswers);
+          setHasExistingSubmission(true);
+          console.log("✅ Loaded previous answers:", parsedAnswers);
+          return true;
+        } catch (parseError) {
+          console.error("❌ Error parsing saved answers:", parseError);
+          return false;
+        }
+      }
+
+      return false;
+    } catch (error) {
+      console.error("❌ Error checking for existing submissions:", error);
+      return false;
     }
   };
 
@@ -247,10 +310,10 @@ export default function QuizPage() {
       setUser(user);
 
       // Fetch exam data only if the user is approved
-      fetchExamData();
+      await fetchExamData(user.id);
     };
 
-    async function fetchExamData() {
+    async function fetchExamData(userId: string) {
       try {
         // Fetch exam details
         const { data: examData, error: examError } = await supabase
@@ -285,15 +348,26 @@ export default function QuizPage() {
 
         setExam(examData);
         setQuestions(sortedQuestions);
-        setAnswers(
-          sortedQuestions.map((q) => ({
-            questionId: q.id,
-            code: "",
-            explanation: "",
-          }))
-        );
+
+        // Initialize empty answers array (will be populated if existing submission is found)
+        const initialAnswers = sortedQuestions.map((q) => ({
+          questionId: q.id,
+          code: "",
+          explanation: "",
+        }));
+
+        setAnswers(initialAnswers);
         setTimeRemaining(examData.exam_time_limit * 60);
+
+        // Check for existing submissions and load answers if found
+        const hasSubmission = await checkForExistingSubmission(userId);
+
         setLoading(false);
+
+        // Show instructions only if no previous submission was found
+        if (hasSubmission) {
+          setShowInstructions(false);
+        }
       } catch (error) {
         console.error("Error fetching exam data:", error);
         setLoading(false);
@@ -406,6 +480,33 @@ export default function QuizPage() {
     return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
   };
 
+  // Add auto-save functionality for answers
+  const autoSaveAnswers = async () => {
+    if (!user || !hasExistingSubmission || !submissionId) return;
+
+    try {
+      const { error } = await supabase
+        .from("exam_submissions")
+        .update({
+          answers: JSON.stringify(answers),
+        })
+        .eq("submission_id", submissionId);
+
+      if (error) throw error;
+      console.log("✅ Answers auto-saved successfully");
+    } catch (error) {
+      console.error("❌ Error auto-saving answers:", error);
+    }
+  };
+
+  // Auto-save answers every 30 seconds
+  useEffect(() => {
+    if (!showInstructions && hasExistingSubmission) {
+      const autoSaveInterval = setInterval(autoSaveAnswers, 30000); // 30 seconds
+      return () => clearInterval(autoSaveInterval);
+    }
+  }, [answers, hasExistingSubmission, showInstructions]);
+
   if (loading) {
     return (
       <div
@@ -431,8 +532,24 @@ export default function QuizPage() {
   }
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-indigo-600 flex flex-col justify-center items-center p-4">
-      <div class="absolute inset-0 bg-white/10"></div>
+      <div className="absolute inset-0 bg-white/10"></div>
       <DashboardButton onClick={navigateToDashboard} />
+
+      {hasExistingSubmission && showInstructions && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 mb-4 rounded shadow-md max-w-2xl w-full">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <Info className="h-5 w-5 text-yellow-500" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700">
+                You have an existing submission for this exam. Your previous
+                answers have been loaded.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Conditionally render based on submission status */}
       {showFeedback ? (
@@ -466,7 +583,7 @@ export default function QuizPage() {
                 className="w-full px-6 py-2 bg-blue-500 text-white font-semibold rounded-full hover:bg-blue-600 transition-colors"
                 onClick={() => setShowInstructions(false)}
               >
-                Start Exam
+                {hasExistingSubmission ? "Continue Exam" : "Start Exam"}
               </button>
             </div>
           ) : (

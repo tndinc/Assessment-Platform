@@ -24,6 +24,7 @@ interface Exam {
   status: string;
   subject: string;
   deadline: string;
+  isInProgress: boolean;
 }
 
 const ManageExams = () => {
@@ -33,7 +34,7 @@ const ManageExams = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchExamsNotTakenByUser = async () => {
+    const fetchExamsForUser = async () => {
       try {
         // First, get the current user
         const {
@@ -68,28 +69,52 @@ const ManageExams = () => {
           return;
         }
 
-        // Get submissions for the current user
-        const { data: userSubmissions, error: submissionsError } =
-          await supabase
-            .from("exam_submissions")
-            .select("exam_id")
-            .eq("user_id", user.id);
+        // Get student feedback for the current user
+        const { data: userFeedback, error: feedbackError } = await supabase
+          .from("student_feedback")
+          .select("exam_id")
+          .eq("user_id", user.id);
 
-        if (submissionsError) {
-          console.error("Error fetching user submissions:", submissionsError);
+        if (feedbackError) {
+          console.error("Error fetching user feedback:", feedbackError);
           setLoading(false);
           return;
         }
 
-        // Create a set of exam_ids that the user has already submitted
-        const submittedExamIds = new Set(
-          userSubmissions.map((submission) => submission.exam_id)
+        // Get exam submissions for the current user
+        const { data: examSubmissions, error: submissionsError } =
+          await supabase
+            .from("exam_submissions")
+            .select("exam_id, submission_id")
+            .eq("user_id", user.id);
+
+        if (submissionsError) {
+          console.error("Error fetching exam submissions:", submissionsError);
+          setLoading(false);
+          return;
+        }
+
+        // Create a set of exam_ids that the user has already received feedback for
+        const feedbackExamIds = new Set(
+          userFeedback?.map((feedback) => feedback.exam_id) || []
         );
 
-        // Filter out exams that the user has already submitted
-        const availableExams = allExams.filter(
-          (exam) => !submittedExamIds.has(exam.exam_id)
+        // Create a map of exam_ids that the user has started but not completed
+        const inProgressExams = new Map(
+          examSubmissions?.map((submission) => [
+            submission.exam_id,
+            submission.submission_id,
+          ]) || []
         );
+
+        // Filter out exams that the user has already completed (has feedback for)
+        // And mark the ones that are in progress
+        const availableExams = allExams
+          .filter((exam) => !feedbackExamIds.has(exam.exam_id))
+          .map((exam) => ({
+            ...exam,
+            isInProgress: inProgressExams.has(exam.exam_id),
+          }));
 
         setExams(availableExams);
       } catch (error) {
@@ -99,10 +124,10 @@ const ManageExams = () => {
       }
     };
 
-    fetchExamsNotTakenByUser();
+    fetchExamsForUser();
   }, []);
 
-  const handleTakeExam = (exam_id: string) => {
+  const handleExamAction = (exam_id: string) => {
     setLoadingExamId(exam_id);
     setTimeout(() => {
       router.push(`/user-dashboard/exam/${exam_id}`);
@@ -162,11 +187,20 @@ const ManageExams = () => {
                 <p className="text-sm font-medium text-[#A66E38] dark:text-[#D8F8B7]">
                   Due: {convertToPHT(exam.deadline)}
                 </p>
+                {exam.isInProgress && (
+                  <div className="text-sm text-amber-600 dark:text-amber-400 font-medium">
+                    You have an unfinished attempt
+                  </div>
+                )}
               </CardContent>
               <CardFooter className="bg-[#D7D3BF] dark:bg-[#344C64] p-4">
                 <Button
-                  className="w-full py-2 bg-[#8E806A]/60 hover:bg-[#8E806A] dark:bg-[#577B8D]/50 dark:hover:bg-[#577B8D] text-gray-900 dark:text-white font-semibold transition-colors duration-300"
-                  onClick={() => handleTakeExam(exam.exam_id)}
+                  className={`w-full py-2 ${
+                    exam.isInProgress
+                      ? "bg-amber-500/60 hover:bg-amber-500 dark:bg-amber-600/50 dark:hover:bg-amber-600"
+                      : "bg-[#8E806A]/60 hover:bg-[#8E806A] dark:bg-[#577B8D]/50 dark:hover:bg-[#577B8D]"
+                  } text-gray-900 dark:text-white font-semibold transition-colors duration-300`}
+                  onClick={() => handleExamAction(exam.exam_id)}
                   disabled={loadingExamId === exam.exam_id}
                 >
                   {loadingExamId === exam.exam_id ? (
@@ -193,6 +227,8 @@ const ManageExams = () => {
                       </svg>
                       Loading...
                     </span>
+                  ) : exam.isInProgress ? (
+                    "Resume Exam"
                   ) : (
                     "Start Exam"
                   )}
