@@ -416,7 +416,7 @@ export default function FeedbackPage({
               <h1 className="text-3xl font-bold text-gray-800 dark:text-[#67C6E3]">
                 Exam Feedback
               </h1>
-              <p className="text-gray-600 mt-1 dark:text-gray-300">
+              <p className="text-gray-600 mt-1 dark:text-gray-600">
                 Your performance analysis and personalized feedback
               </p>
             </div>
@@ -545,9 +545,9 @@ export default function FeedbackPage({
                         </div>
                       </div>
 
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <h4 className="font-semibold">Question:</h4>
-                        <p>{item.questionText}</p>
+                      <div className="p-4 bg-blue-50 dark:bg-[#4C6793] rounded-lg">
+                        <h4 className="font-semibold text-blue-800 dark:text-blue-200">Question:</h4>
+                        <p className="text-gray-800 dark:text-gray-200">{item.questionText}</p>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4 ">
