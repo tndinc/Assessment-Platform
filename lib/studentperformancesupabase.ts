@@ -271,7 +271,7 @@ export async function fetchStudentDetails(studentId) {
       activityLog,
       riskFactors,
       cheatingLogs: formattedCheatingLogs,
-      lastLogin: profile.last_sign_in_at ? new Date(profile.last_sign_in_at).toLocaleDateString() : "Unknown",
+      lastLogin: submissions.length > 0 ? new Date(submissions[0].submission_date).toLocaleDateString() : "Never",
     }
   } catch (error) {
     console.error("Error fetching student details:", error)
