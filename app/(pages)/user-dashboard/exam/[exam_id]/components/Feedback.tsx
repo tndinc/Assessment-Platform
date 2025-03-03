@@ -550,6 +550,7 @@ export default function FeedbackPage({
                       </div>
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                       <div className="p-4 bg-blue-50 rounded-lg">
                         <h4 className="font-semibold">Question:</h4>
                         <p>{item.questionText}</p>
@@ -558,6 +559,11 @@ export default function FeedbackPage({
                         <h4 className="font-semibold text-blue-800 dark:text-blue-200">Question:</h4>
                         <p className="text-gray-800 dark:text-gray-200">{item.questionText}</p>
 >>>>>>> jv
+=======
+                      <div className="p-4 bg-blue-50 dark:bg-[#4C6793] rounded-lg">
+                        <h4 className="font-semibold text-blue-800 dark:text-blue-200">Question:</h4>
+                        <p className="text-gray-800 dark:text-gray-200">{item.questionText}</p>
+>>>>>>> ian2
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4 ">
