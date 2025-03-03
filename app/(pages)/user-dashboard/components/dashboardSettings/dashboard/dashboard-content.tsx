@@ -18,6 +18,8 @@ import {
   CheckSquare,
   ClipboardList,
 } from "lucide-react";
+import { ExamMetrics, ProgrammingSkillsOverview } from "./ProgrammingSkills";
+import { SkillsMetricsBreakdown } from "./SkillsMetrics";
 
 const supabase = createClient();
 
@@ -138,80 +140,124 @@ export function DashboardContent() {
   ];
 
   return (
-    <div className="space-y-6 p-4 sm:p-6 lg:p-8">
+    <div className="space-y-6 p-2 sm:p-4 lg:p-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Your Dashboard</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+          Your Dashboard
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Here's an overview of your academic progress and upcoming tasks. Stay
           focused and keep up the great work!
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Stats cards - Full width on mobile, 2 per row on tablets, 4 per row on desktop */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
         {stats.map((item, index) => (
           <Card
             key={index}
-            className="bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md "
+            className="bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md w-full"
           >
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm text-[#74512D] dark:text-[#67C6E3] font-medium">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2 px-3 sm:px-4 pt-3 sm:pt-4">
+              <CardTitle className="text-xs sm:text-sm text-[#74512D] dark:text-[#67C6E3] font-medium">
                 {item.title}
               </CardTitle>
-              <item.icon className="h-4 w-4 text-muted-foreground" />
+              <item.icon className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{item.value}</div>
-
-              <p className="mt-2 text-sm text-muted-foreground">
+            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <div className="text-xl sm:text-2xl font-bold">{item.value}</div>
+              <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-muted-foreground">
                 {item.description}
               </p>
             </CardContent>
           </Card>
         ))}
       </div>
+      {/* Grade Overview - Full width */}
+      <Card className="w-full bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md">
+        <CardHeader className="px-3 sm:px-4 pt-3 sm:pt-4 pb-1 sm:pb-2">
+          <CardTitle className="text-sm sm:text-base lg:text-lg text-[#74512D] dark:text-[#67C6E3]">
+            Grade Overview
+          </CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
+            Track your performance across all courses. The chart shows your
+            grades over time.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pl-0 sm:pl-2 px-2 sm:px-3 pb-3 sm:pb-4">
+          <Overview />
+        </CardContent>
+      </Card>
+      {/* Main content cards - Fully responsive layout with proper stacking */}
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:gap-6">
+        {/* First row on larger screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+          {/* Programming Skills */}
+          <Card className="w-full bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md">
+            <CardHeader className="px-3 sm:px-4 pt-3 sm:pt-4 pb-1 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base lg:text-lg text-[#74512D] dark:text-[#67C6E3]">
+                Programming Skills
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                Stay prepared for your next challenges. Click on an exam to see
+                more details or start a practice test.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <ProgrammingSkillsOverview />
+            </CardContent>
+          </Card>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-full lg:col-span-4 bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md ">
-          <CardHeader>
-            <CardTitle className="text-[#74512D] dark:text-[#67C6E3]">
-              Grade Overview
-            </CardTitle>
-            <CardDescription>
-              Track your performance across all courses. The chart shows your
-              grades over time.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <Overview />
-          </CardContent>
-        </Card>
-        <Card className="col-span-full md:col-span-1 lg:col-span-3 bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md">
-          <CardHeader>
-            <CardTitle className="text-[#74512D] dark:text-[#67C6E3]">
-              Upcoming Exams
-            </CardTitle>
-            <CardDescription>
-              Stay prepared for your next challenges. Click on an exam to see
-              more details or start a practice test.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <UpcomingExams />
-          </CardContent>
-        </Card>
-        <Card className="col-span-full bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md">
-          <CardHeader>
-            <CardTitle className="text-[#74512D] dark:text-[#67C6E3]">
-              Recent Activity
-            </CardTitle>
-            <CardDescription>
-              Keep track of your latest academic activities.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RecentActivity />
-          </CardContent>
-        </Card>
+          {/* Skills Metrics */}
+          <Card className="w-full bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md">
+            <CardHeader className="px-3 sm:px-4 pt-3 sm:pt-4 pb-1 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base lg:text-lg text-[#74512D] dark:text-[#67C6E3]">
+                Skills Metrics
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                Stay prepared for your next challenges. Click on an exam to see
+                more details or start a practice test.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <SkillsMetricsBreakdown />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Last row on larger screens */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 lg:gap-6">
+          {/* Upcoming Exams */}
+          <Card className="w-full bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md">
+            <CardHeader className="px-3 sm:px-4 pt-3 sm:pt-4 pb-1 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base lg:text-lg text-[#74512D] dark:text-[#67C6E3]">
+                Upcoming Exams
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                Stay prepared for your next challenges. Click on an exam to see
+                more details or start a practice test.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <UpcomingExams />
+            </CardContent>
+          </Card>
+
+          {/* Recent Activity - Full width on tablet down, half width on desktop */}
+          <Card className="w-full md:col-span-1 bg-[#E5E1DA] dark:bg-[#27374D] transition-all hover:shadow-md">
+            <CardHeader className="px-3 sm:px-4 pt-3 sm:pt-4 pb-1 sm:pb-2">
+              <CardTitle className="text-sm sm:text-base lg:text-lg text-[#74512D] dark:text-[#67C6E3]">
+                Recent Activity
+              </CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
+                Keep track of your latest academic activities.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
+              <RecentActivity />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

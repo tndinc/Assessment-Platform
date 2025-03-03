@@ -51,8 +51,81 @@ export default function FeedbackPage({
       setLoading(false);
       return;
     }
-    fetchQuestionsAndGrade();
-  }, [examId, userId, answers, submissionId]);
+
+    fetchExistingFeedback();
+
+    // Set up realtime subscription for updates to this specific feedback
+    const subscription = supabase
+      .channel("student_feedback_changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "student_feedback",
+          filter: `user_id=eq.${userId} AND exam_id=eq.${examId} AND submission_id=eq.${submissionId}`,
+        },
+        (payload) => {
+          console.log("Realtime update received:", payload);
+          // If we get an update, refresh the feedback data
+          fetchExistingFeedback();
+        }
+      )
+      .subscribe();
+
+    // Cleanup function to remove subscription when component unmounts
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  }, [examId, userId, submissionId]);
+
+  async function fetchExistingFeedback() {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Check if feedback already exists in the database
+      const { data: existingFeedback, error: feedbackError } = await supabase
+        .from("student_feedback")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("exam_id", examId)
+        .eq("submission_id", submissionId)
+        .single();
+
+      if (feedbackError && feedbackError.code !== "PGRST116") {
+        // PGRST116 is "no rows returned" - not an error for our purpose
+        console.error("Error fetching existing feedback:", feedbackError);
+        throw feedbackError;
+      }
+
+      // If feedback exists, use it
+      if (existingFeedback) {
+        console.log("Found existing feedback, using stored data");
+
+        // Parse the stored JSON data
+        const feedbackData = JSON.parse(existingFeedback.feedback_data || "[]");
+        const metricsData = JSON.parse(existingFeedback.metrics_data || "{}");
+
+        // Update state with the stored data
+        setFeedback(feedbackData);
+        setTotalScore(existingFeedback.total_score || 0);
+        setMaxPossibleScore(existingFeedback.max_score || 0);
+        setMetricsData(
+          Object.entries(metricsData).map(([name, data]) => ({ name, ...data }))
+        );
+        setLoading(false);
+      } else {
+        console.log("No existing feedback found, generating new feedback");
+        // No existing feedback, proceed with generating new feedback
+        fetchQuestionsAndGrade();
+      }
+    } catch (error) {
+      console.error("Error in fetchExistingFeedback:", error);
+      setError(error.message);
+      setLoading(false);
+    }
+  }
 
   async function fetchQuestionsAndGrade() {
     try {
@@ -117,10 +190,20 @@ export default function FeedbackPage({
       let maxScore = 0;
       const metricsScores = { ...initialMetrics };
 
+      // Create a map of questionId to answer for more efficient lookup
+      const answerMap = {};
+      answers.forEach((answer) => {
+        answerMap[answer.questionId] = answer;
+      });
+
+      // Log for debugging
+      console.log("Total questions to process:", questions.length);
+      console.log("Total answers available:", answers.length);
+
       // Process each question sequentially
       for (const question of questions) {
-        // Find the matching answer by questionId
-        const answer = answers.find((a) => a.questionId === question.id);
+        // Find the matching answer using our map instead of .find()
+        const answer = answerMap[question.id];
 
         // Debug log for troubleshooting
         console.log(
@@ -137,20 +220,24 @@ export default function FeedbackPage({
           llmFeedback: "No submission provided",
           syntaxAnalysis: "No code to analyze",
           pmdFeedback: "No code to analyze",
-          criteriaScores: {
-            "Code Correctness": 0,
-            "Input Handling": 0,
-            "Code Structure": 0,
-            "Logic Functionality": 0
+          criterionFeedback: {
+            "Code Structure": "Not evaluated",
+            Functionality: "Not evaluated",
+            "Best Practices": "Not evaluated",
           },
           overallFeedback:
             "No submission to evaluate\nSuggestions for Improvement: Please submit your code for evaluation.",
         };
 
         // Only grade if there's actual code to evaluate
-        let gradingResult = processedAnswer.code
-          ? await gradeJavaQuestion(question, processedAnswer)
-          : defaultFeedback;
+        let gradingResult;
+        if (processedAnswer.code && processedAnswer.code.trim()) {
+          gradingResult = await gradeJavaQuestion(question, processedAnswer);
+          console.log(`Completed grading for Q${question.id}`);
+        } else {
+          gradingResult = defaultFeedback;
+          console.log(`Skipped grading for Q${question.id} (no code)`);
+        }
 
         // Ensure we have all feedback fields
         gradingResult = {
@@ -189,9 +276,11 @@ export default function FeedbackPage({
         });
       }
 
+      console.log("All questions processed, saving feedback");
+
       // Save feedback to database
       try {
-        await supabase.from("student_feedback").upsert({
+        const { data, error } = await supabase.from("student_feedback").upsert({
           user_id: userId,
           exam_id: examId,
           submission_id: submissionId,
@@ -201,6 +290,10 @@ export default function FeedbackPage({
           metrics_data: JSON.stringify(metricsScores),
           created_at: new Date().toISOString(),
         });
+
+        if (error) throw error;
+
+        console.log("Feedback successfully saved to database");
       } catch (dbError) {
         console.error("Error saving feedback to database:", dbError);
         // Continue execution even if database save fails
@@ -227,9 +320,8 @@ export default function FeedbackPage({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          studentCode: answer.code,
           question: question.question_txt,
-          expectedAnswer: question.question_answer,
+          studentCode: answer.code,
         }),
       });
 
@@ -264,17 +356,9 @@ export default function FeedbackPage({
       ) {
         points = question.points;
       }
-      // If close implementation (similar logic/approach but with minor issues)
-      else if (
-        evaluation.llmFeedback.toLowerCase().includes("close") ||
-        evaluation.llmFeedback.toLowerCase().includes("almost correct") ||
-        evaluation.llmFeedback.toLowerCase().includes("partially correct")
-      ) {
-        points = Math.round(question.points * 0.7); // 70% of full points
-      }
       // If submission is Java code but not close to correct implementation
       else {
-        points = Math.round(question.points * 0.4); // 40% of full points for an attempt
+        points = 0; // No points for uncertain feedback
       }
 
       return {
@@ -323,22 +407,24 @@ export default function FeedbackPage({
   }
 
   return (
-    <div className="container mx-auto bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen dark:bg-[#344C64]">
-      <div className="bg-white/80 dark:bg-[#344C64] backdrop-blur-md rounded-2xl shadow-2xl">
-        <div className="p-8 border-4">
+    <div className="container mx-auto px-4 py-14 ">
+      <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden mb-8">
+        <div className="p-8">
           {/* Score Header Section */}
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 dark:text-[#67C6E3]">
                 Exam Feedback
               </h1>
-              <p className="text-gray-600 mt-1 dark:text-gray-300">
+              <p className="text-gray-600 mt-1 dark:text-gray-600">
                 Your performance analysis and personalized feedback
               </p>
             </div>
-            <div className="mt-4 md:mt-0 bg-gray-100 dark:bg-[#27374D] p-4 rounded-xl flex items-center">
+            <div className="mt-4 md:mt-0 bg-gray-100   dark:bg-[#27374D] p-4 rounded-xl flex items-center">
               <div className="mr-4">
-                <p className="text-gray-600 dark:text-gray-200 text-sm">Your Score</p>
+                <p className="text-gray-600  dark:text-gray-200 text-sm">
+                  Your Score
+                </p>
                 <p className="text-3xl font-bold text-blue-600 dark:text-[#37B7C3]">
                   {totalScore}/{maxPossibleScore}
                 </p>
@@ -365,7 +451,10 @@ export default function FeedbackPage({
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Award className="text-blue-600 dark:text-[#37B7C3]" size={24} />
+                  <Award
+                    className="text-blue-600 dark:text-[#37B7C3]"
+                    size={24}
+                  />
                 </div>
               </div>
             </div>
@@ -416,12 +505,35 @@ export default function FeedbackPage({
 
                 {feedback.map((item, index) => (
                   <TabsContent key={index} value={`${index + 1}`}>
+<<<<<<< HEAD
                       <div className="p-4 bg-blue-50 rounded-lg dark:bg-[#344C64]">
+=======
+                    <div className="space-y-6">
+>>>>>>> jv
                       {/* Question Score Card - Updated to show metrics */}
                       <div className="p-4 bg-blue-100 rounded-lg">
                         <div className="flex justify-between items-center mb-2">
                           <h4 className="font-semibold text-blue-800">
-                            Question {index + 1}
+                            Question {index + 1} -{" "}
+                            {item.metrics &&
+                              (Array.isArray(item.metrics)
+                                ? item.metrics
+                                : [item.metrics]
+                              ).map((metric, idx) => (
+                                <span
+                                  key={idx}
+                                  className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm ml-1"
+                                >
+                                  {metric}
+                                </span>
+                              ))}
+                            {(!item.metrics ||
+                              (Array.isArray(item.metrics) &&
+                                item.metrics.length === 0)) && (
+                              <span className="text-sm text-gray-500 italic">
+                                No metrics assigned
+                              </span>
+                            )}
                           </h4>
                           <div className="text-center px-3 py-1 bg-white rounded-lg shadow">
                             <span className="block text-xl font-bold text-blue-600">
@@ -435,34 +547,17 @@ export default function FeedbackPage({
                             </span>
                           </div>
                         </div>
-
-                        {/* Display metrics as badges */}
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {item.metrics &&
-                            (Array.isArray(item.metrics)
-                              ? item.metrics
-                              : [item.metrics]
-                            ).map((metric, idx) => (
-                              <span
-                                key={idx}
-                                className="px-3 py-1 bg-blue-200 text-blue-800 rounded-full text-sm"
-                              >
-                                {metric}
-                              </span>
-                            ))}
-                          {(!item.metrics ||
-                            (Array.isArray(item.metrics) &&
-                              item.metrics.length === 0)) && (
-                            <span className="text-sm text-gray-500 italic">
-                              No metrics assigned
-                            </span>
-                          )}
-                        </div>
                       </div>
 
+<<<<<<< HEAD
                       <div className="p-4 bg-blue-50 rounded-lg">
                         <h4 className="font-semibold">Question:</h4>
                         <p>{item.questionText}</p>
+=======
+                      <div className="p-4 bg-blue-50 dark:bg-[#4C6793] rounded-lg">
+                        <h4 className="font-semibold text-blue-800 dark:text-blue-200">Question:</h4>
+                        <p className="text-gray-800 dark:text-gray-200">{item.questionText}</p>
+>>>>>>> jv
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4 ">
@@ -509,17 +604,16 @@ export default function FeedbackPage({
 
                       <div className="p-4 bg-purple-50 dark:bg-[#6D5D6E] rounded-lg">
                         <h4 className="text-lg font-bold text-purple-400">
-                          🎓 Graded Criteria:
+                          ✅ Criterion-Based Feedback:
                         </h4>
                         <ul className="mt-2 list-disc pl-5">
-                          {Object.entries(item.criteriaScores || {}).map(
-                            ([criteria, score]) => (
+                          {Object.entries(item.criterionFeedback || {}).map(
+                            ([criteria, feedback]) => (
                               <li key={criteria}>
                                 <strong>
                                   {criteria.replace(/([A-Z])/g, " $1")}:
                                 </strong>{" "}
-                                {score}/5 {" "}
-                                {score >= 4 ? "✅" : "⚠️"}
+                                {feedback}
                               </li>
                             )
                           )}
@@ -527,22 +621,26 @@ export default function FeedbackPage({
                       </div>
 
                       {item.overallFeedback && (
-                      <div className="p-4 bg-gray-50 dark:bg-[#395B64] rounded-lg">
-                        <h4 className="mt-4 text-lg font-bold">📊 Overall Feedback:</h4>
-                        <ul className="list-none pl-0 text-gray-800 dark:text-white space-y-2">
-                          {item.overallFeedback &&
-                            typeof item.overallFeedback === "string" &&
-                            item.overallFeedback.split("\n").map((feedback, idx) => {
-                              if (feedback.includes("Overall Summary:")) {
-                                return (
-                                  <li key={idx} className="flex items-start gap-2 text-green-600">
-                                    ✅{" "}
+                        <div className="p-4 bg-gray-50 dark:bg-[#395B64] rounded-lg">
+                          <h4 className="mt-4 text-lg font-bold">
+                            📊 Overall Feedback:
+                          </h4>
+                          <ul className="list-none pl-0 text-gray-800 dark:text-white space-y-2">
+                            {item.overallFeedback
+                              .split("\n")
+                              .map((feedback, idx) => {
+                                if (feedback.includes("Overall Summary:")) {
+                                  return (
+                                    <li
+                                      key={idx}
+                                      className="flex items-start gap-2 text-green-600"
+                                    >
+                                      ✅{" "}
                                       <span>
                                         <strong>Overall Summary:</strong>{" "}
                                         {feedback
                                           .replace("Overall Summary:", "")
                                           .trim()}
-
                                       </span>
                                     </li>
                                   );
@@ -606,7 +704,10 @@ export default function FeedbackPage({
                                   );
                                 }
                                 return (
-                                  <li key={idx} className="text-gray-700 dark:text-gray-200">
+                                  <li
+                                    key={idx}
+                                    className="text-gray-700 dark:text-gray-200"
+                                  >
                                     {feedback}
                                   </li>
                                 );
