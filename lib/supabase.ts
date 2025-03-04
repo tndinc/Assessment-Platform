@@ -90,7 +90,7 @@ export type StudentFeedback = {
 
 // Data fetching functions
 export async function fetchProfiles() {
-  const { data, error } = await supabase.from("profiles").select("*")
+  const { data, error } = await supabase.from("synthetic_profiles").select("*")
 
   if (error) {
     console.error("Error fetching profiles:", error)
@@ -141,7 +141,7 @@ export async function fetchTotalExams() {
 }
 
 export async function fetchExamSubmissions() {
-  const { data, error } = await supabase.from("exam_submissions").select("*")
+  const { data, error } = await supabase.from("synthetic_submissions").select("*")
 
   if (error) {
     console.error("Error fetching exam submissions:", error)
@@ -163,7 +163,7 @@ export async function fetchCheatingLogs() {
 }
 
 export async function fetchStudentFeedback() {
-  const { data, error } = await supabase.from("student_feedback").select("*")
+  const { data, error } = await supabase.from("synthetic_feedback").select("*")
 
   if (error) {
     console.error("Error fetching student feedback:", error)
@@ -207,9 +207,9 @@ export async function fetchStudentPerformanceData() {
   const totalExams = await fetchTotalExams()
 
   // Fetch profiles, exam submissions, and student feedback
-  const { data: profiles, error: profilesError } = await supabase.from("profiles").select("*")
-  const { data: submissions, error: submissionsError } = await supabase.from("exam_submissions").select("*")
-  const { data: feedback, error: feedbackError } = await supabase.from("student_feedback").select("*")
+  const { data: profiles, error: profilesError } = await supabase.from("synthetic_profiles").select("*")
+  const { data: submissions, error: submissionsError } = await supabase.from("synthetic_submissions").select("*")
+  const { data: feedback, error: feedbackError } = await supabase.from("synthetic_feedback").select("*")
   
   if (profilesError || submissionsError || feedbackError) {
     console.error("Error fetching data:", { profilesError, submissionsError, feedbackError })
@@ -284,8 +284,8 @@ export async function fetchAnalyticsData() {
   console.log("Fetching analytics data...")
 
   const { data: exams, error: examsError } = await supabase.from("exam_tbl").select("*")
-  const { data: feedback, error: feedbackError } = await supabase.from("student_feedback").select("*")
-  const { data: profiles, error: profilesError } = await supabase.from("profiles").select("*")
+  const { data: feedback, error: feedbackError } = await supabase.from("synthetic_feedback").select("*")
+  const { data: profiles, error: profilesError } = await supabase.from("synthetic_profiles").select("*")
 
   if (examsError || feedbackError || profilesError) {
     console.error("Error fetching data:", { examsError, feedbackError, profilesError })
@@ -407,8 +407,8 @@ export async function fetchClassStatistics() {
   const supabase = createClientComponentClient()
   console.log("Fetching class statistics...")
 
-  const { data: profiles, error: profilesError } = await supabase.from("profiles").select("*")
-  const { data: feedback, error: feedbackError } = await supabase.from("student_feedback").select("*")
+  const { data: profiles, error: profilesError } = await supabase.from("synthetic_profiles").select("*")
+  const { data: feedback, error: feedbackError } = await supabase.from("synthetic_feedback").select("*")
 
   if (profilesError || feedbackError) {
     console.error("Error fetching data:", { profilesError, feedbackError })

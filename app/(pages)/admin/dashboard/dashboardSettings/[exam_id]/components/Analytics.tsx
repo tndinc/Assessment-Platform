@@ -124,7 +124,7 @@ const Analytics = ({ examId }: AnalyticsProps) => {
 
         // First, fetch exam submissions with their answers
         const { data: submissions, error: submissionsError } = await supabase
-          .from("exam_submissions")
+          .from("synthetic_submissions")
           .select(
             `
             submission_id,
@@ -134,7 +134,7 @@ const Analytics = ({ examId }: AnalyticsProps) => {
             time_spent,
             answers,
             status,
-            profiles!exam_submissions_user_id_fkey (
+            synthetic_profiles!synthetic_submissions_user_id_fkey (
               full_name,
               email,
               avatar_url
@@ -147,7 +147,7 @@ const Analytics = ({ examId }: AnalyticsProps) => {
 
         // Then fetch feedback data that matches these submissions
         const { data: feedbackData, error: feedbackError } = await supabase
-          .from("student_feedback")
+          .from("synthetic_feedback")
           .select(
             `
             id,
@@ -173,7 +173,7 @@ const Analytics = ({ examId }: AnalyticsProps) => {
         // Process the submissions with feedback data
         const processedSubmissions = submissions.map((sub) => ({
           ...sub,
-          full_name: sub.profiles?.full_name,
+          full_name: sub.synthetic_profiles?.full_name,
           answers: sub.answers, // Keep the answers from exam_submissions
           total_score: feedbackLookup[sub.submission_id]?.total_score || 0,
           max_score: feedbackLookup[sub.submission_id]?.max_score || 0,

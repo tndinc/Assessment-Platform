@@ -10,7 +10,7 @@ export async function fetchStudentPerformanceData() {
   try {
     // Fetch profiles with student feedback data
     const { data: profiles, error: profilesError } = await supabase
-      .from("profiles")
+      .from("synthetic_profiles")
       .select("id, full_name, email, avatar_url, user_section, status")
       .eq("status", "active")
 
@@ -18,7 +18,7 @@ export async function fetchStudentPerformanceData() {
 
     // Fetch student feedback data
     const { data: feedback, error: feedbackError } = await supabase
-      .from("student_feedback")
+      .from("synthetic__feedback")
       .select("user_id, total_score, max_score, feedback_data, metrics_data, created_at, submission_id")
 
     if (feedbackError) throw feedbackError
@@ -32,7 +32,7 @@ export async function fetchStudentPerformanceData() {
 
     // Fetch exam submissions
     const { data: examSubmissions, error: examSubmissionsError } = await supabase
-      .from("exam_submissions")
+      .from("synthetic__submissions")
       .select("user_id, exam_id, submission_date, time_spent, status")
 
     if (examSubmissionsError) throw examSubmissionsError
@@ -105,7 +105,7 @@ export async function fetchStudentDetails(studentId) {
   try {
     // Fetch profile data
     const { data: profile, error: profileError } = await supabase
-      .from("profiles")
+      .from("synthetic_profiles")
       .select("*")
       .eq("id", studentId)
       .single()
@@ -114,7 +114,7 @@ export async function fetchStudentDetails(studentId) {
 
     // Fetch student feedback
     const { data: feedback, error: feedbackError } = await supabase
-      .from("student_feedback")
+      .from("synthetic_feedback")
       .select(`
         id, 
         user_id, 
@@ -134,7 +134,7 @@ export async function fetchStudentDetails(studentId) {
 
     // Fetch exam submissions
     const { data: submissions, error: submissionsError } = await supabase
-      .from("exam_submissions")
+      .from("synthetic_submissions")
       .select(`
         submission_id, 
         user_id, 
