@@ -136,15 +136,17 @@ export function SkillsMetricsBreakdown() {
 
   if (metrics.length === 0) {
     return (
-      <div className="w-full p-8 bg-[#f5f1ea] flex items-center justify-center h-64 rounded-lg">
-        <p className="text-gray-600">No skills data available yet.</p>
+      <div className="w-full p-8 bg-[#f5f1ea] dark:bg-[#344C64] flex items-center justify-center h-64 rounded-lg">
+        <p className="text-gray-600 dark:text-gray-200">
+          No skills data available yet.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="w-full p-8 bg-[#f5f1ea] rounded-lg">
-      <h2 className="text-3xl font-bold mb-8 text-center text-[#5d4037]">
+    <div className="w-full p-8 bg-[#f5f1ea] dark:bg-[#344C64] rounded-lg">
+      <h2 className="text-3xl font-bold mb-8 text-center text-[#5d4037] dark:text-gray-200">
         Skill Breakdown
       </h2>
       <div className="flex flex-wrap justify-center gap-x-16 gap-y-8">
@@ -186,7 +188,7 @@ export function SkillsMetricsBreakdown() {
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <motion.span
-                  className="text-3xl font-bold"
+                  className="text-3xl dark:text-gray-200 font-bold"
                   style={{ color: metric.color }}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -195,7 +197,7 @@ export function SkillsMetricsBreakdown() {
                   {Math.round(metric.percentage)}%
                 </motion.span>
                 <motion.span
-                  className="text-sm text-gray-600"
+                  className="text-sm  text-gray-600 dark:text-gray-200"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.3 + 1.2 }}
@@ -206,7 +208,7 @@ export function SkillsMetricsBreakdown() {
             </div>
             {/* Skill Name Below Circle */}
             <motion.span
-              className="text-sm font-semibold text-gray-800 text-center max-w-[120px]"
+              className="text-sm font-semibold text-gray-800  dark:text-gray-200 text-center max-w-[120px]"
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.3 + 1.4 }}

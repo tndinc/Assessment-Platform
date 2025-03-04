@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@codemirror/lang-java": "^6.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.6",
     "@radix-ui/react-avatar": "^1.1.2",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -23,8 +24,11 @@
     "@radix-ui/react-tabs": "^1.1.1",
     "@radix-ui/react-toast": "^1.2.2",
     "@radix-ui/react-tooltip": "^1.1.6",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.4",
+    "@uiw/codemirror-theme-dracula": "^4.23.8",
+    "@uiw/react-codemirror": "^4.23.8",
     "alert": "^6.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -36,6 +40,7 @@
     "openai": "^4.76.1",
     "pdfjs-dist": "^4.10.38",
     "react": "^18",
+    "react-day-picker": "^9.5.1",
     "react-dom": "^18",
     "recharts": "^2.15.0",
     "shadcn": "^2.4.0-canary.9",

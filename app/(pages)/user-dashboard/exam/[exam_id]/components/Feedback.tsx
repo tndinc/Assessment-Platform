@@ -408,7 +408,7 @@ export default function FeedbackPage({
 
   return (
     <div className="container mx-auto px-4 py-14 ">
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden mb-8">
+      <div className="bg-white/80 dark:bg-[#27374D] backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden mb-8">
         <div className="p-8">
           {/* Score Header Section */}
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8">
@@ -416,11 +416,11 @@ export default function FeedbackPage({
               <h1 className="text-3xl font-bold text-gray-800 dark:text-[#67C6E3]">
                 Exam Feedback
               </h1>
-              <p className="text-gray-600 mt-1 dark:text-gray-300">
+              <p className="text-gray-600 mt-1 dark:text-gray-200">
                 Your performance analysis and personalized feedback
               </p>
             </div>
-            <div className="mt-4 md:mt-0 bg-gray-100   dark:bg-[#27374D] p-4 rounded-xl flex items-center">
+            <div className="mt-4 md:mt-0 bg-gray-100   dark:bg-[#344C64] p-4 rounded-xl flex items-center">
               <div className="mr-4">
                 <p className="text-gray-600  dark:text-gray-200 text-sm">
                   Your Score
@@ -461,7 +461,7 @@ export default function FeedbackPage({
           </div>
 
           {/* Metrics Chart */}
-          <div className="mb-8 p-6 bg-gray-50 dark:bg-[#27374D] rounded-xl">
+          <div className="mb-8 p-6 bg-gray-50 dark:bg-[#344C64] rounded-xl">
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
               Score Distribution
             </h2>
@@ -507,9 +507,9 @@ export default function FeedbackPage({
                   <TabsContent key={index} value={`${index + 1}`}>
                     <div className="space-y-6">
                       {/* Question Score Card - Updated to show metrics */}
-                      <div className="p-4 bg-blue-100 rounded-lg">
+                      <div className="p-4 bg-blue-100 dark:bg-[#344C64] rounded-lg">
                         <div className="flex justify-between items-center mb-2">
-                          <h4 className="font-semibold text-blue-800">
+                          <h4 className="font-semibold text-blue-800 dark:text-gray-200">
                             Question {index + 1} -{" "}
                             {item.metrics &&
                               (Array.isArray(item.metrics)
@@ -545,9 +545,13 @@ export default function FeedbackPage({
                         </div>
                       </div>
 
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <h4 className="font-semibold">Question:</h4>
-                        <p>{item.questionText}</p>
+                      <div className="p-4 bg-blue-50 dark:bg-[#4C6793] rounded-lg">
+                        <h4 className="font-semibold text-blue-800 dark:text-blue-200">
+                          Question:
+                        </h4>
+                        <p className="text-gray-800 dark:text-gray-200">
+                          {item.questionText}
+                        </p>
                       </div>
 
                       <div className="grid md:grid-cols-2 gap-4 ">

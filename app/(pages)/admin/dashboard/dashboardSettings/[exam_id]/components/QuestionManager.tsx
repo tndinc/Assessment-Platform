@@ -226,13 +226,13 @@ export default function QuestionManager({ examId }: { examId: number }) {
   }
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 flex-1 flex flex-col overflow-hidden">
+    <div className="bg-white  dark:bg-[#344C64] shadow-md rounded-lg p-4 sm:p-6 flex-1 flex flex-col overflow-hidden">
       <div className="flex justify-between items-center mb-4">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-800">
+          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
             {examDetails?.exam_title}
           </h2>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-200">
             Subject: {examDetails?.subject}
           </p>
         </div>
@@ -268,7 +268,7 @@ export default function QuestionManager({ examId }: { examId: number }) {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700  dark:text-gray-200 mb-1">
                   Question Type
                 </label>
                 <select
@@ -276,7 +276,7 @@ export default function QuestionManager({ examId }: { examId: number }) {
                   onChange={(e) =>
                     setNewQuestion({ ...newQuestion, type: e.target.value })
                   }
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="w-full rounded-md border border-input bg-background  dark:text-gray-200 px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   <option value="easy">Easy</option>
                   <option value="medium">Medium</option>
@@ -284,7 +284,7 @@ export default function QuestionManager({ examId }: { examId: number }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700  dark:text-gray-400 mb-1">
                   Question Format
                 </label>
                 <select
@@ -295,14 +295,14 @@ export default function QuestionManager({ examId }: { examId: number }) {
                       question_type: e.target.value,
                     })
                   }
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="w-full rounded-md border border-input bg-background  dark:text-gray-200px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   <option value="text">Text-based</option>
                   <option value="java">Java</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium  dark:text-gray-200 text-gray-700 mb-1">
                   Points
                 </label>
                 <Input
@@ -318,7 +318,7 @@ export default function QuestionManager({ examId }: { examId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   Question Text
                 </label>
                 <Textarea
@@ -334,7 +334,7 @@ export default function QuestionManager({ examId }: { examId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   Question Answer
                 </label>
                 <Textarea
@@ -350,7 +350,7 @@ export default function QuestionManager({ examId }: { examId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200  mb-1">
                   Initial Code
                 </label>
                 <Textarea
@@ -366,7 +366,7 @@ export default function QuestionManager({ examId }: { examId: number }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
                   Metrics
                 </label>
                 <select
@@ -374,7 +374,7 @@ export default function QuestionManager({ examId }: { examId: number }) {
                   onChange={(e) =>
                     setNewQuestion({ ...newQuestion, metrics: e.target.value })
                   }
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="w-full rounded-md border border-input bg-background dark:text-gray-200  px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
                   <option value="Fundamentals of Programming">
                     Fundamentals of programming
@@ -396,11 +396,13 @@ export default function QuestionManager({ examId }: { examId: number }) {
         {currentQuestions.map((question) => (
           <div
             key={question.id}
-            className="flex items-center justify-between bg-gray-50 p-4 rounded-md"
+            className="flex items-center justify-between bg-gray-50 dark:bg-[#27374D] p-4 rounded-md"
           >
             <div className="flex-1 mr-4">
-              <p className="text-gray-800">{question.question_txt}</p>
-              <div className="flex gap-4 mt-1 text-sm text-gray-500">
+              <p className="text-gray-800 dark:text-gray-200">
+                {question.question_txt}
+              </p>
+              <div className="flex gap-4 mt-1 text-sm text-gray-500 dark:text-gray-400 ">
                 <span>Type: {question.type}</span>
                 <span>Format: {question.question_type}</span>
                 <span>Points: {question.points}</span>

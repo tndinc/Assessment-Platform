@@ -125,7 +125,7 @@ export function ProgrammingSkillsOverview() {
 
   if (isLoading) {
     return (
-      <div className="w-full p-8 bg-[#f5f1ea] flex items-center justify-center h-64 rounded-lg">
+      <div className="w-full p-8 bg-[#f5f1ea] dark:bg-[#344C64] flex items-center justify-center h-64 rounded-lg">
         <p className="text-gray-600">Loading overall skills data...</p>
       </div>
     );
@@ -133,8 +133,8 @@ export function ProgrammingSkillsOverview() {
 
   if (!overallMetric) {
     return (
-      <div className="w-full p-8 bg-[#f5f1ea] flex items-center justify-center h-64 rounded-lg">
-        <p className="text-gray-600">
+      <div className="w-full p-8 bg-[#f5f1ea] dark:bg-[#344C64] flex items-center justify-center h-64 rounded-lg">
+        <p className="text-gray-600 dark:text-gray-200">
           No programming skills data available yet.
         </p>
       </div>
@@ -142,8 +142,8 @@ export function ProgrammingSkillsOverview() {
   }
 
   return (
-    <div className="w-full p-8 bg-[#f5f1ea] rounded-lg">
-      <h2 className="text-3xl font-bold mb-8 text-center text-[#5d4037]">
+    <div className="w-full p-8 bg-[#f5f1ea] dark:bg-[#344C64] rounded-lg">
+      <h2 className="text-3xl font-bold mb-8 text-center text-[#5d4037] dark:text-gray-200">
         Programming Proficiency
       </h2>
       <div className="flex flex-col items-center">
@@ -179,7 +179,7 @@ export function ProgrammingSkillsOverview() {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <motion.span
-              className="text-5xl font-bold"
+              className="text-5xl font-bold dark:text-gray-200"
               style={{ color: overallMetric.color }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -188,7 +188,7 @@ export function ProgrammingSkillsOverview() {
               {Math.round(overallMetric.percentage)}%
             </motion.span>
             <motion.span
-              className="text-lg text-gray-600 mt-2"
+              className="text-lg text-gray-600 mt-2 dark:text-gray-200"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 1.2 }}
@@ -199,7 +199,7 @@ export function ProgrammingSkillsOverview() {
         </div>
         {/* Skill Name Below Circle */}
         <motion.span
-          className="text-xl font-semibold text-gray-800 text-center max-w-[200px]"
+          className="text-xl font-semibold text-gray-800 dark:text-gray-200 text-center max-w-[200px] "
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 1.4 }}
