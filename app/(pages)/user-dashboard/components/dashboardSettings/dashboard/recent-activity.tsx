@@ -306,23 +306,26 @@ const ViewFeedbackButton = ({
           </TabsList>
 
           <TabsContent value="feedback">
-            <div className="whitespace-pre-wrap text-sm text-gray-800 max-h-96 overflow-y-auto space-y-6">
+            <div className="whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 max-h-96 overflow-y-auto space-y-6">
               {feedback.length > 0 ? (
                 feedback.map((feedbackItem: any, index: number) => (
-                  <div key={index} className="p-4 border rounded-lg bg-white">
+                  <div
+                    key={index}
+                    className="p-4 border rounded-lg bg-white dark:bg-[#344C64]"
+                  >
                     <div className="space-y-4">
                       <div>
                         <h3 className="font-medium text-base">
                           Question {index + 1}
                         </h3>
-                        <p className="text-gray-600">
+                        <p className="text-gray-600 dark:text-gray-200">
                           {feedbackItem.questionText}
                         </p>
                       </div>
 
-                      <div className="bg-gray-50 p-4 rounded-md">
+                      <div className="bg-gray-50 dark:bg-[#344C64] p-4 rounded-md">
                         <h4 className="font-medium mb-2">Your Answer:</h4>
-                        <pre className="bg-black text-white p-4 rounded-md overflow-x-auto">
+                        <pre className="bg-black text-white dark:text-gray-200 p-4 rounded-md overflow-x-auto">
                           <code>
                             {getAnswerForQuestion(feedbackItem.questionId)}
                           </code>
@@ -395,7 +398,7 @@ const ViewFeedbackButton = ({
                 <div className="mt-4">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="bg-gray-50">
+                      <tr className="bg-gray-50 dark:bg-[#344C64]">
                         <th className="text-left p-2">Concept</th>
                         <th className="text-right p-2">Score</th>
                         <th className="text-right p-2">Max Score</th>

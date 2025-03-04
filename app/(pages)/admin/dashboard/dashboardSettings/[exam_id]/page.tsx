@@ -46,18 +46,18 @@ export default function ManageExam() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
+    <main className="min-h-screen bg-gray-50 dark:bg-[#27374D] flex flex-col">
       <div className="flex-1 max-w-7xl w-full mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col">
         <div className="space-y-6">
           <div className="flex justify-between items-center">
-            <Button variant="ghost" onClick={handleBackToDashboard}>
+            <Button variant="bluelogin" onClick={handleBackToDashboard}>
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
             <Button
               variant="outline"
               onClick={toggleAnalytics}
-              className={showAnalytics ? "bg-gray-200" : ""}
+              className={showAnalytics ? "bg-gray-200 dark:bg-[#344C64] " : ""}
             >
               <BarChart className="mr-2 h-4 w-4" />
               Analytics

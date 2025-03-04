@@ -122,16 +122,16 @@ export function Overview() {
 
   if (isLoading) {
     return (
-      <div className="w-full p-8 bg-[#f5f1ea] flex items-center justify-center h-64 rounded-lg">
+      <div className="w-full p-8 bg-[#f5f1ea] dark:bg-[#344C64] flex items-center justify-center h-64 rounded-lg">
         <p className="text-gray-600">Loading exam data...</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full p-8 bg-[#f5f1ea] rounded-lg">
+    <div className="w-full p-8 bg-[#f5f1ea]  dark:bg-[#344C64] rounded-lg">
       <motion.h2
-        className="text-3xl font-bold mb-8 text-center text-[#5d4037]"
+        className="text-3xl font-bold mb-8 text-center text-[#5d4037] dark:text-gray-200"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
@@ -140,95 +140,95 @@ export function Overview() {
       </motion.h2>
 
       {chartData.length === 0 ? (
-  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-    No exam data available
-  </div>
-) : (
-  <motion.div
-    className="p-6 rounded-lg bg-white dark:bg-gray-800"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.8, delay: 0.3 }}
-  >
-    <ResponsiveContainer width="100%" height={400}>
-      <AreaChart
-        data={chartData}
-        margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-      >
-        <defs>
-          <linearGradient
-            id="totalScoreGradient"
-            x1="0"
-            y1="0"
-            x2="0"
-            y2="1"
-          >
-            <stop
-              offset="5%"
-              stopColor={gradientColor}
-              stopOpacity={0.8}
-            />
-            <stop
-              offset="95%"
-              stopColor={gradientColor}
-              stopOpacity={0.1}
-            />
-          </linearGradient>
-        </defs>
-        <CartesianGrid
-          strokeDasharray="3 3"
-          vertical={false}
-          opacity={0.2}
-        />
-        <XAxis
-          dataKey="name"
-          stroke="#888888"
-          fontSize={12}
-          tickLine={false}
-          axisLine={false}
-          angle={-45}
-          textAnchor="end"
-          height={60}
-        />
-        <YAxis
-          stroke="#888888"
-          fontSize={12}
-          tickLine={false}
-          axisLine={false}
-          tickFormatter={(value) => `${value}%`}
-          domain={[0, 100]}
-        />
-        <Tooltip content={<CustomTooltip />} />
-        <Area
-          type="monotone"
-          dataKey="totalScore"
-          stroke={gradientColor}
-          strokeWidth={3}
-          fillOpacity={1}
-          fill="url(#totalScoreGradient)"
-          activeDot={{
-            r: 8,
-            fill: gradientColor,
-            strokeWidth: 2,
-            stroke: "#fff",
-          }}
-        />
-      </AreaChart>
-    </ResponsiveContainer>
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          No exam data available
+        </div>
+      ) : (
+        <motion.div
+          className="p-6 rounded-lg bg-white dark:bg-gray-800"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          <ResponsiveContainer width="100%" height={400}>
+            <AreaChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            >
+              <defs>
+                <linearGradient
+                  id="totalScoreGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
+                  <stop
+                    offset="5%"
+                    stopColor={gradientColor}
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset="95%"
+                    stopColor={gradientColor}
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                opacity={0.2}
+              />
+              <XAxis
+                dataKey="name"
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                angle={-45}
+                textAnchor="end"
+                height={60}
+              />
+              <YAxis
+                stroke="#888888"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `${value}%`}
+                domain={[0, 100]}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Area
+                type="monotone"
+                dataKey="totalScore"
+                stroke={gradientColor}
+                strokeWidth={3}
+                fillOpacity={1}
+                fill="url(#totalScoreGradient)"
+                activeDot={{
+                  r: 8,
+                  fill: gradientColor,
+                  strokeWidth: 2,
+                  stroke: "#fff",
+                }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
 
-    <motion.div
-      className="mt-4 text-center text-gray-700 dark:text-gray-300"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 1 }}
-    >
-      <p className="text-sm">
-        {chartData.length} {chartData.length === 1 ? "exam" : "exams"}{" "}
-        completed
-      </p>
-    </motion.div>
-  </motion.div>
-)}
+          <motion.div
+            className="mt-4 text-center text-gray-700 dark:text-gray-300"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 1 }}
+          >
+            <p className="text-sm">
+              {chartData.length} {chartData.length === 1 ? "exam" : "exams"}{" "}
+              completed
+            </p>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   );
 }

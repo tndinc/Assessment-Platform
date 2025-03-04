@@ -270,7 +270,7 @@ const Analytics = ({ examId }: AnalyticsProps) => {
   };
 
   const renderParticipantList = () => (
-    <div className="grid grid-cols-1 gap-2">
+    <div className="grid grid-cols-1 gap-2 ">
       {analyticsData.submissions.map((submission) => {
         const userAverageScore =
           submission.max_score > 0
@@ -305,7 +305,7 @@ const Analytics = ({ examId }: AnalyticsProps) => {
         return (
           <div
             key={submission.user_id}
-            className="p-2 bg-gray-50 rounded-md flex justify-between items-center"
+            className="p-2 bg-gray-50 dark:bg-[#27374D] rounded-md flex justify-between items-center"
           >
             {/* Student Info */}
             <div>
@@ -351,22 +351,22 @@ const Analytics = ({ examId }: AnalyticsProps) => {
                           feedbackData.map((feedback, index) => (
                             <div
                               key={index}
-                              className="p-4 border rounded-lg bg-white"
+                              className="p-4 border rounded-lg bg-white dark:bg-[#27374D]"
                             >
                               <div className="space-y-4">
                                 {/* Question */}
                                 <div>
-                                  <h3 className="font-medium text-base">
+                                  <h3 className="font-medium text-base dark:text-gray-200">
                                     Question {index + 1}
                                   </h3>
-                                  <p className="text-gray-600">
+                                  <p className="text-gray-600 dark:text-gray-400">
                                     {feedback.questionText}
                                   </p>
                                 </div>
 
                                 {/* Student Answer */}
-                                <div className="bg-gray-50 p-4 rounded-md">
-                                  <h4 className="font-medium mb-2">
+                                <div className="bg-gray-50 dark:bg-[#344C64] p-4 rounded-md">
+                                  <h4 className="font-medium mb-2 dark:text-gray-200">
                                     Student's Answer:
                                   </h4>
                                   <pre className="bg-black text-white p-4 rounded-md overflow-x-auto">
@@ -457,7 +457,7 @@ const Analytics = ({ examId }: AnalyticsProps) => {
                           <div className="mt-4">
                             <table className="w-full text-sm">
                               <thead>
-                                <tr className="bg-gray-50">
+                                <tr className="bg-gray-50 dark:bg-[#27374D]">
                                   <th className="text-left p-2">Concept</th>
                                   <th className="text-right p-2">Score</th>
                                   <th className="text-right p-2">Max Score</th>
@@ -699,27 +699,33 @@ const Analytics = ({ examId }: AnalyticsProps) => {
               {analyticsData.cheatingStats.map((stat) => (
                 <div
                   key={stat.id}
-                  className="p-4 bg-gray-50 rounded-md border-l-4 border-amber-500"
+                  className="p-4 bg-gray-50 dark:bg-[#27374D] rounded-md border-l-4 border-amber-500"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-medium">{stat.full_name}</span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-200">
                       {new Date(stat.timestamp).toLocaleString()}
                     </span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-600">Copy Percentage:</p>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Copy Percentage:
+                      </p>
                       <p className="font-semibold">{stat.copy_percentage}%</p>
                     </div>
                     <div>
-                      <p className="text-gray-600">Time Away:</p>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Time Away:
+                      </p>
                       <p className="font-semibold">
                         {stat.time_spent_away} seconds
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600">Risk Level:</p>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        Risk Level:
+                      </p>
                       <p className="font-semibold">{stat.cheat_risk_level}</p>
                     </div>
                   </div>

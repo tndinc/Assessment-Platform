@@ -19,6 +19,7 @@ interface Question {
   exam_id: number;
   points: number;
   type: string;
+  metrics: string;
   question_type: "text" | "java";
   initial_code?: string;
 }
@@ -591,7 +592,7 @@ export default function QuizPage() {
               <div className="p-8 dark:bg-[#344C64]">
                 <div className="flex justify-between items-center mb-6">
                   <motion.h1
-                    className="text-3xl font-bold text-gray-800"
+                    className="text-3xl font-bold text-gray-800 dark:text-gray-200"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
@@ -652,6 +653,9 @@ export default function QuizPage() {
                         Question {currentQuestion + 1} of {questions.length}
                       </span>
                       <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium text-white px-2 py-1 rounded-full bg-blue-500">
+                          {questions[currentQuestion].metrics}
+                        </span>
                         <span className="text-sm font-medium text-white px-2 py-1 rounded-full bg-blue-500">
                           Points: {questions[currentQuestion].points}
                         </span>
