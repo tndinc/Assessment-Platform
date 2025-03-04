@@ -134,7 +134,7 @@ export function ProgrammingSkillsOverview() {
   if (!overallMetric) {
     return (
       <div className="w-full p-8 bg-[#f5f1ea] dark:bg-[#344C64] flex items-center justify-center h-64 rounded-lg">
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-200">
           No programming skills data available yet.
         </p>
       </div>

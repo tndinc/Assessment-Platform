@@ -199,8 +199,8 @@ export function DashboardContent() {
                 Programming Skills
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                Stay prepared for your next challenges. Click on an exam to see
-                more details or start a practice test.
+                Monitor your programming proficiency and identify areas for
+                improvement.
               </CardDescription>
             </CardHeader>
             <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
@@ -215,8 +215,8 @@ export function DashboardContent() {
                 Skills Metrics
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
-                Stay prepared for your next challenges. Click on an exam to see
-                more details or start a practice test.
+                Enhance your skills with targeted practice. Explore exams to
+                gain insights and improve your performance.
               </CardDescription>
             </CardHeader>
             <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">
@@ -235,7 +235,7 @@ export function DashboardContent() {
               </CardTitle>
               <CardDescription className="text-xs sm:text-sm">
                 Stay prepared for your next challenges. Click on an exam to see
-                more details or start a practice test.
+                more details.
               </CardDescription>
             </CardHeader>
             <CardContent className="px-3 sm:px-4 pb-3 sm:pb-4">

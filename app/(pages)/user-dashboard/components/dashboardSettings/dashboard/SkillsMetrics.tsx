@@ -136,8 +136,10 @@ export function SkillsMetricsBreakdown() {
 
   if (metrics.length === 0) {
     return (
-      <div className="w-full p-8 bg-[#f5f1ea] flex items-center justify-center h-64 rounded-lg">
-        <p className="text-gray-600">No skills data available yet.</p>
+      <div className="w-full p-8 bg-[#f5f1ea] dark:bg-[#344C64] flex items-center justify-center h-64 rounded-lg">
+        <p className="text-gray-600 dark:text-gray-200">
+          No skills data available yet.
+        </p>
       </div>
     );
   }
