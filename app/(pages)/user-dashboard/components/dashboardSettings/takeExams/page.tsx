@@ -107,10 +107,15 @@ const ManageExams = () => {
           ]) || []
         );
 
-        // Filter out exams that the user has already completed (has feedback for)
+        // Filter out exams that:
+        // 1. The user has already completed (has feedback for)
+        // 2. Exams with status not equal to "open"
         // And mark the ones that are in progress
         const availableExams = allExams
-          .filter((exam) => !feedbackExamIds.has(exam.exam_id))
+          .filter(
+            (exam) =>
+              !feedbackExamIds.has(exam.exam_id) && exam.status === "open"
+          )
           .map((exam) => ({
             ...exam,
             isInProgress: inProgressExams.has(exam.exam_id),
@@ -240,7 +245,7 @@ const ManageExams = () => {
       ) : (
         <div className="text-center p-8">
           <p className="text-lg text-gray-600 dark:text-gray-300">
-            You have completed all available exams.
+            No open exams available or you have completed all available exams.
           </p>
         </div>
       )}

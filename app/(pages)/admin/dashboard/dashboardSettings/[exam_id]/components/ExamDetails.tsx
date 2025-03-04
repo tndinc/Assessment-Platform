@@ -209,9 +209,9 @@ export default function ExamDetails({ examId }: { examId: number }) {
             onChange={(e) => setExam({ ...exam, status: e.target.value })}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <option value="Draft">Draft</option>
-            <option value="Published">Published</option>
-            <option value="Closed">Closed</option>
+            <option value="open">Open</option>
+
+            <option value="close">Closed</option>
           </select>
         </div>
         <div>
