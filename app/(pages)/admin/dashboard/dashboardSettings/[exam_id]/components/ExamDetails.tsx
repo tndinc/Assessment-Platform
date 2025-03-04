@@ -95,15 +95,15 @@ export default function ExamDetails({ examId }: { examId: number }) {
   }
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 sm:p-6 flex-1 lg:w-2/5 overflow-auto">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+    <div className="bg-white dark:bg-[#344C64] shadow-md rounded-lg p-4 sm:p-6 flex-1 lg:w-2/5 overflow-auto">
+      <h2 className="text-2xl font-semibold text-gray-800  dark:text-gray-200 mb-4">
         Exam Details
       </h2>
       <div className="grid grid-cols-1 gap-4">
         <div>
           <label
             htmlFor="title"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-200  mb-1"
           >
             Exam Title
           </label>
@@ -117,7 +117,7 @@ export default function ExamDetails({ examId }: { examId: number }) {
         <div>
           <label
             htmlFor="subject"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700  dark:text-gray-200 mb-1"
           >
             Subject
           </label>
@@ -131,7 +131,7 @@ export default function ExamDetails({ examId }: { examId: number }) {
         <div>
           <label
             htmlFor="timeLimit"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Time Limit (minutes)
           </label>
@@ -151,7 +151,7 @@ export default function ExamDetails({ examId }: { examId: number }) {
         <div>
           <label
             htmlFor="points"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Total Points
           </label>
@@ -168,7 +168,7 @@ export default function ExamDetails({ examId }: { examId: number }) {
         <div>
           <label
             htmlFor="createdBy"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700  dark:text-gray-200 mb-1"
           >
             Created By
           </label>
@@ -184,7 +184,7 @@ export default function ExamDetails({ examId }: { examId: number }) {
         <div>
           <label
             htmlFor="deadline"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Deadline
           </label>
@@ -199,7 +199,7 @@ export default function ExamDetails({ examId }: { examId: number }) {
         <div>
           <label
             htmlFor="status"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-200  mb-1"
           >
             Status
           </label>
@@ -207,7 +207,7 @@ export default function ExamDetails({ examId }: { examId: number }) {
             id="status"
             value={exam.status}
             onChange={(e) => setExam({ ...exam, status: e.target.value })}
-            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="w-full rounded-md border border-input bg-background dark:bg-[#344C64] px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <option value="open">Open</option>
 
@@ -217,7 +217,7 @@ export default function ExamDetails({ examId }: { examId: number }) {
         <div>
           <label
             htmlFor="description"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
           >
             Exam Description
           </label>
