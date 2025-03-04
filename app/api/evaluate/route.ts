@@ -94,7 +94,7 @@ async function generateLLMFeedback(
         { role: "system", content: "Evaluate the Java code. Start the response with 'Correct' or 'Incorrect', then provide an explanation." },
         { role: "user", content: `Question: ${question}\nStudent Code:\n${code}` }
       ],
-      max_tokens: 300
+      max_tokens: 600
     });
 
     feedback = fineTunedResponse.choices[0]?.message?.content || "Unable to generate feedback.";
@@ -122,7 +122,7 @@ async function generateLLMFeedback(
           { role: "system", content: "Evaluate the Java code. Start the response with 'Correct' or 'Incorrect', then provide an explanation." },
           { role: "user", content: `Question: ${question}\nStudent Code:\n${code}` }
         ],
-        max_tokens: 300
+        max_tokens: 600
       });
 
       feedback = gpt4Response.choices[0]?.message?.content || "Unable to generate feedback.";
@@ -246,7 +246,7 @@ export async function POST(req: NextRequest) {
             content: `Evaluation Results:\n${evaluationSummary}`
           }
         ],
-        max_tokens: 400
+        max_tokens: 600
       });
 
       overallFeedback = overallResponse.choices[0]?.message?.content || 
