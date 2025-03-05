@@ -562,7 +562,7 @@ export default function FeedbackPage({
                           </pre>
                         </div>
                         <div className="p-4 bg-gray-50 rounded-lg dark:bg-[#344C64]">
-                          <h4 className="font-semibold">Expected Answer:</h4>
+                          <h4 className="font-semibold">Possible Answer:</h4>
                           <pre className="mt-2 whitespace-pre-wrap">
                             {item.correctAnswer}
                           </pre>
